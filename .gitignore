@@ -1,0 +1,14 @@
+.DS_Store
+Thumbs.db
+*.log
+_probe.mp3
+tmp_*.json
+search_gauss.json
+dump_out.txt
+_scan.js
+_dump.js
+_find.js
+_inject_ex.js
+node_modules/
+.vscode/
+.idea/

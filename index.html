@@ -1,0 +1,2273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>四年级奥数 · 每日30分钟闯关 · 数学指挥部</title>
+  <style>
+    :root {
+      --bg-deep: #1a2e1a;
+      --bg-mid: #2d4a2d;
+      --card: #2d2d2d;
+      --border: #8B7355;
+      --accent: #FF6A00;
+      --text: #e0e0e0;
+      --muted: #9a9a9a;
+      --btn: #4a7a4a;
+      --btn-hover: #5c9a5c;
+      --danger: #c44;
+      --ok: #5c9a5c;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+      color: var(--text);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+      background:
+        repeating-linear-gradient(
+          -45deg,
+          transparent,
+          transparent 8px,
+          rgba(0, 0, 0, 0.06) 8px,
+          rgba(0, 0, 0, 0.06) 16px
+        ),
+        repeating-linear-gradient(
+          45deg,
+          transparent,
+          transparent 12px,
+          rgba(255, 255, 255, 0.02) 12px,
+          rgba(255, 255, 255, 0.02) 24px
+        ),
+        radial-gradient(ellipse at 20% 20%, #3a5a3a 0%, transparent 50%),
+        linear-gradient(160deg, var(--bg-deep) 0%, var(--bg-mid) 45%, #1f351f 100%);
+      background-attachment: fixed;
+    }
+
+    .status-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 20px;
+      background: rgba(10, 18, 10, 0.82);
+      border-bottom: 2px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(6px);
+    }
+
+    .status-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .status-title {
+      font-size: 1.05rem;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .encourage {
+      font-size: 0.9rem;
+      color: #ffd08a;
+    }
+
+    .status-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      min-width: 200px;
+    }
+
+    .rank-line {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .score-line {
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    .rank-bar {
+      width: 220px;
+      max-width: 100%;
+      height: 10px;
+      background: #1a1a1a;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .rank-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #4a7a4a, var(--accent));
+      transition: width 0.4s ease;
+    }
+
+    .timer-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .source-tag {
+      display: inline-block;
+      margin: 0 0 10px;
+      padding: 4px 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #ffd08a;
+      border: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.35);
+    }
+
+    .video-meta {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin: 0 0 8px;
+    }
+
+    .welcome-banner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding: 12px 16px;
+      background: rgba(0, 0, 0, 0.35);
+      border-left: 4px solid var(--accent);
+      color: #ffd08a;
+    }
+
+    .welcome-banner[hidden] {
+      display: none !important;
+    }
+
+    .day-switch {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .day-switch select, .day-switch button {
+      font-size: 0.85rem;
+      padding: 6px 8px;
+      background: #1a1a1a;
+      color: var(--text);
+      border: 1px solid var(--border);
+      font-family: inherit;
+    }
+    .day-switch button {
+      cursor: pointer;
+      background: #3a3a3a;
+    }
+
+    .mute-btn {
+      font-size: 0.9rem;
+      padding: 8px 12px;
+    }
+
+    .timer-display {
+      font-variant-numeric: tabular-nums;
+      font-size: 1.25rem;
+      color: var(--accent);
+      min-width: 4.5em;
+    }
+
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 20px 16px 48px;
+    }
+
+    .mission-card {
+      background: var(--card);
+      border: 2px solid var(--border);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.06),
+        0 8px 24px rgba(0, 0, 0, 0.45);
+      padding: 20px 22px 24px;
+      position: relative;
+    }
+
+    .mission-card::before {
+      content: "";
+      position: absolute;
+      inset: 4px;
+      border: 1px solid rgba(139, 115, 85, 0.35);
+      pointer-events: none;
+    }
+
+    .mission-title {
+      margin: 0 0 4px;
+      font-size: 1.55rem;
+      color: var(--accent);
+      text-shadow: 0 0 12px rgba(255, 106, 0, 0.35), 0 2px 4px rgba(0, 0, 0, 0.9);
+    }
+
+    .mission-sub {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .briefing {
+      margin: 0 0 16px;
+      padding: 10px 12px;
+      background: rgba(74, 122, 74, 0.2);
+      border: 1px dashed var(--border);
+      line-height: 1.5;
+    }
+
+    .btn {
+      appearance: none;
+      border: 2px solid #6b8f6b;
+      background: linear-gradient(180deg, #5a8a5a 0%, var(--btn) 100%);
+      color: #f5f5f5;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 12px 18px;
+      cursor: pointer;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 3px 0 #2a4a2a;
+      transition: background 0.15s, transform 0.08s;
+      font-family: inherit;
+    }
+
+    .btn:hover {
+      background: linear-gradient(180deg, #6aaa6a 0%, var(--btn-hover) 100%);
+    }
+
+    .btn:active {
+      transform: translateY(2px);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 0 #2a4a2a;
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-orange {
+      background: linear-gradient(180deg, #ff8a33 0%, var(--accent) 100%);
+      border-color: #ffb366;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 3px 0 #a34500;
+    }
+
+    .btn-orange:hover {
+      background: linear-gradient(180deg, #ff9a4d 0%, #ff7a1a 100%);
+    }
+
+    .btn-ghost {
+      background: #3a3a3a;
+      border-color: var(--border);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 3px 0 #1a1a1a;
+    }
+
+    .btn-ghost:hover {
+      background: #4a4a4a;
+    }
+
+    .video-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .scouted-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .scouted-label input {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--accent);
+    }
+
+    .question {
+      margin-top: 16px;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.28);
+      border: 1px solid #555;
+    }
+
+    .question.core {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(255, 106, 0, 0.25);
+    }
+
+    .q-badge {
+      display: inline-block;
+      margin-bottom: 8px;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .q-text {
+      margin: 0 0 12px;
+      line-height: 1.6;
+      font-size: 1.08rem;
+    }
+
+    .answer-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .answer-input {
+      flex: 1 1 160px;
+      min-width: 140px;
+      max-width: 280px;
+      padding: 12px 14px;
+      font-size: 1.15rem;
+      background: #1a1a1a;
+      border: 2px solid var(--border);
+      color: var(--text);
+      font-family: inherit;
+      text-shadow: none;
+    }
+
+    .answer-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .answer-input:disabled {
+      opacity: 0.7;
+    }
+
+    .feedback {
+      min-height: 1.4em;
+      margin: 6px 0 0;
+      font-weight: 700;
+    }
+
+    .feedback.ok { color: #7dffa0; }
+    .feedback.bad { color: #ff8a8a; }
+    .feedback.done { color: #7dffa0; }
+
+    .rest-box, .review-empty, .empty-box {
+      text-align: center;
+      padding: 36px 16px;
+      font-size: 1.15rem;
+      line-height: 1.7;
+    }
+
+    .review-meta {
+      margin-bottom: 12px;
+      color: #ffd08a;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .overlay.show { display: flex; }
+
+    .overlay-panel {
+      background: var(--card);
+      border: 3px solid var(--accent);
+      padding: 28px 24px;
+      max-width: 420px;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .overlay-panel h2 {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: 1.4rem;
+    }
+
+    #confetti-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .timer-alert {
+      margin-top: 12px;
+      padding: 10px 12px;
+      background: rgba(255, 106, 0, 0.15);
+      border: 1px solid var(--accent);
+      display: none;
+    }
+
+    .timer-alert.show { display: block; }
+
+    /* 长官讲解战术板 */
+    .brief-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+      z-index: 1100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .brief-overlay.show { display: flex; }
+    .brief-panel {
+      width: min(640px, 100%);
+      max-height: 92vh;
+      overflow: auto;
+      background: #242424;
+      border: 3px solid var(--accent);
+      box-shadow: 0 0 0 1px #8B7355 inset, 0 12px 40px rgba(0,0,0,0.6);
+      padding: 18px 18px 16px;
+    }
+    .brief-panel h2 {
+      margin: 0 0 8px;
+      color: var(--accent);
+      font-size: 1.25rem;
+    }
+    .brief-stage {
+      min-height: 160px;
+      margin: 10px 0 14px;
+      padding: 14px;
+      background: #1a1a1a;
+      border: 1px solid var(--border);
+      position: relative;
+    }
+    .brief-formulas {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .brief-formulas li {
+      opacity: 0.25;
+      transform: translateX(-8px);
+      transition: opacity 0.35s, transform 0.35s, background 0.35s;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      border-left: 3px solid transparent;
+      font-size: 1.05rem;
+      font-variant-numeric: tabular-nums;
+      background: transparent;
+    }
+    .brief-formulas li.show {
+      opacity: 1;
+      transform: none;
+      border-left-color: var(--accent);
+      background: rgba(255, 106, 0, 0.08);
+    }
+    .brief-formulas li.active {
+      opacity: 1;
+      border-left-color: #7dffa0;
+      background: rgba(92, 154, 92, 0.18);
+      box-shadow: 0 0 12px rgba(125, 255, 160, 0.15);
+    }
+    .brief-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    .bar-label {
+      width: 5.5em;
+      flex-shrink: 0;
+      font-size: 0.9rem;
+      color: #ffd08a;
+    }
+    .bar-track {
+      flex: 1;
+      height: 28px;
+      background: #111;
+      border: 1px solid #555;
+      position: relative;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #4a7a4a, #6aaa6a);
+      transition: width 0.7s ease;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+    .bar-fill.more { background: linear-gradient(90deg, #a34500, var(--accent)); }
+    .seg-row {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      margin: 12px 0;
+      align-items: flex-end;
+    }
+    .seg {
+      width: 36px;
+      height: 36px;
+      border: 2px solid var(--border);
+      background: #333;
+      opacity: 0;
+      transform: scale(0.6);
+      transition: opacity 0.35s, transform 0.35s, background 0.35s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .seg.show { opacity: 1; transform: scale(1); }
+    .seg.hi { background: var(--accent); border-color: #ffb366; color: #111; }
+    .tree-line {
+      position: relative;
+      height: 48px;
+      margin: 28px 8px 8px;
+      border-bottom: 3px solid #8B7355;
+    }
+    .tree-dot {
+      position: absolute;
+      bottom: -7px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #555;
+      border: 2px solid #aaa;
+      transform: scale(0);
+      transition: transform 0.3s ease, background 0.3s;
+    }
+    .tree-dot.show { transform: scale(1); background: var(--accent); border-color: #ffd08a; }
+    .tree-dot.ghost { background: transparent; border-style: dashed; opacity: 0.5; }
+    .brief-caption {
+      color: #ffd08a;
+      min-height: 1.4em;
+      margin: 0 0 8px;
+      font-size: 0.95rem;
+    }
+    .eq-box {
+      text-align: center;
+      font-size: 1.35rem;
+      color: var(--accent);
+      padding: 16px;
+      letter-spacing: 0.04em;
+    }
+    .eq-box .pop {
+      display: inline-block;
+      animation: popIn 0.45s ease;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.7); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    @media (max-width: 600px) {
+      .mission-title { font-size: 1.25rem; }
+      .status-right { align-items: flex-start; width: 100%; }
+      .rank-bar { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header class="status-bar">
+    <div class="status-left">
+      <div class="status-title">📡 数学指挥部 · 今日任务</div>
+      <div class="encourage" id="encourageText"></div>
+      <div class="timer-wrap">
+        <button type="button" class="btn btn-orange" id="timerBtn">⏱️ 开始行动</button>
+        <span class="timer-display" id="timerDisplay">30:00</span>
+      </div>
+      <div class="timer-alert" id="timerAlert">⏰ 时间到！今日任务完成，撤退休整！</div>
+      <div class="day-switch" title="家长调试：切换模拟日期预览课程">
+        <span>📅 战役日历</span>
+        <select id="simDateSelect"></select>
+        <button type="button" id="simDateApply">切换日</button>
+        <button type="button" id="simDateReset">回到今天</button>
+      </div>
+    </div>
+    <div class="status-right">
+      <div class="rank-line" id="rankLabel">🎖️ 列兵</div>
+      <div class="score-line" id="scoreLabel">战果：0/3</div>
+      <div class="rank-bar" title="军衔进度">
+        <div class="rank-bar-fill" id="rankBarFill"></div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="welcome-banner" id="welcomeBanner" hidden>
+      <span id="welcomeText"></span>
+      <button type="button" class="btn btn-orange" id="receiveCommBtn">🎙️ 接收长官通讯</button>
+      <button type="button" class="btn btn-ghost mute-btn" id="muteBtn" title="开关背景音乐">🔊 音效开</button>
+    </div>
+    <section class="mission-card" id="missionRoot"></section>
+  </main>
+
+  <audio id="bgmAudio" src="lemonmusicstudio-the-destroyer-109436.mp3" preload="auto" loop></audio>
+
+  <div class="overlay" id="clearOverlay" role="dialog" aria-modal="true">
+    <canvas id="confetti-canvas"></canvas>
+    <div class="overlay-panel">
+      <h2>🎉 今日通关！</h2>
+      <p>你已获得【今日数学之星】称号！</p>
+      <button type="button" class="btn btn-orange" id="closeOverlayBtn">继续指挥</button>
+    </div>
+  </div>
+
+  <div class="brief-overlay" id="briefOverlay" role="dialog" aria-modal="true" aria-labelledby="briefTitle">
+    <div class="brief-panel">
+      <h2 id="briefTitle">📢 长官战术讲解</h2>
+      <p class="brief-caption" id="briefCaption">正在接通战术频道……</p>
+      <div class="brief-stage" id="briefStage"></div>
+      <ol class="brief-formulas" id="briefFormulas"></ol>
+      <div class="brief-actions">
+        <button type="button" class="btn btn-orange" id="briefReplayBtn">🔄 再讲一遍</button>
+        <button type="button" class="btn btn-ghost" id="briefCloseBtn">收到，关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const START_DATE = new Date(2026, 8, 1);
+    const STORAGE_KEY = "redAlert_progress";
+    const MAX_RANK_SCORE = 74;
+
+    const RANKS = [
+      { name: "列兵", need: 0 },
+      { name: "上等兵", need: 3 },
+      { name: "下士", need: 6 },
+      { name: "中士", need: 10 },
+      { name: "上士", need: 14 },
+      { name: "准尉", need: 18 },
+      { name: "少尉", need: 23 },
+      { name: "中尉", need: 28 },
+      { name: "上尉", need: 34 },
+      { name: "少校", need: 40 },
+      { name: "中校", need: 47 },
+      { name: "上校", need: 55 },
+      { name: "大校", need: 64 },
+      { name: "少将", need: 74 }
+    ];
+
+    const PROMOTE_SPEECH = {
+      1: "晋升上等兵！你已经开始发光了。",
+      2: "下士！干得漂亮，继续前进。",
+      3: "中士！你已经能带领小队了。",
+      4: "上士！离军官只有一步之遥，别停下。",
+      5: "准尉！你已经有了军官的气质。",
+      6: "少尉！这是你的第一颗星，记住这一刻。",
+      7: "中尉！两颗星了，继续闪耀。",
+      8: "上尉！三颗星，指挥官的料。",
+      9: "少校！跨入校官行列，恭喜你。",
+      10: "中校！威信在增长。",
+      11: "上校！你是战场的主宰。",
+      12: "大校！四颗星，将军在向你招手。",
+      13: "少将！！将军！全体敬礼！"
+    };
+
+    /* 做对：长官短评（语音） */
+    const HIT_SPEECH = [
+      "干得漂亮，士兵！继续保持。",
+      "命中目标！你是个好苗子。",
+      "漂亮！我已经看到你身上的将军潜质了。",
+      "完美！这一仗打得漂亮，我为你骄傲。"
+    ];
+
+    /* 每日归队：简短点名（语音 + 文字条） */
+    const WELCOME_SPEECH = [
+      "士兵，欢迎归队！今天的目标是拿下这个据点。",
+      "看到你来了，我就放心了。开始行动吧。",
+      "战场已经准备好，就差你了，指挥官。",
+      "别让敌人觉得你好欺负，让他们见识你的厉害！"
+    ];
+
+    /* 做错：战术提醒 + 上司鼓励（更适合语音，不宜只当标题标语） */
+    const MISS_SPEECH = [
+      "目标丢失，别灰心，重新瞄准！",
+      "记住，真正的战士不是不失败，而是失败后依然冲锋。",
+      "一次失手不算什么，站起来，再给敌人一炮！",
+      "冷静，士兵。看清题意，我们还能赢。"
+    ];
+
+    /* 顶部氛围标语：短、带符号，只显示文字，不播语音 */
+    const ENCOURAGE_LINES = [
+      "🏆 今天的目标：全歼敌人！",
+      "⭐ 数学小战士，准备出击！",
+      "🚀 你的大脑正在升级武器系统……",
+      "💪 每一道题都是你的一枚勋章。",
+      "🎯 瞄准目标，一击必中！",
+      "🌈 你不是在解题，你是在征服领地。"
+    ];
+
+    /* 一三五=高斯短片；二四=超级课堂故事主线 */
+    const courses = [
+      {
+        week: 1, day: 1,
+        name: { redAlert: "🏗️ 基地资源分配", original: "和差入门" },
+        videoSource: "gauss",
+        videoLabel: "零食短片 · 高斯",
+        videoTitle: "3205 和差问题",
+        videoDuration: "1:58",
+        videoUrl: "https://www.bilibili.com/video/BV1Es4y177LY?p=25",
+        videoType: "short",
+        questions: [
+          { q: "基地有动员兵和工程师共20人，动员兵比工程师多4人。动员兵有多少人？", answer: 12, hint: "总人数减去多出的人数，再平分，就是工程师的数量。动员兵就是工程师加4。", ex: { t: "sd", A: "动员兵", B: "工程师", S: 20, D: 4, want: "A" } },
+          { q: "建造战车工厂和雷达站共花费30万资金，战车工厂比雷达站多花6万。雷达站花了多少万？", answer: 12, hint: "总花费减去多出的部分，再除以2，就是少的那一项。", ex: { t: "sd", A: "战车工厂", B: "雷达站", S: 30, D: 6, want: "B" } },
+          { q: "基地的采矿车和运兵车共50辆，采矿车比运兵车多10辆。运兵车有多少辆？", answer: 20, hint: "总数减差，平分得小数。", ex: { t: "sd", A: "采矿车", B: "运兵车", S: 50, D: 10, want: "B" } },
+          { q: "两个油井共产油80桶，第一口井比第二口井多产8桶。两口井各产多少桶？", answer: "44,36", hint: "先求第二口井：（80-8）÷2=36，第一口：36+8=44。", ex: { t: "sd", A: "第一口井", B: "第二口井", S: 80, D: 8, want: "both" } }
+        ]
+      },
+      {
+        week: 1, day: 2,
+        name: { redAlert: "🔬 科技研发投入", original: "和差巩固" },
+        videoSource: "super",
+        videoLabel: "故事主线 · 超级课堂",
+        videoTitle: "02 未公布的分数—和差问题二",
+        videoDuration: "6:43",
+        videoUrl: "https://www.bilibili.com/video/BV1ScwnzFEkR?p=2",
+        videoType: "long",
+        questions: [
+          { q: "研发激光武器和磁能武器共投入18亿，激光武器比磁能武器多4亿。磁能武器投入多少亿？", answer: 7, hint: "总投入减差，平分得小数。", ex: { t: "sd", A: "激光武器", B: "磁能武器", S: 18, D: 4, want: "B" } },
+          { q: "两个科技实验室共存铀矿100吨，甲实验室比乙实验室多20吨。甲实验室存铀多少吨？", answer: 60, hint: "（100+20）÷2=60，甲是多的那一个。", ex: { t: "sd", A: "甲实验室", B: "乙实验室", S: 100, D: 20, want: "A" } },
+          { q: "A级芯片库存15万片，B级库存7万片，A级给B级多少万片后两者一样多？", answer: 4, hint: "先算差：15-7=8，给出一半：8÷2=4。", ex: { t: "give", A: "A级", B: "B级", Xa: 15, Xb: 7 } },
+          { q: "两座精炼厂总产能为120单位，产能差为30单位。产能高的那座是多少？", answer: 75, hint: "（120+30）÷2=75，高的那一座。", ex: { t: "sd", A: "高产能厂", B: "低产能厂", S: 120, D: 30, want: "A" } }
+        ]
+      },
+      {
+        week: 1, day: 3,
+        name: { redAlert: "🪖 部队规模对比", original: "差倍" },
+        videoSource: "gauss",
+        videoLabel: "零食短片 · 高斯",
+        videoTitle: "4101 差倍差不变",
+        videoDuration: "2:02",
+        videoUrl: "https://www.bilibili.com/video/BV1Ys4y1S7ZB?p=1",
+        videoType: "short",
+        questions: [
+          { q: "基地有12辆犀牛坦克，4辆防空履带车。犀牛坦克是防空履带车的几倍？", answer: 3, hint: "12÷4=3。", ex: { t: "mul", A: "犀牛坦克", B: "防空车", Xa: 12, Xb: 4 } },
+          { q: "动员兵24人，工程师6人，动员兵是工程师的几倍？", answer: 4, hint: "24÷6=4。", ex: { t: "mul", A: "动员兵", B: "工程师", Xa: 24, Xb: 6 } },
+          { q: "天启坦克数量是幻影坦克的5倍，天启比幻影多32辆。幻影坦克有多少辆？", answer: 8, hint: "差÷（倍数-1）=32÷4=8。", ex: { t: "cd", A: "天启", B: "幻影", K: 5, D: 32, want: "B" } },
+          { q: "盟军战斗机比苏军战斗机多20架，盟军数量是苏军的3倍。苏军有多少架？", answer: 10, hint: "20÷（3-1）=10。", ex: { t: "cd", A: "盟军", B: "苏军", K: 3, D: 20, want: "B" } }
+        ]
+      },
+      {
+        week: 1, day: 4,
+        name: { redAlert: "⚔️ 联合作战力量", original: "和倍" },
+        videoSource: "super",
+        videoLabel: "故事主线 · 超级课堂",
+        videoTitle: "35 采蜜实习生“毛球”—和倍问题一",
+        videoDuration: "9:53",
+        videoUrl: "https://www.bilibili.com/video/BV1ScwnzFEkR?p=34",
+        videoType: "long",
+        questions: [
+          { q: "步兵和坦克共36个单位，步兵数量是坦克的3倍。坦克有多少个单位？", answer: 9, hint: "总数÷（倍数+1）=36÷4=9。", ex: { t: "hb", A: "步兵", B: "坦克", S: 36, K: 3, want: "B" } },
+          { q: "基地有防空部队和地面部队共48支，防空部队是地面部队的2倍。地面部队有多少支？", answer: 16, hint: "48÷（2+1）=16。", ex: { t: "hb", A: "防空部队", B: "地面部队", S: 48, K: 2, want: "B" } },
+          { q: "两个航母编队总舰载机72架，甲编队是乙编队的5倍。乙编队有多少架？", answer: 12, hint: "72÷（5+1）=12。", ex: { t: "hb", A: "甲编队", B: "乙编队", S: 72, K: 5, want: "B" } },
+          { q: "陆海空三军共有48个单位，陆军是海军的2倍，空军与海军一样多。海军有多少？", answer: 12, hint: "设海军为x，则2x+x+x=48，x=12。", ex: { t: "hbm", S: 48, parts: [2, 1, 1], exact: 12 } }
+        ]
+      },
+      {
+        week: 1, day: 5,
+        name: { redAlert: "🛡️ 防御工事部署", original: "植树" },
+        videoSource: "gauss",
+        videoLabel: "零食短片 · 高斯",
+        videoTitle: "直线上两端植树问题",
+        videoDuration: "2:34",
+        videoUrl: "https://www.bilibili.com/video/BV1VCWSz6ERs?p=47",
+        videoType: "short",
+        questions: [
+          { q: "基地围墙长20米，每隔5米建一座机枪碉堡，两端都建，一共建几座？", answer: 5, hint: "段数=20÷5=4，两端都建：4+1=5。", ex: { t: "tree", L: 20, G: 5, mode: "both" } },
+          { q: "防线长30米，每隔6米布设一座光棱塔，两端都布设，一共几座？", answer: 6, hint: "30÷6=5段，5+1=6。", ex: { t: "tree", L: 30, G: 6, mode: "both" } },
+          { q: "跑道长40米，每隔8米安装一盏探照灯，两端都安装，一共几盏？", answer: 6, hint: "40÷8=5段，5+1=6。", ex: { t: "tree", L: 40, G: 8, mode: "both" } },
+          { q: "雷达监测线长100米，每隔10米部署一座防空炮，两端都部署，一共几座？", answer: 11, hint: "100÷10=10段，10+1=11。", ex: { t: "tree", L: 100, G: 10, mode: "both" } }
+        ]
+      },
+      { week: 1, day: 6, type: "review" },
+      { week: 1, day: 0, type: "rest" },
+
+      {
+        week: 2, day: 1,
+        name: { redAlert: "🏗️ 基地资源分配 · 巩固战", original: "和差入门" },
+        videoSource: "gauss",
+        videoLabel: "零食短片 · 高斯",
+        videoTitle: "和差问题（巩固）",
+        videoDuration: "1:34",
+        videoUrl: "https://www.bilibili.com/video/BV1MEMr6DEsq?p=2",
+        videoType: "short",
+        questions: [
+          { q: "基地的防空炮和光棱塔共40座，防空炮比光棱塔多8座。光棱塔有多少座？", answer: 16, hint: "（40-8）÷2=16。", ex: { t: "sd", A: "防空炮", B: "光棱塔", S: 40, D: 8, want: "B" } },
+          { q: "两支巡逻队共60人，第一队比第二队多12人。第二队有多少人？", answer: 24, hint: "（60-12）÷2=24。", ex: { t: "sd", A: "第一队", B: "第二队", S: 60, D: 12, want: "B" } },
+          { q: "两个兵营共驻军90人，A兵营比B兵营多10人。B兵营驻军多少人？", answer: 40, hint: "（90-10）÷2=40。", ex: { t: "sd", A: "A兵营", B: "B兵营", S: 90, D: 10, want: "B" } },
+          { q: "指挥官年龄和副官年龄之和为42岁，指挥官比副官大28岁。副官几岁？", answer: 7, hint: "（42-28）÷2=7。", ex: { t: "sd", A: "指挥官", B: "副官", S: 42, D: 28, want: "B" } }
+        ]
+      },
+      {
+        week: 2, day: 2,
+        name: { redAlert: "🔬 科技研发投入 · 巩固战", original: "和差巩固" },
+        videoSource: "super",
+        videoLabel: "故事主线 · 超级课堂",
+        videoTitle: "03 Terry的小秘密—和差问题三",
+        videoDuration: "9:40",
+        videoUrl: "https://www.bilibili.com/video/BV1ScwnzFEkR?p=3",
+        videoType: "long",
+        questions: [
+          { q: "特斯拉线圈库存12台，幻影坦克库存8台，特斯拉给幻影多少台后两者一样多？", answer: 2, hint: "（12-8）÷2=2。", ex: { t: "give", A: "特斯拉", B: "幻影", Xa: 12, Xb: 8 } },
+          { q: "两个矿场总产出80吨，甲矿比乙矿多16吨。乙矿产出多少吨？", answer: 32, hint: "（80-16）÷2=32。", ex: { t: "sd", A: "甲矿", B: "乙矿", S: 80, D: 16, want: "B" } },
+          { q: "一个两位数加密代码，十位与个位数字之和为13，十位比个位大3。这个代码是多少？", answer: 85, hint: "十位=（13+3）÷2=8，个位=8-3=5。", ex: { t: "digit", S: 13, D: 3 } },
+          { q: "三个军火库总储量150吨，甲比乙多10吨，乙比丙多10吨。丙库多少吨？", answer: 40, hint: "丙=（150-10-20）÷3=40。", ex: { t: "stair", S: 150, d1: 20, d2: 10 } }
+        ]
+      },
+      {
+        week: 2, day: 3,
+        name: { redAlert: "🪖 部队规模对比 · 巩固战", original: "差倍" },
+        videoSource: "gauss",
+        videoLabel: "零食短片 · 高斯",
+        videoTitle: "4101 差倍和不变",
+        videoDuration: "2:11",
+        videoUrl: "https://www.bilibili.com/video/BV1Ys4y1S7ZB?p=2",
+        videoType: "short",
+        questions: [
+          { q: "基地有18架入侵者战机，6架黑鹰战机。入侵者是黑鹰的几倍？", answer: 3, hint: "18÷6=3。", ex: { t: "mul", A: "入侵者", B: "黑鹰", Xa: 18, Xb: 6 } },
+          { q: "光棱坦克数量是磁能坦克的4倍，光棱比磁能多27辆。磁能坦克多少辆？", answer: 9, hint: "27÷（4-1）=9。", ex: { t: "cd", A: "光棱", B: "磁能", K: 4, D: 27, want: "B" } },
+          { q: "航空兵比伞兵多30人，航空兵是伞兵的4倍。伞兵多少人？", answer: 10, hint: "30÷（4-1）=10。", ex: { t: "cd", A: "航空兵", B: "伞兵", K: 4, D: 30, want: "B" } },
+          { q: "指挥官年龄是副官年龄的3倍，指挥官比副官大24岁。副官几岁？", answer: 12, hint: "24÷（3-1）=12。", ex: { t: "cd", A: "指挥官", B: "副官", K: 3, D: 24, want: "B" } }
+        ]
+      },
+      {
+        week: 2, day: 4,
+        name: { redAlert: "⚔️ 联合作战力量 · 巩固战", original: "和倍" },
+        videoSource: "super",
+        videoLabel: "故事主线 · 超级课堂",
+        videoTitle: "36 仓库管理员“探探”—和倍问题二",
+        videoDuration: "6:59",
+        videoUrl: "https://www.bilibili.com/video/BV1ScwnzFEkR?p=35",
+        videoType: "long",
+        questions: [
+          { q: "科技中心和战车工厂共54座，科技中心是战车工厂的2倍。战车工厂多少座？", answer: 18, hint: "54÷（2+1）=18。", ex: { t: "hb", A: "科技中心", B: "战车工厂", S: 54, K: 2, want: "B" } },
+          { q: "两座雷达站共探测到96个目标，A站是B站的3倍。B站探测到多少个？", answer: 24, hint: "96÷（3+1）=24。", ex: { t: "hb", A: "A站", B: "B站", S: 96, K: 3, want: "B" } },
+          { q: "军官和士兵共60人，军官是士兵的4倍。士兵有多少人？", answer: 12, hint: "60÷（4+1）=12。", ex: { t: "hb", A: "军官", B: "士兵", S: 60, K: 4, want: "B" } },
+          { q: "三支突击队共180人，第一支是第二支的2倍，第二支是第三支的2倍。第三支多少人？（取整数）", answer: 26, hint: "设第三支为x，则4x+2x+x=180，x≈25.7，取整为26。", ex: { t: "hbm", S: 180, parts: [4, 2, 1], exact: 26 } }
+        ]
+      },
+      {
+        week: 2, day: 5,
+        name: { redAlert: "🛡️ 防御工事部署 · 巩固战", original: "植树" },
+        videoSource: "gauss",
+        videoLabel: "零食短片 · 高斯",
+        videoTitle: "直线上两端不植树问题",
+        videoDuration: "2:45",
+        videoUrl: "https://www.bilibili.com/video/BV1VCWSz6ERs?p=48",
+        videoType: "short",
+        questions: [
+          { q: "基地围栏长50米，每隔5米插一面旗帜，两端都插，一共几面？", answer: 11, hint: "50÷5=10段，10+1=11。", ex: { t: "tree", L: 50, G: 5, mode: "both" } },
+          { q: "阅兵路线长60米，每隔10米站一名仪仗兵，两端都站，一共几名？", answer: 7, hint: "60÷10=6段，6+1=7。", ex: { t: "tree", L: 60, G: 10, mode: "both" } },
+          { q: "战略公路长45米，每隔9米设一个检查站，两端都设，一共几个？", answer: 6, hint: "45÷9=5段，5+1=6。", ex: { t: "tree", L: 45, G: 9, mode: "both" } },
+          { q: "地雷阵长120米，每隔12米埋一颗雷，两端都不埋，一共几颗？", answer: 9, hint: "120÷12=10段，两端不埋：10-1=9。", ex: { t: "tree", L: 120, G: 12, mode: "none" } }
+        ]
+      },
+      { week: 2, day: 6, type: "review" },
+      { week: 2, day: 0, type: "rest" }
+
+      /*
+      第3周及以后扩展专题（取消注释并填入数据即可）：
+      { week: 3, day: 1, name: { redAlert: "👤 军官档案解密", original: "年龄问题" }, videoUrl: "待补充", videoType: "short", questions: [] },
+      { week: 3, day: 2, name: { redAlert: "🐾 战地动物识别", original: "鸡兔同笼" }, videoUrl: "待补充", videoType: "long", questions: [] },
+      { week: 3, day: 3, name: { redAlert: "🧠 情报分析中心", original: "逻辑推理" }, videoUrl: "待补充", videoType: "short", questions: [] },
+      { week: 3, day: 4, name: { redAlert: "🤝 两军会师计划", original: "行程相遇" }, videoUrl: "待补充", videoType: "long", questions: [] },
+      { week: 3, day: 5, name: { redAlert: "🏃 追击敌军行动", original: "行程追及" }, videoUrl: "待补充", videoType: "short", questions: [] },
+      { week: 4, day: 1, name: { redAlert: "📊 战损统计报告", original: "平均数" }, videoUrl: "待补充", videoType: "short", questions: [] },
+      { week: 4, day: 2, name: { redAlert: "📐 武器序列研发", original: "等差数列" }, videoUrl: "待补充", videoType: "long", questions: [] },
+      { week: 4, day: 3, name: { redAlert: "⚙️ 新武器测试协议", original: "定义新运算" }, videoUrl: "待补充", videoType: "short", questions: [] },
+      { week: 4, day: 4, name: { redAlert: "🔄 雷达扫描周期", original: "周期问题" }, videoUrl: "待补充", videoType: "long", questions: [] },
+      { week: 4, day: 5, name: { redAlert: "📐 基地扩建工程", original: "几何面积" }, videoUrl: "待补充", videoType: "short", questions: [] },
+      { week: 5, day: 1, name: { redAlert: "🛡️ 防御墙测绘", original: "几何周长" }, videoUrl: "待补充", videoType: "short", questions: [] },
+      { week: 5, day: 2, name: { redAlert: "🔢 密码破译行动", original: "数论初步" }, videoUrl: "待补充", videoType: "long", questions: [] },
+      { week: 5, day: 3, name: { redAlert: "🎯 将军战略推演", original: "逻辑进阶" }, videoUrl: "待补充", videoType: "short", questions: [] },
+      { week: 5, day: 4, name: { redAlert: "🏛️ 综合大演习", original: "综合复习" }, videoUrl: "待补充", videoType: "long", questions: [] },
+      */
+    ];
+
+    /* ========== 工具 ========== */
+    function startOfDay(d) {
+      return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    }
+
+    function dateKey(d = getSimulatedToday()) {
+      const x = startOfDay(d);
+      return `${x.getFullYear()}-${x.getMonth() + 1}-${x.getDate()}`;
+    }
+
+    function getSimulatedToday() {
+      const raw = localStorage.getItem("redAlert_simDate");
+      if (!raw) return new Date();
+      const d = new Date(raw + "T12:00:00");
+      return Number.isNaN(d.getTime()) ? new Date() : d;
+    }
+
+    function getSchedule(today = getSimulatedToday()) {
+      const t0 = startOfDay(START_DATE);
+      const t1 = startOfDay(today);
+      const diffDays = Math.floor((t1 - t0) / 86400000);
+      const day = t1.getDay();
+      const week = diffDays >= 0 ? Math.floor(diffDays / 7) + 1 : 0;
+      return { diffDays, week, day, beforeStart: diffDays < 0, today: t1 };
+    }
+
+    function findCourse(week, day) {
+      return courses.find((c) => c.week === week && c.day === day) || null;
+    }
+
+    function qid(week, day, index) {
+      return `w${week}-d${day}-q${index}`;
+    }
+
+    function normalizeAnswer(v) {
+      return String(v).trim().replace(/\s+/g, "");
+    }
+
+    function answersEqual(user, expected) {
+      return normalizeAnswer(user) === normalizeAnswer(expected);
+    }
+
+    function pickRandom(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function getRankIndex(count) {
+      let idx = 0;
+      for (let i = 0; i < RANKS.length; i++) {
+        if (count >= RANKS[i].need) idx = i;
+      }
+      return idx;
+    }
+
+    function nextRankNeed(count) {
+      const idx = getRankIndex(count);
+      if (idx >= RANKS.length - 1) return RANKS[RANKS.length - 1].need;
+      return RANKS[idx + 1].need;
+    }
+
+    /* ========== 存储 ========== */
+    function defaultProgress() {
+      return {
+        correctCount: 0,
+        questions: {},
+        wrongList: [],
+        clearedTopics: [],
+        clearedDays: [],
+        promotedAnnounced: [],
+        lastWelcomeDate: "",
+        scoutedDays: []
+      };
+    }
+
+    function loadProgress() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return defaultProgress();
+        const data = JSON.parse(raw);
+        return {
+          correctCount: data.correctCount || 0,
+          questions: data.questions || {},
+          wrongList: Array.isArray(data.wrongList) ? data.wrongList : [],
+          clearedTopics: Array.isArray(data.clearedTopics) ? data.clearedTopics : [],
+          clearedDays: Array.isArray(data.clearedDays) ? data.clearedDays : [],
+          promotedAnnounced: Array.isArray(data.promotedAnnounced) ? data.promotedAnnounced : [],
+          lastWelcomeDate: data.lastWelcomeDate || "",
+          scoutedDays: Array.isArray(data.scoutedDays) ? data.scoutedDays : []
+        };
+      } catch (e) {
+        return defaultProgress();
+      }
+    }
+
+    function saveProgress() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    }
+
+    let progress = loadProgress();
+
+    function getQState(id) {
+      return progress.questions[id] || { status: "unanswered", firstCorrect: false };
+    }
+
+    function setQState(id, state) {
+      progress.questions[id] = state;
+      saveProgress();
+    }
+
+    function addWrong(id) {
+      if (!progress.wrongList.includes(id)) {
+        progress.wrongList.push(id);
+        saveProgress();
+      }
+    }
+
+    function removeWrong(id) {
+      progress.wrongList = progress.wrongList.filter((x) => x !== id);
+      saveProgress();
+    }
+
+    /* ========== 语音 + 背景音乐 ========== */
+    const bgmEl = document.getElementById("bgmAudio");
+    let soundMuted = localStorage.getItem("redAlert_mute") === "1";
+    let bgmStopTimer = null;
+    let pendingWelcomeLine = "";
+
+    function updateMuteBtn() {
+      const btn = document.getElementById("muteBtn");
+      if (!btn) return;
+      btn.textContent = soundMuted ? "🔇 音效关" : "🔊 音效开";
+    }
+
+    function setMuted(muted) {
+      soundMuted = muted;
+      localStorage.setItem("redAlert_mute", muted ? "1" : "0");
+      if (muted) {
+        stopBgm();
+        stopVoicePlayer();
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+      }
+      updateMuteBtn();
+    }
+
+    function stopBgm() {
+      if (bgmStopTimer) {
+        clearTimeout(bgmStopTimer);
+        bgmStopTimer = null;
+      }
+      try {
+        bgmEl.pause();
+        bgmEl.currentTime = 0;
+      } catch (e) { /* ignore */ }
+    }
+
+    /** 播放一段战地 BGM（默认约 14 秒后淡出停止） */
+    function playBgmBurst(durationMs = 14000, volume = 0.32) {
+      if (soundMuted) return Promise.resolve();
+      return new Promise((resolve) => {
+        try {
+          if (bgmStopTimer) clearTimeout(bgmStopTimer);
+          bgmEl.loop = true;
+          bgmEl.volume = volume;
+          bgmEl.currentTime = 0;
+          const p = bgmEl.play();
+          const finish = () => {
+            const startVol = bgmEl.volume;
+            let step = 0;
+            const fade = setInterval(() => {
+              step += 1;
+              bgmEl.volume = Math.max(0, startVol * (1 - step / 8));
+              if (step >= 8) {
+                clearInterval(fade);
+                stopBgm();
+                resolve();
+              }
+            }, 80);
+          };
+          bgmStopTimer = setTimeout(finish, durationMs);
+          if (p && p.then) p.catch(() => resolve());
+          else resolve();
+        } catch (e) {
+          resolve();
+        }
+      });
+    }
+
+    function duckBgmForSpeech() {
+      if (!bgmEl || bgmEl.paused) return;
+      bgmEl.volume = Math.min(bgmEl.volume, 0.12);
+    }
+
+    let cachedMaleVoice = null;
+    let voicesReady = false;
+    let voicePlayer = null;
+
+    function stopVoicePlayer() {
+      if (voicePlayer) {
+        try {
+          voicePlayer.onended = null;
+          voicePlayer.onerror = null;
+          voicePlayer.pause();
+          voicePlayer.src = "";
+        } catch (e) { /* ignore */ }
+        voicePlayer = null;
+      }
+    }
+
+    /** 优先播放预生成的 Edge 男声 MP3，失败再回退系统语音 */
+    function playVoiceFile(relPath) {
+      if (soundMuted) return Promise.resolve(false);
+      return new Promise((resolve) => {
+        stopVoicePlayer();
+        const a = new Audio(relPath);
+        voicePlayer = a;
+        a.onended = () => {
+          if (voicePlayer === a) voicePlayer = null;
+          resolve(true);
+        };
+        a.onerror = () => {
+          if (voicePlayer === a) voicePlayer = null;
+          resolve(false);
+        };
+        duckBgmForSpeech();
+        const p = a.play();
+        if (p && p.then) p.catch(() => resolve(false));
+      });
+    }
+
+    function scoreMaleVoice(v) {
+      const n = (v.name + " " + v.lang).toLowerCase();
+      if (!/zh|chinese|中文/.test(n)) return -100;
+      let s = 10;
+      if (/natural|neural|online|云|neural/.test(n)) s += 40;
+      if (/yunyang|yunjian|yunfeng|yunze|kangkang|yunhao|yunjie|男/.test(n)) s += 50;
+      if (/male/.test(n)) s += 30;
+      if (/huihui|xiaoxiao|xiaoyi|xiaoxuan|xiaohan|female|女|yaoyao|hui/.test(n)) s -= 60;
+      if (/google/.test(n)) s += 5;
+      return s;
+    }
+
+    function pickCommanderVoice() {
+      if (cachedMaleVoice) return cachedMaleVoice;
+      const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+      if (!voices.length) return null;
+      const ranked = voices
+        .map((v) => ({ v, s: scoreMaleVoice(v) }))
+        .filter((x) => x.s > 0)
+        .sort((a, b) => b.s - a.s);
+      cachedMaleVoice = ranked.length ? ranked[0].v : voices.find((v) => /zh/.test(v.lang)) || null;
+      return cachedMaleVoice;
+    }
+
+    if (window.speechSynthesis) {
+      window.speechSynthesis.onvoiceschanged = function () {
+        cachedMaleVoice = null;
+        voicesReady = true;
+        pickCommanderVoice();
+      };
+      pickCommanderVoice();
+    }
+
+    function speak(text, opts) {
+      if (soundMuted || !text) return Promise.resolve();
+
+      // 固定台词：优先真人男声 MP3
+      if (opts && opts.file) {
+        return playVoiceFile(opts.file).then((ok) => {
+          if (ok) return;
+          return speakSynth(text, opts);
+        });
+      }
+      return speakSynth(text, opts);
+    }
+
+    function speakSynth(text, opts) {
+      if (!window.speechSynthesis || !text) return Promise.resolve();
+      return new Promise((resolve) => {
+        try {
+          if (!(opts && opts.queue)) window.speechSynthesis.cancel();
+          duckBgmForSpeech();
+          const u = new SpeechSynthesisUtterance(text);
+          u.lang = "zh-CN";
+          u.rate = (opts && opts.rate) != null ? opts.rate : 0.78;
+          u.pitch = (opts && opts.pitch) != null ? opts.pitch : 0.72;
+          u.volume = 1;
+          const voice = pickCommanderVoice();
+          if (voice) u.voice = voice;
+          u.onend = () => resolve();
+          u.onerror = () => resolve();
+          window.speechSynthesis.speak(u);
+        } catch (e) {
+          resolve();
+        }
+      });
+    }
+
+    function playWelcomeComm(line) {
+      const idx = Math.max(0, WELCOME_SPEECH.indexOf(line));
+      const file = `voice/welcome-${idx >= 0 ? idx : 0}.mp3`;
+      playBgmBurst(16000, 0.34);
+      setTimeout(() => speak(line, { file }), 600);
+    }
+
+    function playClearFanfare() {
+      playBgmBurst(12000, 0.38);
+      setTimeout(() => speak("完美！今日任务全部完成，你证明了自己！", { file: "voice/clear.mp3" }), 500);
+    }
+
+    /* ========== 长官讲解：图形 + 算式动画 ========== */
+    let briefToken = 0;
+    let briefCurrentQ = null;
+
+    function sleep(ms) {
+      return new Promise((r) => setTimeout(r, ms));
+    }
+
+    function buildBriefing(q) {
+      const ex = q.ex;
+      if (!ex) {
+        return {
+          steps: [
+            {
+              say: "士兵，听好了。" + (q.hint || "仔细审题，找到已知条件。"),
+              formula: q.hint || "",
+              paint: (stage) => {
+                stage.innerHTML = `<div class="eq-box"><span class="pop">${escapeHtml(String(q.answer))}</span></div>`;
+              }
+            }
+          ]
+        };
+      }
+
+      if (ex.t === "sd") {
+        const less = (ex.S - ex.D) / 2;
+        const more = less + ex.D;
+        const max = Math.max(more, less, 1);
+        return {
+          steps: [
+            {
+              say: `士兵，看战术板。${ex.A}和${ex.B}一共${ex.S}。`,
+              formula: `${ex.A} + ${ex.B} = ${ex.S}`,
+              paint: (stage) => {
+                stage.innerHTML = `
+                  <div class="bar-row"><span class="bar-label">${escapeHtml(ex.A)}</span><div class="bar-track"><div class="bar-fill more" id="bA"></div></div></div>
+                  <div class="bar-row"><span class="bar-label">${escapeHtml(ex.B)}</span><div class="bar-track"><div class="bar-fill" id="bB"></div></div></div>
+                  <div class="eq-box">合计 ${ex.S}</div>`;
+                requestAnimationFrame(() => {
+                  document.getElementById("bA").style.width = "70%";
+                  document.getElementById("bB").style.width = "55%";
+                });
+              }
+            },
+            {
+              say: `${ex.A}比${ex.B}多${ex.D}。先把多出来的${ex.D}拿掉，两边就一样长了。`,
+              formula: `${ex.S} − ${ex.D} = ${ex.S - ex.D}`,
+              paint: (stage) => {
+                stage.innerHTML = `
+                  <div class="bar-row"><span class="bar-label">${escapeHtml(ex.A)}</span><div class="bar-track"><div class="bar-fill more" id="bA" style="width:${(more/max)*100}%"></div></div></div>
+                  <div class="bar-row"><span class="bar-label">${escapeHtml(ex.B)}</span><div class="bar-track"><div class="bar-fill" id="bB" style="width:${(less/max)*100}%"></div></div></div>
+                  <div class="eq-box">多出的 ${ex.D} 先拿掉 → 剩下 ${ex.S - ex.D}</div>`;
+              }
+            },
+            {
+              say: `剩下的${ex.S - ex.D}平分，每边是${less}。这就是${ex.B}。`,
+              formula: `(${ex.S} − ${ex.D}) ÷ 2 = ${less}`,
+              paint: (stage) => {
+                stage.innerHTML = `
+                  <div class="bar-row"><span class="bar-label">${escapeHtml(ex.B)}</span><div class="bar-track"><div class="bar-fill" id="bB"></div></div></div>
+                  <div class="bar-row"><span class="bar-label">${escapeHtml(ex.B)}</span><div class="bar-track"><div class="bar-fill" id="bB2"></div></div></div>
+                  <div class="eq-box pop">各 ${less}</div>`;
+                requestAnimationFrame(() => {
+                  const w = (less / max) * 100 + "%";
+                  document.getElementById("bB").style.width = w;
+                  document.getElementById("bB2").style.width = w;
+                });
+              }
+            },
+            {
+              say: ex.want === "B"
+                ? `所以${ex.B}是${less}。记住：和差问题，先减差再平分。`
+                : ex.want === "both"
+                  ? `${ex.A}就是${less}加${ex.D}，等于${more}。答案是${more}和${less}。`
+                  : `${ex.A}是${less}加${ex.D}，等于${more}。目标锁定！`,
+              formula: ex.want === "B"
+                ? `${ex.B} = ${less}`
+                : ex.want === "both"
+                  ? `${ex.A}=${more}，${ex.B}=${less}`
+                  : `${ex.A} = ${less} + ${ex.D} = ${more}`,
+              paint: (stage) => {
+                stage.innerHTML = `
+                  <div class="bar-row"><span class="bar-label">${escapeHtml(ex.A)}</span><div class="bar-track"><div class="bar-fill more" id="bA"></div></div></div>
+                  <div class="bar-row"><span class="bar-label">${escapeHtml(ex.B)}</span><div class="bar-track"><div class="bar-fill" id="bB"></div></div></div>
+                  <div class="eq-box"><span class="pop">${ex.want === "B" ? less : ex.want === "both" ? more + " , " + less : more}</span></div>`;
+                requestAnimationFrame(() => {
+                  document.getElementById("bA").style.width = (more / max) * 100 + "%";
+                  document.getElementById("bA").textContent = more;
+                  document.getElementById("bB").style.width = (less / max) * 100 + "%";
+                  document.getElementById("bB").textContent = less;
+                });
+              }
+            }
+          ]
+        };
+      }
+
+      if (ex.t === "sm") {
+        // (S+D)/2 = more
+        const more = (ex.S + ex.D) / 2;
+        const less = more - ex.D;
+        return buildBriefing({ ...q, ex: { t: "sd", A: ex.A, B: ex.B, S: ex.S, D: ex.D, want: "A" } });
+      }
+
+      if (ex.t === "give") {
+        const diff = ex.A - ex.B;
+        const half = diff / 2;
+        return {
+          steps: [
+            {
+              say: `士兵，${ex.A}有${ex.Xa}，${ex.B}有${ex.Xb}。差是${diff}。`,
+              formula: `${ex.Xa} − ${ex.Xb} = ${diff}`,
+              paint: (stage) => {
+                const max = Math.max(ex.Xa, ex.Xb);
+                stage.innerHTML = `
+                  <div class="bar-row"><span class="bar-label">${escapeHtml(ex.A)}</span><div class="bar-track"><div class="bar-fill more" id="bA"></div></div></div>
+                  <div class="bar-row"><span class="bar-label">${escapeHtml(ex.B)}</span><div class="bar-track"><div class="bar-fill" id="bB"></div></div></div>`;
+                requestAnimationFrame(() => {
+                  document.getElementById("bA").style.width = (ex.Xa / max) * 100 + "%";
+                  document.getElementById("bA").textContent = ex.Xa;
+                  document.getElementById("bB").style.width = (ex.Xb / max) * 100 + "%";
+                  document.getElementById("bB").textContent = ex.Xb;
+                });
+              }
+            },
+            {
+              say: `要一样多，把差的一半交给对方。一半是${half}。`,
+              formula: `${diff} ÷ 2 = ${half}`,
+              paint: (stage) => {
+                stage.innerHTML = `<div class="eq-box">差 ${diff} → 给出一半 <span class="pop">${half}</span></div>
+                  <div class="seg-row">${Array.from({length: diff}, (_,i) => `<div class="seg ${i<half?"hi":""}" id="g${i}"></div>`).join("")}</div>`;
+                requestAnimationFrame(() => {
+                  for (let i = 0; i < diff; i++) {
+                    setTimeout(() => document.getElementById("g" + i).classList.add("show"), i * 80);
+                  }
+                });
+              }
+            },
+            {
+              say: `所以从${ex.A}拿出${half}给${ex.B}，两边就扳平了。`,
+              formula: `给出 ${half}`,
+              paint: (stage) => {
+                stage.innerHTML = `<div class="eq-box"><span class="pop">给出 ${half}</span></div>`;
+              }
+            }
+          ]
+        };
+      }
+
+      if (ex.t === "mul") {
+        return {
+          steps: [
+            {
+              say: `士兵，这是倍数侦察。${ex.A}是${ex.Xa}，${ex.B}是${ex.Xb}。`,
+              formula: `${ex.A}=${ex.Xa}，${ex.B}=${ex.Xb}`,
+              paint: (stage) => {
+                stage.innerHTML = `<div class="seg-row" id="segs"></div><div class="eq-box">${escapeHtml(ex.A)} ÷ ${escapeHtml(ex.B)}</div>`;
+                const box = document.getElementById("segs");
+                for (let i = 0; i < ex.Xa; i++) {
+                  const d = document.createElement("div");
+                  d.className = "seg";
+                  d.textContent = i < ex.Xb ? "B" : "A";
+                  if (i >= ex.Xb) d.classList.add("hi");
+                  box.appendChild(d);
+                  setTimeout(() => d.classList.add("show"), i * 50);
+                }
+              }
+            },
+            {
+              say: `${ex.Xa}除以${ex.Xb}，等于${ex.Xa / ex.Xb}倍。命中。`,
+              formula: `${ex.Xa} ÷ ${ex.Xb} = ${ex.Xa / ex.Xb}`,
+              paint: (stage) => {
+                stage.innerHTML = `<div class="eq-box"><span class="pop">${ex.Xa / ex.Xb} 倍</span></div>`;
+              }
+            }
+          ]
+        };
+      }
+
+      if (ex.t === "cd") {
+        const small = ex.D / (ex.K - 1);
+        const big = small * ex.K;
+        return {
+          steps: [
+            {
+              say: `差倍战术：${ex.A}是${ex.B}的${ex.K}倍，又多${ex.D}。`,
+              formula: `${ex.A} = ${ex.K} × ${ex.B}，${ex.A} − ${ex.B} = ${ex.D}`,
+              paint: (stage) => {
+                let html = `<div class="seg-row">`;
+                for (let i = 0; i < ex.K; i++) html += `<div class="seg hi" id="c${i}"></div>`;
+                html += `</div><div class="eq-box">${ex.K} 份里，多出的是 ${ex.K - 1} 份</div>`;
+                stage.innerHTML = html;
+                requestAnimationFrame(() => {
+                  for (let i = 0; i < ex.K; i++) setTimeout(() => document.getElementById("c" + i).classList.add("show"), i * 120);
+                });
+              }
+            },
+            {
+              say: `多出来的${ex.D}，正好是${ex.K - 1}份。所以一份是${small}。`,
+              formula: `${ex.D} ÷ (${ex.K} − 1) = ${small}`,
+              paint: (stage) => {
+                stage.innerHTML = `<div class="eq-box">每份 = <span class="pop">${small}</span></div>`;
+              }
+            },
+            {
+              say: ex.want === "A"
+                ? `${ex.A}有${ex.K}份，是${big}。`
+                : `${ex.B}就是一份，等于${small}。目标确认！`,
+              formula: ex.want === "A" ? `${ex.A} = ${small} × ${ex.K} = ${big}` : `${ex.B} = ${small}`,
+              paint: (stage) => {
+                stage.innerHTML = `<div class="eq-box"><span class="pop">${ex.want === "A" ? big : small}</span></div>`;
+              }
+            }
+          ]
+        };
+      }
+
+      if (ex.t === "hb") {
+        const small = ex.S / (ex.K + 1);
+        const big = small * ex.K;
+        return {
+          steps: [
+            {
+              say: `和倍作战：一共${ex.S}，${ex.A}是${ex.B}的${ex.K}倍。把总数分成${ex.K + 1}份。`,
+              formula: `总份数 = ${ex.K} + 1 = ${ex.K + 1}`,
+              paint: (stage) => {
+                let html = `<div class="seg-row">`;
+                for (let i = 0; i < ex.K + 1; i++) {
+                  html += `<div class="seg ${i < ex.K ? "hi" : ""}" id="h${i}">${i < ex.K ? "A" : "B"}</div>`;
+                }
+                html += `</div><div class="eq-box">共 ${ex.K + 1} 份 = ${ex.S}</div>`;
+                stage.innerHTML = html;
+                requestAnimationFrame(() => {
+                  for (let i = 0; i < ex.K + 1; i++) setTimeout(() => document.getElementById("h" + i).classList.add("show"), i * 100);
+                });
+              }
+            },
+            {
+              say: `${ex.S}除以${ex.K + 1}，一份是${small}。这就是${ex.B}。`,
+              formula: `${ex.S} ÷ ${ex.K + 1} = ${small}`,
+              paint: (stage) => {
+                stage.innerHTML = `<div class="eq-box">每份 <span class="pop">${small}</span> = ${escapeHtml(ex.B)}</div>`;
+              }
+            },
+            {
+              say: ex.want === "A" ? `${ex.A}有${ex.K}份，是${big}。` : `所以${ex.B}是${small}。漂亮。`,
+              formula: ex.want === "A" ? `${ex.A} = ${small}×${ex.K} = ${big}` : `${ex.B} = ${small}`,
+              paint: (stage) => {
+                stage.innerHTML = `<div class="eq-box"><span class="pop">${ex.want === "A" ? big : small}</span></div>`;
+              }
+            }
+          ]
+        };
+      }
+
+      if (ex.t === "hbm") {
+        // parts like [2,1,1] sum S
+        const totalParts = ex.parts.reduce((a, b) => a + b, 0);
+        const one = ex.S / totalParts;
+        const ans = Math.round(one); // for the 26 case they use integer
+        const exact = ex.exact != null ? ex.exact : one;
+        return {
+          steps: [
+            {
+              say: `多部队联合作战。按倍数分成${ex.parts.join("、")}份，总共${totalParts}份。`,
+              formula: `份数：${ex.parts.join(" + ")} = ${totalParts}`,
+              paint: (stage) => {
+                let html = `<div class="seg-row">`;
+                let idx = 0;
+                ex.parts.forEach((p, pi) => {
+                  for (let i = 0; i < p; i++) {
+                    html += `<div class="seg ${pi === 0 ? "hi" : ""}" id="m${idx}">${pi + 1}</div>`;
+                    idx++;
+                  }
+                });
+                html += `</div>`;
+                stage.innerHTML = html;
+                requestAnimationFrame(() => {
+                  for (let i = 0; i < totalParts; i++) setTimeout(() => document.getElementById("m" + i).classList.add("show"), i * 80);
+                });
+              }
+            },
+            {
+              say: `${ex.S}除以${totalParts}，大约每份${Number.isInteger(one) ? one : one.toFixed(1)}。题目要求取整，第三支是${exact}。`,
+              formula: `${ex.S} ÷ ${totalParts} ≈ ${exact}`,
+              paint: (stage) => {
+                stage.innerHTML = `<div class="eq-box"><span class="pop">${exact}</span></div>`;
+              }
+            }
+          ]
+        };
+      }
+
+      if (ex.t === "tree") {
+        const segs = ex.L / ex.G;
+        const n = ex.mode === "none" ? segs - 1 : segs + 1;
+        return {
+          steps: [
+            {
+              say: `防线长${ex.L}米，每隔${ex.G}米一个点。先算段数：${ex.L}除以${ex.G}等于${segs}段。`,
+              formula: `${ex.L} ÷ ${ex.G} = ${segs}（段）`,
+              paint: (stage) => {
+                const count = segs + 1;
+                let html = `<div class="tree-line">`;
+                for (let i = 0; i < count; i++) {
+                  const left = (i / (count - 1)) * 100;
+                  const ghost = ex.mode === "none" && (i === 0 || i === count - 1);
+                  html += `<div class="tree-dot ${ghost ? "ghost" : ""}" id="t${i}" style="left:calc(${left}% - 7px)"></div>`;
+                }
+                html += `</div><div class="eq-box">${segs} 段</div>`;
+                stage.innerHTML = html;
+              }
+            },
+            {
+              say: ex.mode === "none"
+                ? `两端都不建，点数等于段数减一：${segs}减1等于${n}。`
+                : `两端都建，点数等于段数加一：${segs}加1等于${n}。`,
+              formula: ex.mode === "none" ? `${segs} − 1 = ${n}` : `${segs} + 1 = ${n}`,
+              paint: (stage) => {
+                const count = segs + 1;
+                let html = `<div class="tree-line">`;
+                for (let i = 0; i < count; i++) {
+                  const left = (i / (count - 1)) * 100;
+                  const skip = ex.mode === "none" && (i === 0 || i === count - 1);
+                  html += `<div class="tree-dot ${skip ? "ghost" : ""}" id="t${i}" style="left:calc(${left}% - 7px)"></div>`;
+                }
+                html += `</div><div class="eq-box"><span class="pop">${n} 座</span></div>`;
+                stage.innerHTML = html;
+                requestAnimationFrame(() => {
+                  for (let i = 0; i < count; i++) {
+                    const skip = ex.mode === "none" && (i === 0 || i === count - 1);
+                    if (!skip) setTimeout(() => document.getElementById("t" + i).classList.add("show"), i * 100);
+                  }
+                });
+              }
+            }
+          ]
+        };
+      }
+
+      if (ex.t === "digit") {
+        const tens = (ex.S + ex.D) / 2;
+        const ones = tens - ex.D;
+        return {
+          steps: [
+            {
+              say: `密码破译：十位与个位之和${ex.S}，十位比个位大${ex.D}。这就是和差。`,
+              formula: `十位 + 个位 = ${ex.S}，十位 − 个位 = ${ex.D}`,
+              paint: (stage) => {
+                stage.innerHTML = `<div class="eq-box">□ □</div>`;
+              }
+            },
+            {
+              say: `十位等于和加差再除以2：${tens}。个位是${ones}。密码是${tens}${ones}。`,
+              formula: `十位=(${ex.S}+${ex.D})÷2=${tens}，个位=${ones}`,
+              paint: (stage) => {
+                stage.innerHTML = `<div class="eq-box"><span class="pop">${tens}${ones}</span></div>`;
+              }
+            }
+          ]
+        };
+      }
+
+      if (ex.t === "stair") {
+        const c = (ex.S - ex.d1 - ex.d2) / 3;
+        return {
+          steps: [
+            {
+              say: `三座军火库像台阶一样：甲最高，乙居中，丙最低。甲比丙多${ex.d1}，乙比丙多${ex.d2}。设丙为基准。`,
+              formula: `丙 = x，乙 = x+${ex.d2}，甲 = x+${ex.d1}`,
+              paint: (stage) => {
+                stage.innerHTML = `
+                  <div class="bar-row"><span class="bar-label">甲</span><div class="bar-track"><div class="bar-fill more" id="bA"></div></div></div>
+                  <div class="bar-row"><span class="bar-label">乙</span><div class="bar-track"><div class="bar-fill" id="bB"></div></div></div>
+                  <div class="bar-row"><span class="bar-label">丙</span><div class="bar-track"><div class="bar-fill" id="bC"></div></div></div>`;
+                requestAnimationFrame(() => {
+                  document.getElementById("bA").style.width = "90%";
+                  document.getElementById("bB").style.width = "70%";
+                  document.getElementById("bC").style.width = "50%";
+                });
+              }
+            },
+            {
+              say: `三个加起来共${ex.S}吨。丙等于（${ex.S}减去${ex.d1}再减去${ex.d2}）再除以3，等于${c}。`,
+              formula: `丙 = (${ex.S}-${ex.d1}-${ex.d2}) ÷ 3 = ${c}`,
+              paint: (stage) => {
+                stage.innerHTML = `<div class="eq-box">丙 = <span class="pop">${c}</span></div>`;
+              }
+            }
+          ]
+        };
+      }
+
+      return buildBriefing({ ...q, ex: null });
+    }
+
+    async function runBriefing(q, meta) {
+      const token = ++briefToken;
+      briefCurrentQ = { q, meta };
+      const { steps } = buildBriefing(q);
+      const overlay = document.getElementById("briefOverlay");
+      const stage = document.getElementById("briefStage");
+      const formulas = document.getElementById("briefFormulas");
+      const caption = document.getElementById("briefCaption");
+      overlay.classList.add("show");
+      formulas.innerHTML = steps.map((s) => `<li>${escapeHtml(s.formula)}</li>`).join("");
+      stage.innerHTML = "";
+      caption.textContent = "长官频道已接通（云扬男声）……";
+
+      const idBase =
+        meta && meta.week != null
+          ? `w${meta.week}-d${meta.day}-q${meta.index}`
+          : null;
+
+      for (let i = 0; i < steps.length; i++) {
+        if (token !== briefToken) return;
+        const step = steps[i];
+        const lis = formulas.querySelectorAll("li");
+        lis.forEach((li, idx) => {
+          li.classList.toggle("show", idx <= i);
+          li.classList.toggle("active", idx === i);
+        });
+        caption.textContent = step.say;
+        if (step.paint) step.paint(stage);
+        await sleep(280);
+        if (token !== briefToken) return;
+        const stepFile = idBase ? `voice/brief/${idBase}-s${i}.mp3` : null;
+        await speak(step.say, { file: stepFile, rate: 0.76, pitch: 0.7 });
+        if (token !== briefToken) return;
+        await sleep(180);
+      }
+      caption.textContent = "讲解完毕。听懂了就去瞄准目标！";
+      await speak("讲解完毕。听懂了就去瞄准目标！", {
+        file: "voice/brief-end.mp3",
+        rate: 0.78,
+        pitch: 0.7
+      });
+    }
+
+    function closeBriefing() {
+      briefToken++;
+      stopVoicePlayer();
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      document.getElementById("briefOverlay").classList.remove("show");
+    }
+
+    document.getElementById("briefCloseBtn").addEventListener("click", closeBriefing);
+    document.getElementById("briefReplayBtn").addEventListener("click", () => {
+      if (briefCurrentQ) runBriefing(briefCurrentQ.q, briefCurrentQ.meta);
+    });
+    document.getElementById("briefOverlay").addEventListener("click", (e) => {
+      if (e.target.id === "briefOverlay") closeBriefing();
+    });
+
+    /* ========== 军衔 UI ========== */
+    function refreshRankUI() {
+      const count = progress.correctCount;
+      const idx = getRankIndex(count);
+      const name = RANKS[idx].name;
+      const next = nextRankNeed(count);
+      document.getElementById("rankLabel").textContent = `🎖️ ${name}`;
+      document.getElementById("scoreLabel").textContent =
+        idx >= RANKS.length - 1
+          ? `战果：${count}/${MAX_RANK_SCORE}（已达少将）`
+          : `战果：${count}/${next}`;
+      const pct = Math.min(100, (count / MAX_RANK_SCORE) * 100);
+      document.getElementById("rankBarFill").style.width = pct + "%";
+    }
+
+    function maybePromote(oldCount, newCount) {
+      const oldIdx = getRankIndex(oldCount);
+      const newIdx = getRankIndex(newCount);
+      if (newIdx > oldIdx) {
+        for (let i = oldIdx + 1; i <= newIdx; i++) {
+          if (!progress.promotedAnnounced.includes(i)) {
+            progress.promotedAnnounced.push(i);
+            saveProgress();
+            if (PROMOTE_SPEECH[i]) speak(PROMOTE_SPEECH[i]);
+          }
+        }
+      }
+      refreshRankUI();
+    }
+
+    /* ========== 题目解析 ========== */
+    function parseQid(id) {
+      const m = /^w(\d+)-d(\d+)-q(\d+)$/.exec(id);
+      if (!m) return null;
+      return { week: +m[1], day: +m[2], index: +m[3] };
+    }
+
+    function lookupQuestion(id) {
+      const p = parseQid(id);
+      if (!p) return null;
+      const course = findCourse(p.week, p.day);
+      if (!course || !course.questions) return null;
+      const q = course.questions[p.index];
+      if (!q) return null;
+      return { course, q, ...p };
+    }
+
+    function activeQuestionEntries(course) {
+      if (!course || !course.questions) return [];
+      if (course.videoType === "short") {
+        return course.questions.slice(0, 3).map((q, i) => ({ q, index: i, core: false }));
+      }
+      if (course.videoType === "long") {
+        return [{ q: course.questions[3], index: 3, core: true }];
+      }
+      return [];
+    }
+
+    function topicKey(week, day) {
+      return `${week}-${day}`;
+    }
+
+    /* ========== 彩纸 ========== */
+    let confettiTimer = null;
+    function runConfetti(durationMs = 3500) {
+      const canvas = document.getElementById("confetti-canvas");
+      const ctx = canvas.getContext("2d");
+      const resize = () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      };
+      resize();
+      const pieces = Array.from({ length: 120 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        w: 6 + Math.random() * 8,
+        h: 8 + Math.random() * 10,
+        vy: 2 + Math.random() * 4,
+        vx: -2 + Math.random() * 4,
+        rot: Math.random() * Math.PI,
+        vr: -0.2 + Math.random() * 0.4,
+        color: ["#FF6A00", "#ffd08a", "#5c9a5c", "#e0e0e0", "#ff4d4d"][Math.floor(Math.random() * 5)]
+      }));
+      const start = performance.now();
+      cancelAnimationFrame(confettiTimer);
+      function frame(now) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach((p) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += p.vr;
+          if (p.y > canvas.height) p.y = -20;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          ctx.restore();
+        });
+        if (now - start < durationMs) {
+          confettiTimer = requestAnimationFrame(frame);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+      confettiTimer = requestAnimationFrame(frame);
+    }
+
+    function showClearOverlay() {
+      document.getElementById("clearOverlay").classList.add("show");
+      runConfetti();
+      playClearFanfare();
+    }
+
+    /* ========== 作答逻辑 ========== */
+    function markCorrect(id, hitIndex) {
+      const prev = getQState(id);
+      const oldCount = progress.correctCount;
+      let first = prev.firstCorrect;
+      if (!first) {
+        first = true;
+        progress.correctCount += 1;
+        saveProgress();
+        maybePromote(oldCount, progress.correctCount);
+      } else {
+        refreshRankUI();
+      }
+      setQState(id, { status: "correct", firstCorrect: true });
+      removeWrong(id);
+      const speechIdx = Math.min(Math.max(hitIndex, 0), HIT_SPEECH.length - 1);
+      speak(HIT_SPEECH[speechIdx], { file: `voice/hit-${speechIdx}.mp3` });
+    }
+
+    function speakMissEncourage() {
+      const idx = Math.floor(Math.random() * MISS_SPEECH.length);
+      return speak(MISS_SPEECH[idx], { file: `voice/miss-${idx}.mp3` });
+    }
+
+    function checkDailyClear(schedule, course, entries) {
+      if (!course || course.type) return;
+      const dayKey = dateKey();
+      if (progress.clearedDays.includes(dayKey)) return;
+      const allOk = entries.every(({ index }) => {
+        const id = qid(schedule.week, schedule.day, index);
+        return getQState(id).status === "correct";
+      });
+      if (!allOk || entries.length === 0) return;
+      progress.clearedDays.push(dayKey);
+      const tk = topicKey(schedule.week, schedule.day);
+      if (!progress.clearedTopics.includes(tk)) progress.clearedTopics.push(tk);
+      saveProgress();
+      showClearOverlay();
+    }
+
+    function checkReviewClear() {
+      const remaining = progress.wrongList.filter((id) => getQState(id).status === "wrong");
+      if (remaining.length === 0 && document.getElementById("missionRoot").dataset.mode === "review") {
+        const box = document.getElementById("reviewDone");
+        if (box) {
+          box.hidden = false;
+          speak("恭喜你，士兵！本周战场已全部清扫干净。", { file: "voice/review-done.mp3" });
+        }
+      }
+    }
+
+    /* ========== 渲染题目块 ========== */
+    function renderQuestionBlock(meta, opts) {
+      const { id, q, core, hitIndex, week, day, index } = meta;
+      const state = getQState(id);
+      const locked = state.status === "correct";
+      const title = core
+        ? `<span class="q-badge">⭐ 🎯 核心战役 · 第${index + 1}题</span>`
+        : `<span class="q-badge">作战指令 · 第${index + 1}题</span>`;
+
+      let feedback = "";
+      if (locked) {
+        feedback = `<p class="feedback done">✔️ 已攻克</p>`;
+      } else if (state.status === "wrong") {
+        feedback = `<p class="feedback bad">💥 未命中！正确答案是 ${escapeHtml(state.lastReveal || q.answer)}。请重新瞄准！</p>`;
+      }
+
+      return `
+        <article class="question ${core ? "core" : ""}" data-qid="${escapeHtml(id)}" data-hit="${hitIndex}">
+          ${title}
+          <p class="q-text">${escapeHtml(q.q)}</p>
+          <div class="answer-row">
+            <input class="answer-input" type="text" inputmode="numeric" placeholder="输入答案" ${locked ? "disabled" : ""} value="" />
+            <button type="button" class="btn btn-check" ${locked ? "disabled" : ""}>✅ 确认战果</button>
+            <button type="button" class="btn btn-ghost btn-hint">📢 长官讲解</button>
+          </div>
+          <div class="feedback-slot">${feedback}</div>
+        </article>
+      `;
+    }
+
+    function bindQuestionEvents(root, onAfterAnswer) {
+      root.querySelectorAll(".question").forEach((el) => {
+        const id = el.dataset.qid;
+        const hitIndex = Number(el.dataset.hit || 0);
+        const info = lookupQuestion(id);
+        if (!info) return;
+        const input = el.querySelector(".answer-input");
+        const slot = el.querySelector(".feedback-slot");
+        const checkBtn = el.querySelector(".btn-check");
+        const hintBtn = el.querySelector(".btn-hint");
+
+        hintBtn.addEventListener("click", () => runBriefing(info.q, info));
+
+        if (checkBtn.disabled) return;
+
+        checkBtn.addEventListener("click", async () => {
+          const user = input.value;
+          if (!normalizeAnswer(user)) {
+            slot.innerHTML = `<p class="feedback bad">请先输入答案再确认战果。</p>`;
+            return;
+          }
+          if (answersEqual(user, info.q.answer)) {
+            markCorrect(id, hitIndex);
+            input.disabled = true;
+            checkBtn.disabled = true;
+            slot.innerHTML = `<p class="feedback ok">✔️ 命中目标！</p>`;
+            if (onAfterAnswer) onAfterAnswer(true, id);
+          } else {
+            const st = getQState(id);
+            st.status = "wrong";
+            st.lastReveal = String(info.q.answer);
+            setQState(id, st);
+            addWrong(id);
+            slot.innerHTML = `<p class="feedback bad">💥 未命中！正确答案是 ${escapeHtml(info.q.answer)}。长官即将讲解……</p>`;
+            input.value = "";
+            await speakMissEncourage();
+            await sleep(400);
+            runBriefing(info.q, info);
+            if (onAfterAnswer) onAfterAnswer(false, id);
+          }
+        });
+
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") checkBtn.click();
+        });
+      });
+    }
+
+    /* ========== 页面模式 ========== */
+    function renderRest() {
+      return `
+        <h1 class="mission-title">🛌 休整日</h1>
+        <p class="mission-sub">周日 · 战术休整</p>
+        <div class="rest-box">
+          今天没有新的作战命令。<br />
+          好好休息，养精蓄锐，明天再战！
+        </div>
+      `;
+    }
+
+    function getWrongIdsForReview(schedule) {
+      const stillWrong = progress.wrongList.filter((id) => getQState(id).status === "wrong");
+      const thisWeek = stillWrong.filter((id) => {
+        const p = parseQid(id);
+        return p && p.week === schedule.week && p.day >= 1 && p.day <= 5;
+      });
+      const legacy = stillWrong.filter((id) => !thisWeek.includes(id));
+      return { thisWeek, legacy, all: thisWeek.concat(legacy) };
+    }
+
+    function renderReview(schedule) {
+      const { thisWeek, legacy, all } = getWrongIdsForReview(schedule);
+      if (all.length === 0) {
+        return `
+          <h1 class="mission-title">📋 本周错题复盘</h1>
+          <p class="mission-sub">战术复盘室</p>
+          <div class="review-empty" id="reviewDone">
+            🎉 暂无待修复漏洞！战场清净。<br />
+            <span style="color:#ffd08a">本周（含历史遗留）错题本为空，可以安心休整。</span>
+          </div>
+        `;
+      }
+
+      let html = `
+        <h1 class="mission-title">📋 本周错题复盘</h1>
+        <p class="mission-sub">战术复盘室 · 答对即移出错题本</p>
+        <p class="review-meta">本周待修复：${thisWeek.length} 题 · 历史遗留：${legacy.length} 题</p>
+        <div id="reviewList">
+      `;
+
+      all.forEach((id, i) => {
+        const info = lookupQuestion(id);
+        if (!info) return;
+        const fromLegacy = legacy.includes(id);
+        html += renderQuestionBlock(
+          {
+            id,
+            q: info.q,
+            core: false,
+            hitIndex: Math.min(i, 3),
+            week: info.week,
+            day: info.day,
+            index: info.index
+          },
+          { showLastWrong: true }
+        );
+        if (fromLegacy) {
+          html = html.replace(
+            `data-qid="${id}"`,
+            `data-qid="${id}" data-legacy="1"`
+          );
+        }
+      });
+
+      html += `</div><div class="review-empty" id="reviewDone" hidden>🎉 漏洞全部修复！军衔晋升！</div>`;
+      return html;
+    }
+
+    function renderMission(schedule, course) {
+      const entries = activeQuestionEntries(course);
+      const briefing =
+        course.videoType === "short"
+          ? "📺 先执行侦察任务（高斯零食短片 1～3 分钟），再完成3道基础题！做错当场修正，全部攻克才算通关。"
+          : "📺 先研究战术地图（超级课堂故事主线），再攻克1道核心题！做错当场修正，命中才算通关。";
+
+      const dayKey = dateKey();
+      const scouted = progress.scoutedDays.includes(dayKey);
+      const label = course.videoLabel || (course.videoType === "short" ? "零食短片 · 高斯" : "故事主线 · 超级课堂");
+      const metaBits = [];
+      if (course.videoTitle) metaBits.push(course.videoTitle);
+      if (course.videoDuration) metaBits.push("约 " + course.videoDuration);
+
+      let blocks = "";
+      entries.forEach((entry, hitIndex) => {
+        const id = qid(schedule.week, schedule.day, entry.index);
+        blocks += renderQuestionBlock(
+          {
+            id,
+            q: entry.q,
+            core: entry.core,
+            hitIndex,
+            week: schedule.week,
+            day: schedule.day,
+            index: entry.index
+          },
+          {}
+        );
+      });
+
+      return {
+        html: `
+          <h1 class="mission-title">${escapeHtml(course.name.redAlert)}</h1>
+          <p class="mission-sub">${escapeHtml(course.name.original)} · 第${schedule.week}周</p>
+          <span class="source-tag">${escapeHtml(label)}</span>
+          <p class="briefing">${briefing}</p>
+          <p class="video-meta">${escapeHtml(metaBits.join(" · "))}</p>
+          <div class="video-row">
+            <button type="button" class="btn btn-orange" id="videoBtn">🎬 前往B站观看</button>
+            <label class="scouted-label">
+              <input type="checkbox" id="scoutedCheck" ${scouted ? "checked" : ""} />
+              已完成侦察（看过视频）
+            </label>
+          </div>
+          <div id="questionList">${blocks}</div>
+        `,
+        entries
+      };
+    }
+
+    function renderEmpty(msg) {
+      return `<div class="empty-box">${msg}</div>`;
+    }
+
+    function mount() {
+      const root = document.getElementById("missionRoot");
+      const schedule = getSchedule();
+      document.getElementById("encourageText").textContent = pickRandom(ENCOURAGE_LINES);
+      refreshRankUI();
+      updateMuteBtn();
+
+      const banner = document.getElementById("welcomeBanner");
+      const receiveBtn = document.getElementById("receiveCommBtn");
+      const todayKey = dateKey();
+      if (progress.lastWelcomeDate !== todayKey) {
+        pendingWelcomeLine = pickRandom(WELCOME_SPEECH);
+        banner.hidden = false;
+        document.getElementById("welcomeText").textContent =
+          "🎙️ 长官通讯待命：" + pendingWelcomeLine;
+        receiveBtn.hidden = false;
+      } else {
+        banner.hidden = true;
+        pendingWelcomeLine = "";
+      }
+
+      if (schedule.beforeStart) {
+        root.dataset.mode = "wait";
+        root.innerHTML = renderEmpty(`训练尚未开始。开营日：2026年9月1日。请指挥官准时归队！`);
+        return;
+      }
+
+      const course = findCourse(schedule.week, schedule.day);
+
+      if (!course) {
+        root.dataset.mode = "empty";
+        root.innerHTML = renderEmpty(
+          `第${schedule.week}周的作战档案尚未送达指挥部。<br />后续专题可在 courses 数组中扩展。`
+        );
+        return;
+      }
+
+      if (course.type === "rest") {
+        root.dataset.mode = "rest";
+        root.innerHTML = renderRest();
+        return;
+      }
+
+      if (course.type === "review") {
+        root.dataset.mode = "review";
+        root.innerHTML = renderReview(schedule);
+        bindQuestionEvents(root, (ok) => {
+          if (ok) {
+            const still = progress.wrongList.filter((id) => getQState(id).status === "wrong");
+            if (still.length === 0) {
+              const done = document.getElementById("reviewDone");
+              const list = document.getElementById("reviewList");
+              if (list) list.innerHTML = "";
+              if (done) {
+                done.hidden = false;
+                playBgmBurst(10000, 0.3);
+                setTimeout(() => speak("恭喜你，士兵！本周战场已全部清扫干净。", { file: "voice/review-done.mp3" }), 400);
+              }
+            }
+            root.querySelectorAll(".question").forEach((node) => {
+              const qidVal = node.dataset.qid;
+              if (getQState(qidVal).status === "correct") node.remove();
+            });
+            checkReviewClear();
+          }
+        });
+        return;
+      }
+
+      root.dataset.mode = "mission";
+      const packed = renderMission(schedule, course);
+      root.innerHTML = packed.html;
+
+      document.getElementById("videoBtn").addEventListener("click", () => {
+        window.open(course.videoUrl, "_blank", "noopener,noreferrer");
+      });
+
+      const scout = document.getElementById("scoutedCheck");
+      scout.addEventListener("change", () => {
+        const key = dateKey();
+        if (scout.checked) {
+          if (!progress.scoutedDays.includes(key)) progress.scoutedDays.push(key);
+        } else {
+          progress.scoutedDays = progress.scoutedDays.filter((d) => d !== key);
+        }
+        saveProgress();
+      });
+
+      bindQuestionEvents(root, () => {
+        checkDailyClear(schedule, course, packed.entries);
+      });
+    }
+
+    document.getElementById("receiveCommBtn").addEventListener("click", () => {
+      const line = pendingWelcomeLine || pickRandom(WELCOME_SPEECH);
+      const todayKey = dateKey();
+      progress.lastWelcomeDate = todayKey;
+      saveProgress();
+      document.getElementById("welcomeText").textContent = "🎙️ 长官通讯：" + line;
+      document.getElementById("receiveCommBtn").hidden = true;
+      playWelcomeComm(line);
+    });
+
+    document.getElementById("muteBtn").addEventListener("click", () => {
+      setMuted(!soundMuted);
+    });
+
+    /* ========== 倒计时 ========== */
+    let timerRemain = 30 * 60;
+    let timerId = null;
+    let timerRunning = false;
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+    }
+
+    function updateTimerUI() {
+      document.getElementById("timerDisplay").textContent = formatTime(timerRemain);
+    }
+
+    document.getElementById("timerBtn").addEventListener("click", () => {
+      if (timerRunning) return;
+      timerRunning = true;
+      timerRemain = 30 * 60;
+      updateTimerUI();
+      document.getElementById("timerBtn").disabled = true;
+      document.getElementById("timerAlert").classList.remove("show");
+      timerId = setInterval(() => {
+        timerRemain -= 1;
+        updateTimerUI();
+        if (timerRemain <= 0) {
+          clearInterval(timerId);
+          timerRunning = false;
+          document.getElementById("timerBtn").disabled = false;
+          document.getElementById("timerAlert").classList.add("show");
+          speak("时间到！今日任务完成，撤退休整！", { file: "voice/timer.mp3" });
+        }
+      }, 1000);
+    });
+
+    document.getElementById("closeOverlayBtn").addEventListener("click", () => {
+      document.getElementById("clearOverlay").classList.remove("show");
+      stopBgm();
+    });
+
+    (function initDaySwitch() {
+      const sel = document.getElementById("simDateSelect");
+      if (!sel) return;
+      const names = ["日", "一", "二", "三", "四", "五", "六"];
+      for (let i = 0; i < 14; i++) {
+        const d = new Date(START_DATE.getTime());
+        d.setDate(START_DATE.getDate() + i);
+        const y = d.getFullYear();
+        const m = d.getMonth() + 1;
+        const day = d.getDate();
+        const iso = `${y}-${String(m).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+        const week = Math.floor(i / 7) + 1;
+        const opt = document.createElement("option");
+        opt.value = iso;
+        opt.textContent = `第${week}周周${names[d.getDay()]} · ${m}/${day}`;
+        sel.appendChild(opt);
+      }
+      const cur = localStorage.getItem("redAlert_simDate");
+      if (cur) sel.value = cur;
+      else {
+        const t = new Date();
+        const iso = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
+        if ([...sel.options].some((o) => o.value === iso)) sel.value = iso;
+      }
+      document.getElementById("simDateApply").addEventListener("click", () => {
+        localStorage.setItem("redAlert_simDate", sel.value);
+        location.reload();
+      });
+      document.getElementById("simDateReset").addEventListener("click", () => {
+        localStorage.removeItem("redAlert_simDate");
+        location.reload();
+      });
+    })();
+
+    // 顶部常驻静音：欢迎条隐藏时仍可开关——挂到状态栏计时区旁
+    (function ensureMuteAlwaysVisible() {
+      const wrap = document.querySelector(".timer-wrap");
+      if (!wrap || document.getElementById("muteBtnStatus")) return;
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "btn btn-ghost mute-btn";
+      b.id = "muteBtnStatus";
+      b.textContent = soundMuted ? "🔇 音效关" : "🔊 音效开";
+      b.addEventListener("click", () => {
+        setMuted(!soundMuted);
+        b.textContent = soundMuted ? "🔇 音效关" : "🔊 音效开";
+        const other = document.getElementById("muteBtn");
+        if (other) other.textContent = b.textContent;
+      });
+      wrap.appendChild(b);
+      const orig = updateMuteBtn;
+      updateMuteBtn = function () {
+        orig();
+        const sb = document.getElementById("muteBtnStatus");
+        if (sb) sb.textContent = soundMuted ? "🔇 音效关" : "🔊 音效开";
+      };
+    })();
+
+    mount();
+  </script>
+</body>
+</html>
