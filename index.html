@@ -91,6 +91,68 @@
       color: var(--accent);
       font-weight: 700;
       font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      min-height: 18px;
+      padding: 2px 6px;
+      border: 1px solid var(--border);
+      background: #1a1a1a;
+    }
+    .rank-bar-mark {
+      width: 4px;
+      height: 14px;
+      background: #c4a574;
+      box-shadow: 0 0 2px #000;
+    }
+    .rank-star {
+      color: #ffd08a;
+      font-size: 0.85rem;
+      line-height: 1;
+      text-shadow: 0 0 4px rgba(255, 180, 0, 0.5);
+    }
+    .rank-star.fine { font-size: 0.7rem; opacity: 0.9; }
+    .rank-star.gold { color: #ffcc33; font-size: 1.1rem; }
+
+    .toast-stack {
+      position: fixed;
+      top: 72px;
+      right: 12px;
+      z-index: 1200;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+    .toast {
+      min-width: 160px;
+      max-width: 260px;
+      padding: 10px 14px;
+      background: rgba(20, 28, 20, 0.92);
+      border: 1px solid var(--accent);
+      color: #ffd08a;
+      font-weight: 700;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+      opacity: 0;
+      transform: translateX(20px);
+      transition: opacity 0.25s, transform 0.25s;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: none;
+    }
+
+    .reset-btn {
+      margin-top: 6px;
+      font-size: 0.75rem !important;
+      padding: 4px 8px !important;
+      opacity: 0.75;
     }
 
     .score-line {
@@ -623,13 +685,16 @@
       </div>
     </div>
     <div class="status-right">
-      <div class="rank-line" id="rankLabel">🎖️ 列兵</div>
+      <div class="rank-line" id="rankLabel"><span class="rank-badge" id="rankBadge"></span><span id="rankName">🪖 列兵</span></div>
       <div class="score-line" id="scoreLabel">战果：0/3</div>
       <div class="rank-bar" title="军衔进度">
         <div class="rank-bar-fill" id="rankBarFill"></div>
       </div>
+      <button type="button" class="btn btn-ghost reset-btn" id="resetProgressBtn" title="清空本地进度，让孩子从零开始">🔄 重置进度（孩子开荒用）</button>
     </div>
   </header>
+
+  <div class="toast-stack" id="toastStack" aria-live="polite"></div>
 
   <main>
     <div class="welcome-banner" id="welcomeBanner" hidden>
@@ -666,48 +731,56 @@
 
   <script>
     const START_DATE = new Date(2026, 8, 1);
-    const STORAGE_KEY = "redAlert_progress";
+    const STORAGE_KEY = "redAlert_progress_v2";
     const MAX_RANK_SCORE = 74;
 
+    // 后面那张表：真实军官制 14 级
     const RANKS = [
-      { name: "列兵", need: 0 },
-      { name: "上等兵", need: 3 },
-      { name: "下士", need: 6 },
-      { name: "中士", need: 10 },
-      { name: "上士", need: 14 },
-      { name: "准尉", need: 18 },
-      { name: "少尉", need: 23 },
-      { name: "中尉", need: 28 },
-      { name: "上尉", need: 34 },
-      { name: "少校", need: 40 },
-      { name: "中校", need: 47 },
-      { name: "上校", need: 55 },
-      { name: "大校", need: 64 },
-      { name: "少将", need: 74 }
+      { name: "列兵", need: 0, icon: "🪖", bars: 0, stars: 0, fineStar: false, gold: false },
+      { name: "上等兵", need: 3, icon: "🪖", bars: 1, stars: 0, fineStar: false, gold: false },
+      { name: "下士", need: 6, icon: "🎖️", bars: 1, stars: 1, fineStar: false, gold: false },
+      { name: "中士", need: 10, icon: "🎖️", bars: 2, stars: 0, fineStar: false, gold: false },
+      { name: "上士", need: 14, icon: "🎖️", bars: 3, stars: 0, fineStar: false, gold: false },
+      { name: "准尉", need: 18, icon: "🎖️", bars: 1, stars: 0, fineStar: true, gold: false },
+      { name: "少尉", need: 23, icon: "🎖️", bars: 1, stars: 1, fineStar: false, gold: false },
+      { name: "中尉", need: 28, icon: "🎖️", bars: 1, stars: 2, fineStar: false, gold: false },
+      { name: "上尉", need: 34, icon: "🎖️", bars: 1, stars: 3, fineStar: false, gold: false },
+      { name: "少校", need: 40, icon: "🎖️", bars: 2, stars: 1, fineStar: false, gold: false },
+      { name: "中校", need: 47, icon: "🎖️", bars: 2, stars: 2, fineStar: false, gold: false },
+      { name: "上校", need: 55, icon: "🎖️", bars: 2, stars: 3, fineStar: false, gold: false },
+      { name: "大校", need: 64, icon: "🎖️", bars: 2, stars: 4, fineStar: false, gold: false },
+      { name: "少将", need: 74, icon: "🏅", bars: 0, stars: 0, fineStar: false, gold: true }
     ];
 
     const PROMOTE_SPEECH = {
-      1: "晋升上等兵！你已经开始发光了。",
-      2: "下士！干得漂亮，继续前进。",
-      3: "中士！你已经能带领小队了。",
-      4: "上士！离军官只有一步之遥，别停下。",
+      0: "欢迎入伍，新兵！证明给我看。",
+      1: "不错，你已经开始像个兵了。",
+      2: "晋升下士！继续冲锋。",
+      3: "中士！你是队伍的脊梁。",
+      4: "上士！离军官只有一步之遥。",
       5: "准尉！你已经有了军官的气质。",
-      6: "少尉！这是你的第一颗星，记住这一刻。",
+      6: "少尉！这是你的第一颗将星，记住今天。",
       7: "中尉！两颗星了，继续闪耀。",
-      8: "上尉！三颗星，指挥官的料。",
-      9: "少校！跨入校官行列，恭喜你。",
-      10: "中校！威信在增长。",
-      11: "上校！你是战场的主宰。",
+      8: "上尉！三颗星，你已经是指挥官了。",
+      9: "少校！校官行列，欢迎你。",
+      10: "中校！两颗星，威信日增。",
+      11: "上校！三颗星，你是战场的主宰。",
       12: "大校！四颗星，将军在向你招手。",
-      13: "少将！！将军！全体敬礼！"
+      13: "少将！！将军！你是真正的领袖！"
     };
 
-    /* 做对：长官短评（语音） */
+    /* 当日连击反馈（右上角横幅 + 男声） */
     const HIT_SPEECH = [
-      "干得漂亮，士兵！继续保持。",
-      "命中目标！你是个好苗子。",
-      "漂亮！我已经看到你身上的将军潜质了。",
-      "完美！这一仗打得漂亮，我为你骄傲。"
+      "第一滴血！",
+      "双杀！",
+      "三连击！",
+      "完美通关！"
+    ];
+    const HIT_TOAST = [
+      "🔥 第一滴血！",
+      "⚡ 双杀！",
+      "🎯 三连击！",
+      "🌟 完美通关！"
     ];
 
     /* 每日归队：简短点名（语音 + 文字条） */
@@ -1001,7 +1074,8 @@
         clearedDays: [],
         promotedAnnounced: [],
         lastWelcomeDate: "",
-        scoutedDays: []
+        scoutedDays: [],
+        enlistedSpoken: false
       };
     }
 
@@ -1018,7 +1092,8 @@
           clearedDays: Array.isArray(data.clearedDays) ? data.clearedDays : [],
           promotedAnnounced: Array.isArray(data.promotedAnnounced) ? data.promotedAnnounced : [],
           lastWelcomeDate: data.lastWelcomeDate || "",
-          scoutedDays: Array.isArray(data.scoutedDays) ? data.scoutedDays : []
+          scoutedDays: Array.isArray(data.scoutedDays) ? data.scoutedDays : [],
+          enlistedSpoken: !!data.enlistedSpoken
         };
       } catch (e) {
         return defaultProgress();
@@ -1710,12 +1785,38 @@
     });
 
     /* ========== 军衔 UI ========== */
+    function renderRankBadge(rank) {
+      if (rank.gold) return '<span class="rank-star gold">★</span>';
+      let html = "";
+      for (let i = 0; i < rank.bars; i++) html += '<span class="rank-bar-mark"></span>';
+      if (rank.fineStar) html += '<span class="rank-star fine">✦</span>';
+      for (let i = 0; i < rank.stars; i++) html += '<span class="rank-star">★</span>';
+      return html || '<span style="opacity:0.35;font-size:0.75rem;">新兵</span>';
+    }
+
+    function showToast(text) {
+      const stack = document.getElementById("toastStack");
+      if (!stack) return;
+      const el = document.createElement("div");
+      el.className = "toast";
+      el.textContent = text;
+      stack.appendChild(el);
+      requestAnimationFrame(() => el.classList.add("show"));
+      setTimeout(() => {
+        el.classList.remove("show");
+        setTimeout(() => el.remove(), 280);
+      }, 2200);
+    }
+
     function refreshRankUI() {
       const count = progress.correctCount;
       const idx = getRankIndex(count);
-      const name = RANKS[idx].name;
+      const rank = RANKS[idx];
       const next = nextRankNeed(count);
-      document.getElementById("rankLabel").textContent = `🎖️ ${name}`;
+      const badge = document.getElementById("rankBadge");
+      const nameEl = document.getElementById("rankName");
+      if (badge) badge.innerHTML = renderRankBadge(rank);
+      if (nameEl) nameEl.textContent = `${rank.icon} ${rank.name}`;
       document.getElementById("scoreLabel").textContent =
         idx >= RANKS.length - 1
           ? `战果：${count}/${MAX_RANK_SCORE}（已达少将）`
@@ -1842,6 +1943,7 @@
       setQState(id, { status: "correct", firstCorrect: true });
       removeWrong(id);
       const speechIdx = Math.min(Math.max(hitIndex, 0), HIT_SPEECH.length - 1);
+      showToast(HIT_TOAST[speechIdx] || HIT_SPEECH[speechIdx]);
       // 先命中语音，再晋升语音，通关语音最后入队 —— 避免叠声/女声抢麦
       enqueueVoice(() => speak(HIT_SPEECH[speechIdx], { file: `voice/hit-${speechIdx}.mp3` }));
       if (first) maybePromote(oldCount, progress.correctCount);
@@ -2183,6 +2285,19 @@
       document.getElementById("welcomeText").textContent = "🎙️ 长官通讯：" + line;
       document.getElementById("receiveCommBtn").hidden = true;
       playWelcomeComm(line);
+      if (!progress.enlistedSpoken && progress.correctCount === 0) {
+        progress.enlistedSpoken = true;
+        saveProgress();
+        enqueueVoice(() => speak(PROMOTE_SPEECH[0], { file: "voice/promote-0.mp3" }));
+      }
+    });
+
+    document.getElementById("resetProgressBtn").addEventListener("click", () => {
+      const ok = confirm("确定清空本机全部进度？孩子将从列兵、未做任何题开始。");
+      if (!ok) return;
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem("redAlert_progress");
+      location.reload();
     });
 
     document.getElementById("muteBtn").addEventListener("click", () => {
