@@ -1139,10 +1139,12 @@
       }
     }
 
-    /** 优先播放预生成的 Edge 男声 MP3，失败再回退系统语音 */
+    /** 优先播放预生成的 Edge 男声 MP3，失败再回退系统语音（仅男声，绝不播女声） */
     function playVoiceFile(relPath) {
       if (soundMuted) return Promise.resolve(false);
       return new Promise((resolve) => {
+        // 播男声 MP3 前，先掐掉系统语音，避免男女声打架
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
         stopVoicePlayer();
         const a = new Audio(relPath);
         voicePlayer = a;
@@ -1208,6 +1210,11 @@
 
     function speakSynth(text, opts) {
       if (!window.speechSynthesis || !text) return Promise.resolve();
+      const voice = pickCommanderVoice();
+      // 找不到可靠男声就静音，绝不用系统女声
+      if (!voice || scoreMaleVoice(voice) < 40) {
+        return Promise.resolve();
+      }
       return new Promise((resolve) => {
         try {
           if (!(opts && opts.queue)) window.speechSynthesis.cancel();
@@ -1217,8 +1224,7 @@
           u.rate = (opts && opts.rate) != null ? opts.rate : 0.78;
           u.pitch = (opts && opts.pitch) != null ? opts.pitch : 0.72;
           u.volume = 1;
-          const voice = pickCommanderVoice();
-          if (voice) u.voice = voice;
+          u.voice = voice;
           u.onend = () => resolve();
           u.onerror = () => resolve();
           window.speechSynthesis.speak(u);
@@ -1228,16 +1234,25 @@
       });
     }
 
+    /** 语音排队：命中 / 晋升 / 通关 不叠播 */
+    let voiceChain = Promise.resolve();
+    function enqueueVoice(fn) {
+      voiceChain = voiceChain.then(() => fn()).catch(() => {});
+      return voiceChain;
+    }
+
     function playWelcomeComm(line) {
       const idx = Math.max(0, WELCOME_SPEECH.indexOf(line));
       const file = `voice/welcome-${idx >= 0 ? idx : 0}.mp3`;
       playBgmBurst(16000, 0.34);
-      setTimeout(() => speak(line, { file }), 600);
+      setTimeout(() => enqueueVoice(() => speak(line, { file })), 600);
     }
 
     function playClearFanfare() {
       playBgmBurst(12000, 0.38);
-      setTimeout(() => speak("完美！今日任务全部完成，你证明了自己！", { file: "voice/clear.mp3" }), 500);
+      return enqueueVoice(() =>
+        speak("完美！今日任务全部完成，你证明了自己！", { file: "voice/clear.mp3" })
+      );
     }
 
     /* ========== 长官讲解：图形 + 算式动画 ========== */
@@ -1717,7 +1732,11 @@
           if (!progress.promotedAnnounced.includes(i)) {
             progress.promotedAnnounced.push(i);
             saveProgress();
-            if (PROMOTE_SPEECH[i]) speak(PROMOTE_SPEECH[i]);
+            const line = PROMOTE_SPEECH[i];
+            if (line) {
+              const file = `voice/promote-${i}.mp3`;
+              enqueueVoice(() => speak(line, { file }));
+            }
           }
         }
       }
@@ -1817,14 +1836,15 @@
         first = true;
         progress.correctCount += 1;
         saveProgress();
-        maybePromote(oldCount, progress.correctCount);
       } else {
         refreshRankUI();
       }
       setQState(id, { status: "correct", firstCorrect: true });
       removeWrong(id);
       const speechIdx = Math.min(Math.max(hitIndex, 0), HIT_SPEECH.length - 1);
-      speak(HIT_SPEECH[speechIdx], { file: `voice/hit-${speechIdx}.mp3` });
+      // 先命中语音，再晋升语音，通关语音最后入队 —— 避免叠声/女声抢麦
+      enqueueVoice(() => speak(HIT_SPEECH[speechIdx], { file: `voice/hit-${speechIdx}.mp3` }));
+      if (first) maybePromote(oldCount, progress.correctCount);
     }
 
     function speakMissEncourage() {
