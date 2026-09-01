@@ -12,3 +12,6 @@ _inject_ex.js
 node_modules/
 .vscode/
 .idea/
+.gh-token
+login-github.ps1
+一键登录GitHub.bat
