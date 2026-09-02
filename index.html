@@ -1466,9 +1466,11 @@
       if (opts && opts.file) {
         return playVoiceFile(opts.file).then((ok) => {
           if (ok) return;
+          if (opts.noSynth) return Promise.resolve();
           return speakSynth(text, opts);
         });
       }
+      if (opts && opts.noSynth) return Promise.resolve();
       return speakSynth(text, opts);
     }
 
@@ -1917,20 +1919,28 @@
 
     async function runBriefing(q, meta) {
       const token = ++briefToken;
-      briefCurrentQ = { q, meta };
-      const { steps } = buildBriefing(q);
+      const frozenMeta = meta ? { dayNum: meta.dayNum, index: meta.index, course: meta.course } : null;
+      const frozenQ = q;
+      briefCurrentQ = { q: frozenQ, meta: frozenMeta };
+      const { steps } = buildBriefing(frozenQ);
       const overlay = document.getElementById("briefOverlay");
       const stage = document.getElementById("briefStage");
       const formulas = document.getElementById("briefFormulas");
       const caption = document.getElementById("briefCaption");
+      const titleEl = document.getElementById("briefTitle");
+      if (titleEl && frozenMeta && frozenMeta.dayNum != null) {
+        titleEl.textContent = `📢 长官讲解 · 第${padDay(frozenMeta.dayNum)}天 第${frozenMeta.index + 1}题`;
+      } else if (titleEl) {
+        titleEl.textContent = "📢 长官战术讲解";
+      }
       overlay.classList.add("show");
       formulas.innerHTML = steps.map((s) => `<li>${escapeHtml(s.formula)}</li>`).join("");
       stage.innerHTML = "";
       caption.textContent = "长官频道已接通（云扬男声）……";
 
       const idBase =
-        meta && meta.dayNum != null
-          ? `d${meta.dayNum}-q${meta.index}`
+        frozenMeta && frozenMeta.dayNum != null
+          ? `d${frozenMeta.dayNum}-q${frozenMeta.index}`
           : null;
 
       for (let i = 0; i < steps.length; i++) {
@@ -1946,13 +1956,14 @@
         await sleep(280);
         if (token !== briefToken) return;
         const stepFile = idBase ? `voice/brief/${idBase}-s${i}.mp3` : null;
-        await speak(step.say, { file: stepFile, rate: 0.76, pitch: 0.7 });
+        await speak(step.say, { file: stepFile, noSynth: true, rate: 0.76, pitch: 0.7 });
         if (token !== briefToken) return;
         await sleep(180);
       }
       caption.textContent = "讲解完毕。听懂了就去瞄准目标！";
       await speak("讲解完毕。听懂了就去瞄准目标！", {
         file: "voice/brief-end.mp3",
+        noSynth: true,
         rate: 0.78,
         pitch: 0.7
       });
@@ -2127,6 +2138,34 @@
     }
 
     /* ========== 作答逻辑 ========== */
+    let advanceTimer = null;
+
+    function clearAdvanceTimer() {
+      if (advanceTimer) {
+        clearTimeout(advanceTimer);
+        advanceTimer = null;
+      }
+    }
+
+    function goToQuestion(dayNum, course, qIndex) {
+      clearAdvanceTimer();
+      closeBriefing();
+      currentQIndex = qIndex;
+      const slotEl = document.getElementById("quizSlot");
+      if (!slotEl) return;
+      slotEl.innerHTML = renderQuizCard(dayNum, course, qIndex);
+      bindActiveQuestion(dayNum, course, qIndex);
+    }
+
+    function playHitStreak(hitIndex) {
+      const speechIdx = Math.min(Math.max(hitIndex, 0), HIT_SPEECH.length - 1);
+      showToast(HIT_TOAST[speechIdx] || HIT_SPEECH[speechIdx]);
+      playBgmBurst(4500 + speechIdx * 900, 0.28 + speechIdx * 0.03);
+      enqueueVoice(() =>
+        speak(HIT_SPEECH[speechIdx], { file: `voice/hit-${speechIdx}.mp3`, noSynth: true })
+      );
+    }
+
     function markCorrect(id, hitIndex) {
       const prev = getQState(id);
       const oldCount = progress.correctCount;
@@ -2140,16 +2179,13 @@
       }
       setQState(id, { status: "correct", firstCorrect: true });
       removeWrong(id);
-      const speechIdx = Math.min(Math.max(hitIndex, 0), HIT_SPEECH.length - 1);
-      showToast(HIT_TOAST[speechIdx] || HIT_SPEECH[speechIdx]);
-      // 先命中语音，再晋升语音，通关语音最后入队 —— 避免叠声/女声抢麦
-      enqueueVoice(() => speak(HIT_SPEECH[speechIdx], { file: `voice/hit-${speechIdx}.mp3` }));
+      playHitStreak(hitIndex);
       if (first) maybePromote(oldCount, progress.correctCount);
     }
 
     function speakMissEncourage() {
       const idx = Math.floor(Math.random() * MISS_SPEECH.length);
-      return speak(MISS_SPEECH[idx], { file: `voice/miss-${idx}.mp3` });
+      return speak(MISS_SPEECH[idx], { file: `voice/miss-${idx}.mp3`, noSynth: true });
     }
 
     function stopMissionTimer() {
@@ -2221,7 +2257,8 @@
           <p class="q-text">${escapeHtml(entry.q)}</p>
           <input class="answer-input answer-input-lg" type="text" inputmode="numeric" placeholder="输入答案" ${locked ? "disabled" : ""} id="activeAnswer" />
           <button type="button" class="btn btn-orange btn-check-lg" id="activeCheckBtn" ${locked ? "disabled" : ""}>✅ 确认战果</button>
-          <button type="button" class="btn btn-ghost" id="activeHintBtn" style="width:100%;margin-top:8px;">📢 长官讲解</button>
+          <button type="button" class="btn btn-ghost" id="activeHintBtn" style="width:100%;margin-top:8px;">📢 长官讲解（自选）</button>
+          ${qIndex > 0 ? '<button type="button" class="btn btn-ghost" id="prevQBtn" style="width:100%;margin-top:8px;">⬅ 返回上一题</button>' : ""}
           <div class="feedback-slot" id="activeFeedback">${locked ? '<p class="feedback ok">✔️ 已攻克</p>' : ""}</div>
         </div>`;
     }
@@ -2232,11 +2269,26 @@
       const input = document.getElementById("activeAnswer");
       const checkBtn = document.getElementById("activeCheckBtn");
       const hintBtn = document.getElementById("activeHintBtn");
+      const prevBtn = document.getElementById("prevQBtn");
       const slot = document.getElementById("activeFeedback");
       if (!input || !checkBtn || !entry) return;
 
-      const info = { course, q: entry, dayNum, index: qIndex };
-      hintBtn.onclick = () => runBriefing(entry, info);
+      const snapInfo = () => ({
+        course,
+        q: course.questions[qIndex],
+        dayNum,
+        index: qIndex
+      });
+
+      hintBtn.onclick = () => {
+        clearAdvanceTimer();
+        const s = snapInfo();
+        runBriefing(s.q, s);
+      };
+
+      if (prevBtn) {
+        prevBtn.onclick = () => goToQuestion(dayNum, course, qIndex - 1);
+      }
 
       if (checkBtn.disabled) return;
 
@@ -2246,40 +2298,41 @@
           slot.innerHTML = `<p class="feedback bad">请先输入答案。</p>`;
           return;
         }
-        if (answersEqual(user, entry.answer)) {
+        const curEntry = course.questions[qIndex];
+        const curInfo = snapInfo();
+        if (answersEqual(user, curEntry.answer)) {
           markCorrect(id, qIndex);
           input.disabled = true;
           checkBtn.disabled = true;
-          slot.innerHTML = `<p class="feedback ok">✔️ 命中目标！</p>`;
+          hintBtn.textContent = "📢 听本题讲解（可选）";
+          hintBtn.onclick = () => {
+            clearAdvanceTimer();
+            runBriefing(curEntry, curInfo);
+          };
           refreshDayProgressUI(dayNum);
           refreshEnergyUI();
 
           const next = qIndex + 1;
           if (next >= QUESTIONS_PER_DAY) {
-            setTimeout(() => checkDailyClear(dayNum, course), 900);
+            slot.innerHTML = `<p class="feedback ok">✔️ 命中目标！即将结算……</p>`;
+            clearAdvanceTimer();
+            advanceTimer = setTimeout(() => checkDailyClear(dayNum, course), 1200);
           } else {
-            setTimeout(() => {
-              currentQIndex = next;
-              const slotEl = document.getElementById("quizSlot");
-              if (slotEl) {
-                slotEl.innerHTML = renderQuizCard(dayNum, course, next);
-                bindActiveQuestion(dayNum, course, next);
-                const ni = document.getElementById("activeAnswer");
-                if (ni) ni.focus();
-              }
-            }, 800);
+            slot.innerHTML = `<p class="feedback ok">✔️ 命中目标！1.5 秒后进入下一题……</p>`;
+            clearAdvanceTimer();
+            advanceTimer = setTimeout(() => goToQuestion(dayNum, course, next), 1500);
           }
         } else {
           const st = getQState(id);
           st.status = "wrong";
-          st.lastReveal = String(entry.answer);
+          st.lastReveal = String(curEntry.answer);
           setQState(id, st);
           addWrong(id);
-          slot.innerHTML = `<p class="feedback bad">💥 未命中！正确答案是 ${escapeHtml(entry.answer)}。长官即将讲解……</p>`;
+          clearAdvanceTimer();
+          slot.innerHTML = `<p class="feedback bad">💥 未命中！正确答案是 ${escapeHtml(curEntry.answer)}。<br />需要讲解请点下方按钮，改好答案再提交。</p>`;
           input.value = "";
+          input.focus();
           await speakMissEncourage();
-          await sleep(400);
-          runBriefing(entry, info);
         }
       };
 
@@ -2316,7 +2369,7 @@
           <div class="answer-row">
             <input class="answer-input" type="text" inputmode="numeric" placeholder="输入答案" ${locked ? "disabled" : ""} />
             <button type="button" class="btn btn-check" ${locked ? "disabled" : ""}>✅ 确认战果</button>
-            <button type="button" class="btn btn-ghost btn-hint">📢 长官讲解</button>
+            <button type="button" class="btn btn-ghost btn-hint">📢 长官讲解（自选）</button>
           </div>
           <div class="feedback-slot">${feedback}</div>
         </article>`;
@@ -2352,11 +2405,9 @@
             st.lastReveal = String(info.q.answer);
             setQState(id, st);
             addWrong(id);
-            slot.innerHTML = `<p class="feedback bad">💥 未命中！正确答案是 ${escapeHtml(info.q.answer)}。长官即将讲解……</p>`;
+            slot.innerHTML = `<p class="feedback bad">💥 未命中！正确答案是 ${escapeHtml(info.q.answer)}。需要讲解请点「长官讲解」。</p>`;
             input.value = "";
             await speakMissEncourage();
-            await sleep(400);
-            runBriefing(info.q, info);
             if (onAfterAnswer) onAfterAnswer(false, id);
           }
         });
