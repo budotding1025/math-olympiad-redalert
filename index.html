@@ -9,933 +9,259 @@
       --bg-deep: #1a2e1a;
       --bg-mid: #2d4a2d;
       --card: #2d2d2d;
-      --border: #8B7355;
+      --border: #4a7a4a;
       --accent: #FF6A00;
       --text: #e0e0e0;
       --muted: #9a9a9a;
       --btn: #4a7a4a;
       --btn-hover: #5c9a5c;
-      --danger: #c44;
-      --ok: #5c9a5c;
+      --ok: #4a7a4a;
     }
-
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
       color: var(--text);
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-      background:
-        repeating-linear-gradient(
-          -45deg,
-          transparent,
-          transparent 8px,
-          rgba(0, 0, 0, 0.06) 8px,
-          rgba(0, 0, 0, 0.06) 16px
-        ),
-        repeating-linear-gradient(
-          45deg,
-          transparent,
-          transparent 12px,
-          rgba(255, 255, 255, 0.02) 12px,
-          rgba(255, 255, 255, 0.02) 24px
-        ),
-        radial-gradient(ellipse at 20% 20%, #3a5a3a 0%, transparent 50%),
-        linear-gradient(160deg, var(--bg-deep) 0%, var(--bg-mid) 45%, #1f351f 100%);
+      background: linear-gradient(160deg, var(--bg-deep) 0%, var(--bg-mid) 50%, #1f351f 100%);
       background-attachment: fixed;
+      padding-bottom: 120px;
     }
-
     .status-bar {
       display: flex;
       flex-wrap: wrap;
-      align-items: center;
       justify-content: space-between;
       gap: 12px;
-      padding: 12px 20px;
-      background: rgba(10, 18, 10, 0.82);
+      padding: 12px 16px;
+      background: rgba(10, 18, 10, 0.9);
       border-bottom: 2px solid var(--border);
       position: sticky;
       top: 0;
       z-index: 100;
-      backdrop-filter: blur(6px);
     }
-
-    .status-left {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .status-title {
-      font-size: 1.05rem;
-      color: var(--accent);
-      font-weight: 700;
-    }
-
-    .encourage {
-      font-size: 0.9rem;
-      color: #ffd08a;
-    }
-
-    .status-right {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 6px;
-      min-width: 200px;
-    }
-
-    .rank-line {
-      color: var(--accent);
-      font-weight: 700;
-      font-size: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .rank-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 3px;
-      min-height: 18px;
-      padding: 2px 6px;
-      border: 1px solid var(--border);
-      background: #1a1a1a;
-    }
-    .rank-bar-mark {
-      width: 4px;
-      height: 14px;
-      background: #c4a574;
-      box-shadow: 0 0 2px #000;
-    }
-    .rank-star {
-      color: #ffd08a;
-      font-size: 0.85rem;
-      line-height: 1;
-      text-shadow: 0 0 4px rgba(255, 180, 0, 0.5);
-    }
-    .rank-star.fine { font-size: 0.7rem; opacity: 0.9; }
-    .rank-star.gold { color: #ffcc33; font-size: 1.1rem; }
-
-    .toast-stack {
-      position: fixed;
-      top: 72px;
-      right: 12px;
-      z-index: 1200;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      pointer-events: none;
-    }
-    .toast {
-      min-width: 160px;
-      max-width: 260px;
-      padding: 10px 14px;
-      background: rgba(20, 28, 20, 0.92);
+    .status-title { color: var(--accent); font-weight: 700; font-size: 1.05rem; }
+    .encourage { color: #ffd08a; font-size: 0.95rem; margin-top: 4px; min-height: 1.4em; }
+    .energy-chip {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 4px 10px;
       border: 1px solid var(--accent);
       color: #ffd08a;
       font-weight: 700;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.45);
-      opacity: 0;
-      transform: translateX(20px);
-      transition: opacity 0.25s, transform 0.25s;
-    }
-    .toast.show {
-      opacity: 1;
-      transform: none;
-    }
-
-    .reset-btn {
-      margin-top: 6px;
-      font-size: 0.75rem !important;
-      padding: 4px 8px !important;
-      opacity: 0.75;
-    }
-
-    .score-line {
-      font-size: 0.9rem;
-      color: var(--text);
-    }
-
-    .rank-bar {
-      width: 220px;
-      max-width: 100%;
-      height: 10px;
-      background: #1a1a1a;
-      border: 1px solid var(--border);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-
-    .rank-bar-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #4a7a4a, var(--accent));
-      transition: width 0.4s ease;
-    }
-
-    .timer-wrap {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .source-tag {
-      display: inline-block;
-      margin: 0 0 10px;
-      padding: 4px 10px;
       font-size: 0.85rem;
-      font-weight: 700;
-      color: #ffd08a;
-      border: 1px solid var(--border);
-      background: rgba(0, 0, 0, 0.35);
+      background: rgba(255,106,0,0.12);
     }
-
-    .video-meta {
-      font-size: 0.9rem;
-      color: var(--muted);
-      margin: 0 0 8px;
+    .rank-line { color: var(--accent); font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .rank-badge { display: inline-flex; gap: 3px; padding: 2px 6px; border: 1px solid var(--border); background: #1a1a1a; }
+    .rank-bar-mark { width: 4px; height: 14px; background: #c4a574; }
+    .rank-star { color: #ffd08a; }
+    .rank-star.fine { font-size: 0.7rem; }
+    .rank-star.gold { color: #ffcc33; font-size: 1.1rem; }
+    .score-line { font-size: 0.9rem; margin-top: 4px; }
+    .rank-bar { width: 180px; height: 10px; background: #1a1a1a; border: 1px solid var(--border); margin-top: 6px; overflow: hidden; }
+    .rank-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--btn), var(--accent)); transition: width 0.8s ease; }
+    .timer-display { color: var(--accent); font-size: 1.2rem; font-variant-numeric: tabular-nums; margin-left: 8px; }
+    .timer-alert { display: none; margin-top: 8px; padding: 8px; border: 1px solid var(--accent); color: #ffd08a; }
+    .timer-alert.show { display: block; }
+    .toast-stack { position: fixed; top: 72px; right: 12px; z-index: 1200; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+    .toast {
+      min-width: 160px; padding: 12px 14px; background: rgba(20,28,20,0.95);
+      border: 1px solid var(--accent); color: #ffd08a; font-weight: 700;
+      opacity: 0; transform: translateX(20px); transition: opacity 0.5s, transform 0.5s;
     }
-
+    .toast.show { opacity: 1; transform: none; }
+    main { max-width: 860px; margin: 0 auto; padding: 16px 16px 24px; }
     .welcome-banner {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-      padding: 12px 16px;
-      background: rgba(0, 0, 0, 0.35);
-      border-left: 4px solid var(--accent);
-      color: #ffd08a;
+      margin-bottom: 14px; padding: 14px 16px; background: rgba(0,0,0,0.35);
+      border-left: 4px solid var(--accent); color: #ffd08a; font-size: 1.05rem;
     }
-
-    .welcome-banner[hidden] {
-      display: none !important;
-    }
-
-    .day-switch {
-      margin-top: 8px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      align-items: center;
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-    .day-switch select, .day-switch button {
-      font-size: 0.85rem;
-      padding: 6px 8px;
-      background: #1a1a1a;
-      color: var(--text);
-      border: 1px solid var(--border);
-      font-family: inherit;
-    }
-    .day-switch button {
-      cursor: pointer;
-      background: #3a3a3a;
-    }
-
-    .mute-btn {
-      font-size: 0.9rem;
-      padding: 8px 12px;
-    }
-
-    .timer-display {
-      font-variant-numeric: tabular-nums;
-      font-size: 1.25rem;
-      color: var(--accent);
-      min-width: 4.5em;
-    }
-
-    main {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 20px 16px 48px;
-    }
-
+    .welcome-banner[hidden] { display: none !important; }
     .mission-card {
-      background: var(--card);
-      border: 2px solid var(--border);
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.06),
-        0 8px 24px rgba(0, 0, 0, 0.45);
-      padding: 20px 22px 24px;
-      position: relative;
+      background: var(--card); border: 2px solid var(--border);
+      padding: 18px 18px 22px; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      transition: opacity 0.8s ease;
     }
-
-    .mission-card::before {
-      content: "";
-      position: absolute;
-      inset: 4px;
-      border: 1px solid rgba(139, 115, 85, 0.35);
-      pointer-events: none;
+    .mission-card.waiting-welcome { opacity: 0.25; pointer-events: none; }
+    .mission-title { margin: 0 0 4px; font-size: 1.4rem; color: var(--accent); }
+    .mission-sub { margin: 0 0 12px; color: var(--muted); }
+    .phase-tag {
+      display: inline-block; padding: 4px 12px; margin: 0 8px 10px 0;
+      font-size: 0.85rem; font-weight: 700; border: 1px solid var(--border);
     }
-
-    .mission-title {
-      margin: 0 0 4px;
-      font-size: 1.55rem;
-      color: var(--accent);
-      text-shadow: 0 0 12px rgba(255, 106, 0, 0.35), 0 2px 4px rgba(0, 0, 0, 0.9);
+    .phase-tag.foundation { color: #7dffa0; }
+    .phase-tag.advancement { color: #ffd08a; border-color: var(--accent); }
+    .source-tag { display: inline-block; padding: 4px 10px; margin-bottom: 10px; font-size: 0.85rem; color: #ffd08a; border: 1px solid var(--border); }
+    .day-progress-wrap { margin: 0 0 16px; }
+    .day-progress-label { display: flex; justify-content: space-between; color: #ffd08a; font-size: 0.9rem; margin-bottom: 6px; }
+    .day-progress-bar { height: 14px; background: #1a1a1a; border: 1px solid var(--border); overflow: hidden; }
+    .day-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--btn), var(--accent)); transition: width 0.8s ease; }
+    .quiz-card {
+      padding: 18px; background: rgba(0,0,0,0.28); border: 2px solid var(--accent);
+      transition: opacity 0.5s ease, transform 0.5s ease;
     }
-
-    .mission-sub {
-      margin: 0 0 14px;
-      color: var(--muted);
-      font-size: 0.95rem;
+    .quiz-dots { display: flex; gap: 10px; justify-content: center; margin-bottom: 14px; }
+    .quiz-dot { width: 14px; height: 14px; border-radius: 50%; background: #444; border: 2px solid #666; transition: all 0.5s; }
+    .quiz-dot.done { background: var(--ok); border-color: #7dffa0; }
+    .quiz-dot.current { background: var(--accent); border-color: #ffd08a; transform: scale(1.25); }
+    .q-badge { color: var(--accent); font-weight: 700; margin: 0 0 8px; }
+    .q-text { margin: 0 0 14px; line-height: 1.7; font-size: 1.12rem; }
+    .answer-input-lg {
+      width: 100%; padding: 16px; font-size: 1.3rem; text-align: center;
+      background: #1a1a1a; border: 2px solid var(--border); color: var(--text);
+      font-family: inherit; margin-bottom: 10px; min-height: 52px;
     }
-
-    .briefing {
-      margin: 0 0 16px;
-      padding: 10px 12px;
-      background: rgba(74, 122, 74, 0.2);
-      border: 1px dashed var(--border);
-      line-height: 1.5;
-    }
-
-    .btn {
-      appearance: none;
-      border: 2px solid #6b8f6b;
-      background: linear-gradient(180deg, #5a8a5a 0%, var(--btn) 100%);
-      color: #f5f5f5;
-      font-size: 1rem;
-      font-weight: 700;
-      padding: 12px 18px;
-      cursor: pointer;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 3px 0 #2a4a2a;
-      transition: background 0.15s, transform 0.08s;
-      font-family: inherit;
-    }
-
-    .btn:hover {
-      background: linear-gradient(180deg, #6aaa6a 0%, var(--btn-hover) 100%);
-    }
-
-    .btn:active {
-      transform: translateY(2px);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 0 #2a4a2a;
-    }
-
-    .btn:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .btn-orange {
-      background: linear-gradient(180deg, #ff8a33 0%, var(--accent) 100%);
-      border-color: #ffb366;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 3px 0 #a34500;
-    }
-
-    .btn-orange:hover {
-      background: linear-gradient(180deg, #ff9a4d 0%, #ff7a1a 100%);
-    }
-
-    .btn-ghost {
-      background: #3a3a3a;
-      border-color: var(--border);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 3px 0 #1a1a1a;
-    }
-
-    .btn-ghost:hover {
-      background: #4a4a4a;
-    }
-
-    .video-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .scouted-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.95rem;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .scouted-label input {
-      width: 20px;
-      height: 20px;
-      accent-color: var(--accent);
-    }
-
-    .question {
-      margin-top: 16px;
-      padding: 16px;
-      background: rgba(0, 0, 0, 0.28);
-      border: 1px solid #555;
-    }
-
-    .question.core {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(255, 106, 0, 0.25);
-    }
-
-    .q-badge {
-      display: inline-block;
-      margin-bottom: 8px;
-      color: var(--accent);
-      font-weight: 700;
-      font-size: 0.9rem;
-    }
-
-    .q-text {
-      margin: 0 0 12px;
-      line-height: 1.6;
-      font-size: 1.08rem;
-    }
-
-    .answer-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .answer-input {
-      flex: 1 1 160px;
-      min-width: 140px;
-      max-width: 280px;
-      padding: 12px 14px;
-      font-size: 1.15rem;
-      background: #1a1a1a;
-      border: 2px solid var(--border);
-      color: var(--text);
-      font-family: inherit;
-      text-shadow: none;
-    }
-
-    .answer-input:focus {
-      outline: none;
-      border-color: var(--accent);
-    }
-
-    .answer-input:disabled {
-      opacity: 0.7;
-    }
-
-    .feedback {
-      min-height: 1.4em;
-      margin: 6px 0 0;
-      font-weight: 700;
-    }
-
+    .answer-input-lg:focus { outline: none; border-color: var(--accent); }
+    .answer-input-lg:disabled { opacity: 0.7; }
+    .feedback { margin: 8px 0 0; font-weight: 700; min-height: 1.5em; animation: fadeIn 0.5s ease; }
     .feedback.ok { color: #7dffa0; }
     .feedback.bad { color: #ff8a8a; }
-    .feedback.done { color: #7dffa0; }
-
-    .rest-box, .review-empty, .empty-box {
-      text-align: center;
-      padding: 36px 16px;
-      font-size: 1.15rem;
-      line-height: 1.7;
-    }
-
-    .review-meta {
-      margin-bottom: 12px;
-      color: #ffd08a;
-    }
-
-    .overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.72);
-      z-index: 1000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .overlay.show { display: flex; }
-
-    .overlay-panel {
-      background: var(--card);
-      border: 3px solid var(--accent);
-      padding: 28px 24px;
-      max-width: 420px;
-      text-align: center;
-      position: relative;
-      z-index: 2;
-    }
-
-    .overlay-panel h2 {
-      margin: 0 0 12px;
-      color: var(--accent);
-      font-size: 1.4rem;
-    }
-
-    #confetti-canvas {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    .timer-alert {
-      margin-top: 12px;
-      padding: 10px 12px;
-      background: rgba(255, 106, 0, 0.15);
-      border: 1px solid var(--accent);
-      display: none;
-    }
-
-    .timer-alert.show { display: block; }
-
-    /* 长官讲解战术板 */
-    .brief-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.78);
-      z-index: 1100;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-    .brief-overlay.show { display: flex; }
-    .brief-panel {
-      width: min(640px, 100%);
-      max-height: 92vh;
-      overflow: auto;
-      background: #242424;
-      border: 3px solid var(--accent);
-      box-shadow: 0 0 0 1px #8B7355 inset, 0 12px 40px rgba(0,0,0,0.6);
-      padding: 18px 18px 16px;
-    }
-    .brief-panel h2 {
-      margin: 0 0 8px;
-      color: var(--accent);
-      font-size: 1.25rem;
-    }
-    .brief-stage {
-      min-height: 160px;
-      margin: 10px 0 14px;
-      padding: 14px;
-      background: #1a1a1a;
-      border: 1px solid var(--border);
-      position: relative;
-    }
-    .brief-formulas {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-    .brief-formulas li {
-      opacity: 0.25;
-      transform: translateX(-8px);
-      transition: opacity 0.35s, transform 0.35s, background 0.35s;
-      padding: 8px 10px;
-      margin-bottom: 6px;
-      border-left: 3px solid transparent;
-      font-size: 1.05rem;
-      font-variant-numeric: tabular-nums;
-      background: transparent;
-    }
-    .brief-formulas li.show {
-      opacity: 1;
-      transform: none;
-      border-left-color: var(--accent);
-      background: rgba(255, 106, 0, 0.08);
-    }
-    .brief-formulas li.active {
-      opacity: 1;
-      border-left-color: #7dffa0;
-      background: rgba(92, 154, 92, 0.18);
-      box-shadow: 0 0 12px rgba(125, 255, 160, 0.15);
-    }
-    .brief-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 14px;
-    }
-    .bar-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 10px 0;
-    }
-    .bar-label {
-      width: 5.5em;
-      flex-shrink: 0;
-      font-size: 0.9rem;
-      color: #ffd08a;
-    }
-    .bar-track {
-      flex: 1;
-      height: 28px;
-      background: #111;
-      border: 1px solid #555;
-      position: relative;
-      overflow: hidden;
-    }
-    .bar-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #4a7a4a, #6aaa6a);
-      transition: width 0.7s ease;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      padding-right: 8px;
-      font-weight: 700;
-      font-size: 0.85rem;
-    }
-    .bar-fill.more { background: linear-gradient(90deg, #a34500, var(--accent)); }
-    .seg-row {
-      display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
-      margin: 12px 0;
-      align-items: flex-end;
-    }
-    .seg {
-      width: 36px;
-      height: 36px;
-      border: 2px solid var(--border);
-      background: #333;
-      opacity: 0;
-      transform: scale(0.6);
-      transition: opacity 0.35s, transform 0.35s, background 0.35s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.75rem;
-      font-weight: 700;
-    }
-    .seg.show { opacity: 1; transform: scale(1); }
-    .seg.hi { background: var(--accent); border-color: #ffb366; color: #111; }
-    .tree-line {
-      position: relative;
-      height: 48px;
-      margin: 28px 8px 8px;
-      border-bottom: 3px solid #8B7355;
-    }
-    .tree-dot {
-      position: absolute;
-      bottom: -7px;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: #555;
-      border: 2px solid #aaa;
-      transform: scale(0);
-      transition: transform 0.3s ease, background 0.3s;
-    }
-    .tree-dot.show { transform: scale(1); background: var(--accent); border-color: #ffd08a; }
-    .tree-dot.ghost { background: transparent; border-style: dashed; opacity: 0.5; }
-    .brief-caption {
-      color: #ffd08a;
-      min-height: 1.4em;
-      margin: 0 0 8px;
-      font-size: 0.95rem;
-    }
-    .eq-box {
-      text-align: center;
-      font-size: 1.35rem;
-      color: var(--accent);
-      padding: 16px;
-      letter-spacing: 0.04em;
-    }
-    .eq-box .pop {
-      display: inline-block;
-      animation: popIn 0.45s ease;
-    }
-    @keyframes popIn {
-      from { transform: scale(0.7); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    /* —— 登录 / 主界面 —— */
-    .login-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 2000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      background:
-        radial-gradient(ellipse at 50% 30%, rgba(255, 106, 0, 0.12) 0%, transparent 55%),
-        rgba(10, 18, 10, 0.96);
-    }
-    .login-overlay[hidden] { display: none !important; }
-    .login-card {
-      width: min(400px, 100%);
-      background: var(--card);
-      border: 2px solid var(--border);
-      box-shadow: 0 16px 48px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06);
-      padding: 28px 24px;
-      text-align: center;
-    }
-    .login-card h1 {
-      margin: 0 0 6px;
-      font-size: 1.35rem;
-      color: var(--accent);
-    }
-    .login-card p { margin: 0 0 20px; color: var(--muted); font-size: 0.92rem; }
-    .login-field { margin-bottom: 14px; text-align: left; }
-    .login-field label { display: block; font-size: 0.85rem; color: #ffd08a; margin-bottom: 6px; }
-    .login-field input {
-      width: 100%;
-      padding: 14px 16px;
-      font-size: 1.05rem;
-      background: #1a1a1a;
-      border: 2px solid var(--border);
-      color: var(--text);
-      border-radius: 10px;
-      font-family: inherit;
-    }
-    .login-field input:focus { outline: none; border-color: var(--accent); }
-    .btn-hero {
-      width: 100%;
-      padding: 16px 20px;
-      font-size: 1.15rem;
-      border-radius: 12px;
-      margin-top: 8px;
-    }
-    .login-hint { margin-top: 14px; font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
-    .user-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      background: rgba(0,0,0,0.4);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      font-size: 0.82rem;
-      color: #ffd08a;
-    }
-    .energy-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 4px 10px;
-      background: rgba(255, 106, 0, 0.15);
-      border: 1px solid var(--accent);
-      border-radius: 20px;
-      font-size: 0.85rem;
-      color: #ffd08a;
-      font-weight: 700;
-    }
-
-    /* —— 任务主流程（iPhone 式大按钮） —— */
-    .command-dock {
-      position: sticky;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 12px 0 0;
-      margin-top: 20px;
-      background: linear-gradient(transparent, var(--card) 30%);
-    }
-    .step-rail {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 18px;
-      justify-content: center;
-    }
-    .step-pill {
-      flex: 1;
-      max-width: 120px;
-      text-align: center;
-      padding: 10px 8px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      border: 2px solid #555;
-      background: #1a1a1a;
-      color: var(--muted);
-      border-radius: 10px;
-      transition: all 0.2s;
-    }
-    .step-pill.active {
-      border-color: var(--accent);
-      background: rgba(255, 106, 0, 0.15);
-      color: #ffd08a;
-    }
-    .step-pill.done {
-      border-color: var(--ok);
-      color: #7dffa0;
-    }
-    .day-progress-wrap {
-      margin: 0 0 16px;
-    }
-    .day-progress-label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.88rem;
-      color: #ffd08a;
-      margin-bottom: 6px;
-    }
-    .day-progress-bar {
-      height: 14px;
-      background: #1a1a1a;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .day-progress-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #4a7a4a, var(--accent));
-      border-radius: 8px;
-      transition: width 0.35s ease;
-    }
-    .phase-tag {
-      display: inline-block;
-      padding: 4px 12px;
-      margin-bottom: 10px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      border-radius: 20px;
-    }
-    .phase-tag.foundation { background: rgba(74,122,74,0.35); color: #7dffa0; border: 1px solid #5c9a5c; }
-    .phase-tag.advancement { background: rgba(255,106,0,0.2); color: #ffd08a; border: 1px solid var(--accent); }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .video-hero {
-      text-align: center;
-      padding: 24px 16px;
-      background: rgba(0,0,0,0.25);
-      border: 2px dashed var(--border);
-      border-radius: 12px;
-      margin-bottom: 16px;
+      text-align: center; padding: 22px 14px; border: 2px dashed var(--border);
+      background: rgba(0,0,0,0.22); margin-bottom: 12px;
     }
-    .video-hero .btn-hero { max-width: 320px; margin: 12px auto 0; }
-    .quiz-card {
-      padding: 20px;
-      background: rgba(0,0,0,0.28);
-      border: 2px solid var(--accent);
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(255,106,0,0.12);
-    }
-    .quiz-dots {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 16px;
-    }
-    .quiz-dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: #444;
-      border: 2px solid #666;
-      transition: all 0.25s;
-    }
-    .quiz-dot.done { background: var(--ok); border-color: #7dffa0; }
-    .quiz-dot.current { background: var(--accent); border-color: #ffd08a; transform: scale(1.2); }
-    .answer-input-lg {
-      width: 100%;
-      max-width: none;
-      padding: 16px 18px;
-      font-size: 1.35rem;
-      text-align: center;
-      border-radius: 10px;
-      margin-bottom: 12px;
-    }
-    .btn-check-lg {
-      width: 100%;
-      padding: 16px;
-      font-size: 1.1rem;
-      border-radius: 12px;
-    }
-    .day-picker {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
+    .video-meta { color: var(--muted); margin: 0 0 12px; }
+    .rest-box, .empty-box, .review-empty { text-align: center; padding: 28px 12px; line-height: 1.7; font-size: 1.1rem; }
+    .day-picker { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
     .day-chip {
-      padding: 8px 12px;
-      font-size: 0.85rem;
-      border: 2px solid #555;
-      background: #1a1a1a;
-      color: var(--muted);
-      border-radius: 8px;
-      cursor: pointer;
-      font-family: inherit;
+      padding: 8px 12px; min-height: 44px; border: 2px solid #555; background: #1a1a1a;
+      color: var(--muted); cursor: pointer; font-family: inherit; font-size: 0.85rem;
     }
     .day-chip.current { border-color: var(--accent); color: #ffd08a; }
     .day-chip.cleared { border-color: var(--ok); color: #7dffa0; }
-    .sync-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px;
-      justify-content: center;
+    .parent-debug { margin-top: 8px; opacity: 0.45; font-size: 0.75rem; }
+    .parent-debug select, .parent-debug button {
+      font-size: 0.8rem; padding: 4px 8px; background: #1a1a1a; color: var(--text);
+      border: 1px solid var(--border); font-family: inherit;
     }
-    .sync-row input { flex: 1; min-width: 140px; padding: 8px; font-size: 0.85rem; background: #1a1a1a; border: 1px solid var(--border); color: var(--text); border-radius: 8px; }
-    .parent-debug { margin-top: 10px; opacity: 0.5; font-size: 0.75rem; }
+    .btn {
+      appearance: none; border: 2px solid #6b8f6b; background: var(--btn); color: #f5f5f5;
+      font-size: 1rem; font-weight: 700; padding: 12px 16px; min-height: 44px;
+      cursor: pointer; font-family: inherit; text-decoration: none; display: inline-flex;
+      align-items: center; justify-content: center; text-align: center;
+    }
+    .btn:hover { background: var(--btn-hover); }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .btn-orange { background: var(--accent); border-color: #ffb366; color: #111; }
+    .btn-ghost { background: #3a3a3a; border-color: var(--border); color: var(--text); }
+    .reset-btn { font-size: 0.75rem !important; padding: 6px 10px !important; min-height: 36px; opacity: 0.8; margin-top: 6px; }
 
+    /* Red Alert command bar */
+    .command-bar {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 900;
+      background: rgba(18, 28, 18, 0.96); border-top: 3px solid var(--accent);
+      padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+      box-shadow: 0 -8px 24px rgba(0,0,0,0.45);
+    }
+    .command-bar-inner {
+      max-width: 900px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
+    }
+    .command-bar .btn { flex: 1 1 120px; max-width: 180px; }
+
+    .overlay, .brief-overlay, .guide-overlay, .history-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 1000;
+      display: none; align-items: center; justify-content: center; padding: 16px;
+    }
+    .overlay.show, .brief-overlay.show, .guide-overlay.show, .history-overlay.show { display: flex; }
+    .overlay-panel, .brief-panel, .history-panel {
+      background: var(--card); border: 3px solid var(--accent); padding: 22px; max-width: 520px; width: 100%;
+      max-height: 90vh; overflow: auto; position: relative; z-index: 2;
+    }
+    .history-panel { max-width: 560px; }
+    .history-list { list-style: none; margin: 0; padding: 0; }
+    .history-list li {
+      display: flex; justify-content: space-between; gap: 10px; align-items: center;
+      padding: 12px; border: 1px solid var(--border); margin-bottom: 10px; background: rgba(0,0,0,0.25);
+    }
+    .history-list button { min-height: 44px; }
+    #confetti-canvas { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+
+    .brief-caption { color: #ffd08a; min-height: 1.4em; margin: 0 0 8px; }
+    .brief-stage { min-height: 160px; margin: 10px 0 14px; padding: 14px; background: #1a1a1a; border: 1px solid var(--border); }
+    .brief-formulas { list-style: none; margin: 0; padding: 0; }
+    .brief-formulas li {
+      opacity: 0.25; transform: translateX(-8px);
+      transition: opacity 0.8s, transform 0.8s, background 0.5s;
+      padding: 8px 10px; margin-bottom: 6px; border-left: 3px solid transparent;
+    }
+    .brief-formulas li.show { opacity: 1; transform: none; border-left-color: var(--accent); background: rgba(255,106,0,0.08); }
+    .brief-formulas li.active { border-left-color: #7dffa0; background: rgba(74,122,74,0.2); }
+    .brief-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px; }
+    .bar-row { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
+    .bar-label { width: 5.5em; flex-shrink: 0; color: #ffd08a; font-size: 0.9rem; }
+    .bar-track { flex: 1; height: 28px; background: #111; border: 1px solid #555; overflow: hidden; }
+    .bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #4a7a4a, #6aaa6a); transition: width 0.8s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-weight: 700; font-size: 0.85rem; }
+    .bar-fill.more { background: linear-gradient(90deg, #a34500, var(--accent)); }
+    .seg-row { display: flex; gap: 4px; flex-wrap: wrap; margin: 12px 0; }
+    .seg { width: 36px; height: 36px; border: 2px solid var(--border); background: #333; opacity: 0; transform: scale(0.6); transition: opacity 0.5s, transform 0.5s; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
+    .seg.show { opacity: 1; transform: scale(1); }
+    .seg.hi { background: var(--accent); border-color: #ffb366; color: #111; }
+    .tree-line { position: relative; height: 48px; margin: 28px 8px 8px; border-bottom: 3px solid #8B7355; }
+    .tree-dot { position: absolute; bottom: -7px; width: 14px; height: 14px; border-radius: 50%; background: #555; border: 2px solid #aaa; transform: scale(0); transition: transform 0.5s ease, background 0.5s; }
+    .tree-dot.show { transform: scale(1); background: var(--accent); border-color: #ffd08a; }
+    .tree-dot.ghost { background: transparent; border-style: dashed; opacity: 0.5; }
+    .eq-box { text-align: center; font-size: 1.2rem; font-weight: 700; color: var(--accent); padding: 16px; }
+    .eq-box .pop { display: inline-block; animation: popIn 0.8s ease; }
+    @keyframes popIn { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    /* Guide */
+    .guide-overlay { background: rgba(0,0,0,0.72); z-index: 1500; align-items: flex-start; justify-content: center; padding-top: 18vh; }
+    .guide-overlay[hidden] { display: none !important; }
+    .guide-card {
+      background: var(--card); border: 3px solid var(--accent); padding: 20px; max-width: 420px; text-align: center; z-index: 1502;
+    }
+    .guide-card p { margin: 0 0 14px; color: #ffd08a; font-size: 1.1rem; line-height: 1.6; }
+    .guide-highlight {
+      position: relative; z-index: 1501 !important;
+      box-shadow: 0 0 0 4px var(--accent), 0 0 24px rgba(255,106,0,0.8) !important;
+      animation: guidePulse 1s ease-in-out infinite;
+    }
+    @keyframes guidePulse {
+      0%, 100% { box-shadow: 0 0 0 4px var(--accent), 0 0 16px rgba(255,106,0,0.6); }
+      50% { box-shadow: 0 0 0 8px #ffb366, 0 0 28px rgba(255,106,0,0.95); }
+    }
+    .readonly-banner {
+      margin-bottom: 12px; padding: 10px 12px; border: 1px solid var(--accent);
+      color: #ffd08a; background: rgba(255,106,0,0.1); font-weight: 700;
+    }
+    .question {
+      margin-top: 14px; padding: 14px; background: rgba(0,0,0,0.28); border: 1px solid #555;
+    }
+    .answer-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+    .answer-input {
+      flex: 1 1 140px; min-height: 44px; padding: 12px; font-size: 1.1rem;
+      background: #1a1a1a; border: 2px solid var(--border); color: var(--text); font-family: inherit;
+    }
     @media (max-width: 600px) {
-      .mission-title { font-size: 1.25rem; }
-      .status-right { align-items: flex-start; width: 100%; }
-      .rank-bar { width: 100%; }
-      main { padding-bottom: 100px; }
+      .mission-title { font-size: 1.2rem; }
+      .command-bar .btn { flex: 1 1 44%; max-width: none; font-size: 0.92rem; padding: 10px 8px; }
+      main { padding-bottom: 160px; }
     }
   </style>
 </head>
 <body>
-  <div class="login-overlay" id="loginOverlay">
-    <div class="login-card">
-      <h1>🎖️ 数学指挥部</h1>
-      <p>输入你的名字和密码<br />换手机、换电脑也能接着学</p>
-      <div class="login-field">
-        <label for="loginName">指挥官代号</label>
-        <input id="loginName" type="text" autocomplete="username" placeholder="例如：小明" maxlength="20" />
-      </div>
-      <div class="login-field">
-        <label for="loginPass">通行密码</label>
-        <input id="loginPass" type="password" autocomplete="current-password" placeholder="自己设一个密码" maxlength="32" />
-      </div>
-      <button type="button" class="btn btn-orange btn-hero" id="loginBtn">▶ 进入指挥部</button>
-      <p class="login-hint">第一次来也会自动建档。请家长帮孩子记住密码。<br />换设备：登录后点「复制进度码」→ 新设备「粘贴恢复」。</p>
-      <div class="sync-row" id="loginSyncRow" hidden>
-        <input id="syncCodeInput" type="text" placeholder="粘贴进度码" />
-        <button type="button" class="btn btn-ghost" id="importSyncBtn">粘贴恢复</button>
-      </div>
-    </div>
-  </div>
-
   <header class="status-bar">
-    <div class="status-left">
+    <div>
       <div class="status-title">📡 数学指挥部</div>
       <div class="encourage" id="encourageText"></div>
-      <span class="user-chip" id="userChip" hidden></span>
-      <span class="energy-chip" id="energyChip" hidden>⚡ 能源 0</span>
-      <div class="timer-wrap">
-        <button type="button" class="btn btn-orange" id="timerBtn">⏱️ 开始行动</button>
+      <span class="energy-chip" id="energyChip">⚡ 能源 0</span>
+      <div style="margin-top:8px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
         <span class="timer-display" id="timerDisplay">30:00</span>
       </div>
       <div class="timer-alert" id="timerAlert">⏰ 三题全部攻克！任务结束，撤退休整！</div>
-      <div class="day-switch parent-debug" title="家长调试">
-        <span>调试</span>
+      <div class="parent-debug">
+        <span>家长调试</span>
         <select id="debugDaySelect"></select>
         <button type="button" id="debugDayApply">切换</button>
       </div>
     </div>
-    <div class="status-right">
-      <div class="rank-line" id="rankLabel"><span class="rank-badge" id="rankBadge"></span><span id="rankName">🪖 列兵</span></div>
+    <div>
+      <div class="rank-line"><span class="rank-badge" id="rankBadge"></span><span id="rankName">🪖 列兵</span></div>
       <div class="score-line" id="scoreLabel">战果：0/3</div>
-      <div class="rank-bar" title="军衔进度">
-        <div class="rank-bar-fill" id="rankBarFill"></div>
-      </div>
-      <button type="button" class="btn btn-ghost reset-btn" id="syncExportBtn" title="复制进度码到剪贴板">📋 复制进度码</button>
-      <button type="button" class="btn btn-ghost reset-btn" id="logoutBtn" title="退出登录">🚪 退出</button>
-      <button type="button" class="btn btn-ghost reset-btn" id="resetProgressBtn" title="清空进度">🔄 重置进度</button>
+      <div class="rank-bar"><div class="rank-bar-fill" id="rankBarFill"></div></div>
+      <button type="button" class="btn btn-ghost reset-btn" id="historyOpenBtn">📅 历史任务</button>
+      <button type="button" class="btn btn-ghost reset-btn" id="muteBtn">🔊 音效开</button>
+      <button type="button" class="btn btn-ghost reset-btn" id="resetProgressBtn">🔄 重置进度</button>
     </div>
   </header>
 
@@ -944,27 +270,36 @@
   <main>
     <div class="welcome-banner" id="welcomeBanner" hidden>
       <span id="welcomeText"></span>
-      <button type="button" class="btn btn-orange" id="receiveCommBtn">🎙️ 接收长官通讯</button>
-      <button type="button" class="btn btn-ghost mute-btn" id="muteBtn" title="开关背景音乐">🔊 音效开</button>
     </div>
-    <section class="mission-card" id="missionRoot"></section>
+    <section class="mission-card waiting-welcome" id="missionRoot"></section>
   </main>
+
+  <nav class="command-bar" id="commandBar" aria-label="作战命令栏">
+    <div class="command-bar-inner">
+      <button type="button" class="btn btn-orange" id="timerBtn">⏱️ 开始行动</button>
+      <a class="btn btn-ghost" id="cmdVideoBtn" href="#" target="_blank" rel="noopener noreferrer">🎬 前往B站观看</a>
+      <button type="button" class="btn btn-ghost" id="cmdPrevBtn">⏪ 上一题</button>
+      <button type="button" class="btn btn-ghost" id="cmdNextBtn">⏩ 下一题</button>
+      <button type="button" class="btn btn-orange" id="cmdCheckBtn">✅ 确认战果</button>
+      <button type="button" class="btn btn-ghost" id="cmdHintBtn">📢 听讲解</button>
+    </div>
+  </nav>
 
   <audio id="bgmAudio" src="lemonmusicstudio-the-destroyer-109436.mp3" preload="auto" loop></audio>
 
   <div class="overlay" id="clearOverlay" role="dialog" aria-modal="true">
     <canvas id="confetti-canvas"></canvas>
     <div class="overlay-panel">
-      <h2 id="clearTitle">🎉 今日通关！</h2>
+      <h2 id="clearTitle" style="color:var(--accent);margin:0 0 12px;">🎉 今日通关！</h2>
       <p id="clearMsg">你已获得【今日数学之星】称号！</p>
       <p id="clearBonus" hidden style="color:#ffd08a;font-weight:700;"></p>
-      <button type="button" class="btn btn-orange" id="closeOverlayBtn">继续指挥</button>
+      <button type="button" class="btn btn-orange" id="closeOverlayBtn" style="margin-top:12px;">继续指挥</button>
     </div>
   </div>
 
   <div class="brief-overlay" id="briefOverlay" role="dialog" aria-modal="true" aria-labelledby="briefTitle">
     <div class="brief-panel">
-      <h2 id="briefTitle">📢 长官战术讲解</h2>
+      <h2 id="briefTitle" style="color:var(--accent);margin:0 0 8px;">📢 长官战术讲解</h2>
       <p class="brief-caption" id="briefCaption">正在接通战术频道……</p>
       <div class="brief-stage" id="briefStage"></div>
       <ol class="brief-formulas" id="briefFormulas"></ol>
@@ -975,24 +310,41 @@
     </div>
   </div>
 
+  <div class="history-overlay" id="historyOverlay" role="dialog" aria-modal="true">
+    <div class="history-panel">
+      <h2 style="color:var(--accent);margin:0 0 12px;">📅 历史任务</h2>
+      <ul class="history-list" id="historyList"></ul>
+      <button type="button" class="btn btn-ghost" id="historyCloseBtn" style="width:100%;margin-top:8px;">关闭</button>
+    </div>
+  </div>
+
+  <div class="guide-overlay" id="guideOverlay" hidden>
+    <div class="guide-card">
+      <p id="guideText">先点击这里开始今日任务！</p>
+      <button type="button" class="btn btn-orange" id="guideNextBtn">下一步</button>
+    </div>
+  </div>
+
   <script>
-    const STORAGE_VERSION = "v3";
-    const SESSION_KEY = "redAlert_session_v3";
-    const ACCOUNT_SALT = "redAlert_math_2026";
+
+    const STORAGE_KEY = "redAlert_progress_v4";
+    const GUIDE_KEY = "redAlert_guide_done_v1";
     const MAX_RANK_SCORE = 74;
     const QUESTIONS_PER_DAY = 3;
     const TIMER_TOTAL_SEC = 30 * 60;
     const BONUS_TIME_SEC = 20 * 60;
     const BONUS_ENERGY = 10;
 
-    let accountHash = "";
-    let accountName = "";
-    let STORAGE_KEY = "redAlert_progress_v3_guest";
     let selectedDayNum = null;
     let missionPhase = "video";
     let currentQIndex = 0;
     let timerStartedAt = null;
     let timerStoppedAt = null;
+    let historyReadonly = false;
+    let welcomeGateDone = false;
+    let advanceTimer = null;
+    let activeCourse = null;
+    let activeDayNum = 1;
 
     // 后面那张表：真实军官制 14 级
     const RANKS = [
@@ -1162,90 +514,34 @@
       { dayNum: 9, type: "review" }
     ];
 
-    /* ========== 工具 ========== */
-    function padDay(n) {
-      return String(n).padStart(2, "0");
-    }
 
+    function padDay(n) { return String(n).padStart(2, "0"); }
     function phaseLabel(phase) {
       return phase === "foundation" ? "打基础" : phase === "advancement" ? "提升" : "";
     }
-
     function findCourseByDay(dayNum) {
       return courses.find((c) => c.dayNum === dayNum) || null;
     }
-
-    function qid(dayNum, index) {
-      return `d${dayNum}-q${index}`;
-    }
-
-    function getDefaultDayNum() {
-      const missionDays = courses.filter((c) => !c.type).map((c) => c.dayNum);
-      for (const d of missionDays) {
-        if (!progress.clearedDays.includes(d)) return d;
-      }
-      return missionDays[missionDays.length - 1] || 1;
-    }
-
-    function getActiveDayNum() {
-      if (selectedDayNum != null) return selectedDayNum;
-      return getDefaultDayNum();
-    }
-
-    function dayQuestionDoneCount(dayNum) {
-      let n = 0;
-      for (let i = 0; i < QUESTIONS_PER_DAY; i++) {
-        if (getQState(qid(dayNum, i)).status === "correct") n++;
-      }
-      return n;
-    }
-
-    function firstUnfinishedQIndex(dayNum) {
-      for (let i = 0; i < QUESTIONS_PER_DAY; i++) {
-        if (getQState(qid(dayNum, i)).status !== "correct") return i;
-      }
-      return QUESTIONS_PER_DAY;
-    }
-
-    function dayKey(dayNum) {
-      return `day-${dayNum}`;
-    }
-
-    function normalizeAnswer(v) {
-      return String(v).trim().replace(/\s+/g, "");
-    }
-
-    function answersEqual(user, expected) {
-      return normalizeAnswer(user) === normalizeAnswer(expected);
-    }
-
-    function pickRandom(arr) {
-      return arr[Math.floor(Math.random() * arr.length)];
-    }
-
+    function qid(dayNum, index) { return `d${dayNum}-q${index}`; }
+    function dayKey(dayNum) { return `day-${dayNum}`; }
+    function normalizeAnswer(v) { return String(v).trim().replace(/\s+/g, ""); }
+    function answersEqual(user, expected) { return normalizeAnswer(user) === normalizeAnswer(expected); }
+    function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
     function escapeHtml(s) {
-      return String(s)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
+      return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
     }
-
     function getRankIndex(count) {
       let idx = 0;
-      for (let i = 0; i < RANKS.length; i++) {
-        if (count >= RANKS[i].need) idx = i;
-      }
+      for (let i = 0; i < RANKS.length; i++) if (count >= RANKS[i].need) idx = i;
       return idx;
     }
-
     function nextRankNeed(count) {
       const idx = getRankIndex(count);
       if (idx >= RANKS.length - 1) return RANKS[RANKS.length - 1].need;
       return RANKS[idx + 1].need;
     }
+    function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
-    /* ========== 存储 ========== */
     function defaultProgress() {
       return {
         correctCount: 0,
@@ -1257,18 +553,18 @@
         promotedAnnounced: [],
         lastWelcomeDay: "",
         scoutedDays: [],
-        enlistedSpoken: false,
-        accountName: ""
+        enlistedSpoken: false
       };
-    }
-
-    function updateStorageKey() {
-      STORAGE_KEY = `redAlert_progress_${STORAGE_VERSION}_${accountHash}`;
     }
 
     function loadProgress() {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
+        let raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          // migrate older local keys if present
+          raw = localStorage.getItem("redAlert_progress_v2")
+            || localStorage.getItem("redAlert_progress_v3_guest");
+        }
         if (!raw) return defaultProgress();
         const data = JSON.parse(raw);
         return {
@@ -1279,10 +575,9 @@
           clearedTopics: Array.isArray(data.clearedTopics) ? data.clearedTopics : [],
           clearedDays: Array.isArray(data.clearedDays) ? data.clearedDays.filter((d) => typeof d === "number") : [],
           promotedAnnounced: Array.isArray(data.promotedAnnounced) ? data.promotedAnnounced : [],
-          lastWelcomeDay: data.lastWelcomeDay || data.lastWelcomeDate || "",
+          lastWelcomeDay: data.lastWelcomeDay || "",
           scoutedDays: Array.isArray(data.scoutedDays) ? data.scoutedDays : [],
-          enlistedSpoken: !!data.enlistedSpoken,
-          accountName: data.accountName || accountName
+          enlistedSpoken: !!data.enlistedSpoken
         };
       } catch (e) {
         return defaultProgress();
@@ -1293,41 +588,83 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
     }
 
-    let progress = defaultProgress();
+    let progress = loadProgress();
+    saveProgress(); // ensure key exists on first visit
 
     function getQState(id) {
       return progress.questions[id] || { status: "unanswered", firstCorrect: false };
     }
-
     function setQState(id, state) {
       progress.questions[id] = state;
       saveProgress();
     }
-
     function addWrong(id) {
       if (!progress.wrongList.includes(id)) {
         progress.wrongList.push(id);
         saveProgress();
       }
     }
-
     function removeWrong(id) {
       progress.wrongList = progress.wrongList.filter((x) => x !== id);
       saveProgress();
     }
 
-    /* ========== 语音 + 背景音乐 ========== */
+    function getDefaultDayNum() {
+      const missionDays = courses.filter((c) => !c.type).map((c) => c.dayNum);
+      for (const d of missionDays) {
+        if (!progress.clearedDays.includes(d)) return d;
+      }
+      return missionDays[missionDays.length - 1] || 1;
+    }
+    function getActiveDayNum() {
+      if (selectedDayNum != null) return selectedDayNum;
+      return getDefaultDayNum();
+    }
+    function dayQuestionDoneCount(dayNum) {
+      let n = 0;
+      for (let i = 0; i < QUESTIONS_PER_DAY; i++) {
+        if (getQState(qid(dayNum, i)).status === "correct") n++;
+      }
+      return n;
+    }
+    function firstUnfinishedQIndex(dayNum) {
+      for (let i = 0; i < QUESTIONS_PER_DAY; i++) {
+        if (getQState(qid(dayNum, i)).status !== "correct") return i;
+      }
+      return QUESTIONS_PER_DAY;
+    }
+    function activeQuestionEntries(course) {
+      if (!course || !course.questions) return [];
+      return course.questions.slice(0, QUESTIONS_PER_DAY).map((q, i) => ({ q, index: i }));
+    }
+    function topicKey(dayNum) { return String(dayNum); }
+    function parseQid(id) {
+      const m = /^d(\d+)-q(\d+)$/.exec(id);
+      if (!m) return null;
+      return { dayNum: +m[1], index: +m[2] };
+    }
+    function lookupQuestion(id) {
+      const p = parseQid(id);
+      if (!p) return null;
+      const course = findCourseByDay(p.dayNum);
+      if (!course || !course.questions) return null;
+      const q = course.questions[p.index];
+      if (!q) return null;
+      return { course, q, dayNum: p.dayNum, index: p.index };
+    }
+
+
     const bgmEl = document.getElementById("bgmAudio");
     let soundMuted = localStorage.getItem("redAlert_mute") === "1";
     let bgmStopTimer = null;
-    let pendingWelcomeLine = "";
+    let voicePlayer = null;
+    let cachedMaleVoice = null;
+    let voiceChain = Promise.resolve();
 
     function updateMuteBtn() {
       const btn = document.getElementById("muteBtn");
-      if (!btn) return;
-      btn.textContent = soundMuted ? "🔇 音效关" : "🔊 音效开";
+      if (btn) btn.textContent = soundMuted ? "🔇 音效关" : "🔊 音效开";
     }
-
     function setMuted(muted) {
       soundMuted = muted;
       localStorage.setItem("redAlert_mute", muted ? "1" : "0");
@@ -1338,19 +675,10 @@
       }
       updateMuteBtn();
     }
-
     function stopBgm() {
-      if (bgmStopTimer) {
-        clearTimeout(bgmStopTimer);
-        bgmStopTimer = null;
-      }
-      try {
-        bgmEl.pause();
-        bgmEl.currentTime = 0;
-      } catch (e) { /* ignore */ }
+      if (bgmStopTimer) { clearTimeout(bgmStopTimer); bgmStopTimer = null; }
+      try { bgmEl.pause(); bgmEl.currentTime = 0; } catch (e) {}
     }
-
-    /** 播放一段战地 BGM（默认约 14 秒后淡出停止） */
     function playBgmBurst(durationMs = 14000, volume = 0.32) {
       if (soundMuted) return Promise.resolve();
       return new Promise((resolve) => {
@@ -1360,72 +688,43 @@
           bgmEl.volume = volume;
           bgmEl.currentTime = 0;
           const p = bgmEl.play();
-          const finish = () => {
+          bgmStopTimer = setTimeout(() => {
             const startVol = bgmEl.volume;
             let step = 0;
             const fade = setInterval(() => {
               step += 1;
               bgmEl.volume = Math.max(0, startVol * (1 - step / 8));
-              if (step >= 8) {
-                clearInterval(fade);
-                stopBgm();
-                resolve();
-              }
+              if (step >= 8) { clearInterval(fade); stopBgm(); resolve(); }
             }, 80);
-          };
-          bgmStopTimer = setTimeout(finish, durationMs);
+          }, durationMs);
           if (p && p.then) p.catch(() => resolve());
-          else resolve();
-        } catch (e) {
-          resolve();
-        }
+        } catch (e) { resolve(); }
       });
     }
-
     function duckBgmForSpeech() {
       if (!bgmEl || bgmEl.paused) return;
       bgmEl.volume = Math.min(bgmEl.volume, 0.12);
     }
-
-    let cachedMaleVoice = null;
-    let voicesReady = false;
-    let voicePlayer = null;
-
     function stopVoicePlayer() {
       if (voicePlayer) {
-        try {
-          voicePlayer.onended = null;
-          voicePlayer.onerror = null;
-          voicePlayer.pause();
-          voicePlayer.src = "";
-        } catch (e) { /* ignore */ }
+        try { voicePlayer.onended = null; voicePlayer.onerror = null; voicePlayer.pause(); voicePlayer.src = ""; } catch (e) {}
         voicePlayer = null;
       }
     }
-
-    /** 优先播放预生成的 Edge 男声 MP3，失败再回退系统语音（仅男声，绝不播女声） */
     function playVoiceFile(relPath) {
       if (soundMuted) return Promise.resolve(false);
       return new Promise((resolve) => {
-        // 播男声 MP3 前，先掐掉系统语音，避免男女声打架
         if (window.speechSynthesis) window.speechSynthesis.cancel();
         stopVoicePlayer();
         const a = new Audio(relPath);
         voicePlayer = a;
-        a.onended = () => {
-          if (voicePlayer === a) voicePlayer = null;
-          resolve(true);
-        };
-        a.onerror = () => {
-          if (voicePlayer === a) voicePlayer = null;
-          resolve(false);
-        };
+        a.onended = () => { if (voicePlayer === a) voicePlayer = null; resolve(true); };
+        a.onerror = () => { if (voicePlayer === a) voicePlayer = null; resolve(false); };
         duckBgmForSpeech();
         const p = a.play();
         if (p && p.then) p.catch(() => resolve(false));
       });
     }
-
     function scoreMaleVoice(v) {
       const n = (v.name + " " + v.lang).toLowerCase();
       if (!/zh|chinese|中文/.test(n)) return -100;
@@ -1434,56 +733,30 @@
       if (/yunyang|yunjian|yunfeng|yunze|kangkang|yunhao|yunjie|男/.test(n)) s += 50;
       if (/male/.test(n)) s += 30;
       if (/huihui|xiaoxiao|xiaoyi|xiaoxuan|xiaohan|female|女|yaoyao|hui/.test(n)) s -= 60;
-      if (/google/.test(n)) s += 5;
       return s;
     }
-
     function pickCommanderVoice() {
       if (cachedMaleVoice) return cachedMaleVoice;
       const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
       if (!voices.length) return null;
-      const ranked = voices
-        .map((v) => ({ v, s: scoreMaleVoice(v) }))
-        .filter((x) => x.s > 0)
-        .sort((a, b) => b.s - a.s);
-      cachedMaleVoice = ranked.length ? ranked[0].v : voices.find((v) => /zh/.test(v.lang)) || null;
+      const ranked = voices.map((v) => ({ v, s: scoreMaleVoice(v) })).filter((x) => x.s > 0).sort((a, b) => b.s - a.s);
+      cachedMaleVoice = ranked.length ? ranked[0].v : null;
       return cachedMaleVoice;
     }
-
     if (window.speechSynthesis) {
       window.speechSynthesis.onvoiceschanged = function () {
         cachedMaleVoice = null;
-        voicesReady = true;
         pickCommanderVoice();
       };
       pickCommanderVoice();
     }
-
-    function speak(text, opts) {
-      if (soundMuted || !text) return Promise.resolve();
-
-      // 固定台词：优先真人男声 MP3
-      if (opts && opts.file) {
-        return playVoiceFile(opts.file).then((ok) => {
-          if (ok) return;
-          if (opts.noSynth) return Promise.resolve();
-          return speakSynth(text, opts);
-        });
-      }
-      if (opts && opts.noSynth) return Promise.resolve();
-      return speakSynth(text, opts);
-    }
-
     function speakSynth(text, opts) {
       if (!window.speechSynthesis || !text) return Promise.resolve();
       const voice = pickCommanderVoice();
-      // 找不到可靠男声就静音，绝不用系统女声
-      if (!voice || scoreMaleVoice(voice) < 40) {
-        return Promise.resolve();
-      }
+      if (!voice || scoreMaleVoice(voice) < 40) return Promise.resolve();
       return new Promise((resolve) => {
         try {
-          if (!(opts && opts.queue)) window.speechSynthesis.cancel();
+          window.speechSynthesis.cancel();
           duckBgmForSpeech();
           const u = new SpeechSynthesisUtterance(text);
           u.lang = "zh-CN";
@@ -1494,26 +767,29 @@
           u.onend = () => resolve();
           u.onerror = () => resolve();
           window.speechSynthesis.speak(u);
-        } catch (e) {
-          resolve();
-        }
+        } catch (e) { resolve(); }
       });
     }
-
-    /** 语音排队：命中 / 晋升 / 通关 不叠播 */
-    let voiceChain = Promise.resolve();
+    function speak(text, opts) {
+      if (soundMuted || !text) return Promise.resolve();
+      if (opts && opts.file) {
+        return playVoiceFile(opts.file).then((ok) => {
+          if (ok) return;
+          return speakSynth(text, opts);
+        });
+      }
+      return speakSynth(text, opts);
+    }
     function enqueueVoice(fn) {
       voiceChain = voiceChain.then(() => fn()).catch(() => {});
       return voiceChain;
     }
-
     function playWelcomeComm(line) {
       const idx = Math.max(0, WELCOME_SPEECH.indexOf(line));
       const file = `voice/welcome-${idx >= 0 ? idx : 0}.mp3`;
       playBgmBurst(16000, 0.34);
-      setTimeout(() => enqueueVoice(() => speak(line, { file })), 600);
+      return enqueueVoice(() => speak(line, { file }));
     }
-
     function playClearFanfare() {
       playBgmBurst(12000, 0.38);
       return enqueueVoice(() =>
@@ -1521,13 +797,8 @@
       );
     }
 
-    /* ========== 长官讲解：图形 + 算式动画 ========== */
     let briefToken = 0;
     let briefCurrentQ = null;
-
-    function sleep(ms) {
-      return new Promise((r) => setTimeout(r, ms));
-    }
 
     function buildBriefing(q) {
       const ex = q.ex;
@@ -1953,17 +1224,16 @@
         });
         caption.textContent = step.say;
         if (step.paint) step.paint(stage);
-        await sleep(280);
+        await sleep(800);
         if (token !== briefToken) return;
         const stepFile = idBase ? `voice/brief/${idBase}-s${i}.mp3` : null;
-        await speak(step.say, { file: stepFile, noSynth: true, rate: 0.76, pitch: 0.7 });
+        await speak(step.say, { file: stepFile, rate: 0.76, pitch: 0.7 });
         if (token !== briefToken) return;
-        await sleep(180);
+        await sleep(500);
       }
       caption.textContent = "讲解完毕。听懂了就去瞄准目标！";
       await speak("讲解完毕。听懂了就去瞄准目标！", {
         file: "voice/brief-end.mp3",
-        noSynth: true,
         rate: 0.78,
         pitch: 0.7
       });
@@ -1984,7 +1254,7 @@
       if (e.target.id === "briefOverlay") closeBriefing();
     });
 
-    /* ========== 军衔 UI ========== */
+
     function renderRankBadge(rank) {
       if (rank.gold) return '<span class="rank-star gold">★</span>';
       let html = "";
@@ -1993,22 +1263,6 @@
       for (let i = 0; i < rank.stars; i++) html += '<span class="rank-star">★</span>';
       return html || '<span style="opacity:0.35;font-size:0.75rem;">新兵</span>';
     }
-
-    function refreshEnergyUI() {
-      const chip = document.getElementById("energyChip");
-      if (!chip) return;
-      chip.hidden = false;
-      chip.textContent = `⚡ 能源 ${progress.energy || 0}`;
-    }
-
-    function refreshDayProgressUI(dayNum) {
-      const done = dayQuestionDoneCount(dayNum);
-      const label = document.getElementById("dayProgressLabel");
-      const fill = document.getElementById("dayProgressFill");
-      if (label) label.innerHTML = `<span>今日战果</span><span>${done}/${QUESTIONS_PER_DAY}</span>`;
-      if (fill) fill.style.width = `${(done / QUESTIONS_PER_DAY) * 100}%`;
-    }
-
     function showToast(text) {
       const stack = document.getElementById("toastStack");
       if (!stack) return;
@@ -2017,12 +1271,19 @@
       el.textContent = text;
       stack.appendChild(el);
       requestAnimationFrame(() => el.classList.add("show"));
-      setTimeout(() => {
-        el.classList.remove("show");
-        setTimeout(() => el.remove(), 280);
-      }, 2200);
+      setTimeout(() => { el.classList.remove("show"); setTimeout(() => el.remove(), 500); }, 2200);
     }
-
+    function refreshEnergyUI() {
+      const chip = document.getElementById("energyChip");
+      if (chip) chip.textContent = `⚡ 能源 ${progress.energy || 0}`;
+    }
+    function refreshDayProgressUI(dayNum) {
+      const done = dayQuestionDoneCount(dayNum);
+      const label = document.getElementById("dayProgressLabel");
+      const fill = document.getElementById("dayProgressFill");
+      if (label) label.innerHTML = `<span>今日战果</span><span>${done}/${QUESTIONS_PER_DAY}</span>`;
+      if (fill) fill.style.width = `${(done / QUESTIONS_PER_DAY) * 100}%`;
+    }
     function refreshRankUI() {
       const count = progress.correctCount;
       const idx = getRankIndex(count);
@@ -2033,13 +1294,9 @@
       if (badge) badge.innerHTML = renderRankBadge(rank);
       if (nameEl) nameEl.textContent = `${rank.icon} ${rank.name}`;
       document.getElementById("scoreLabel").textContent =
-        idx >= RANKS.length - 1
-          ? `战果：${count}/${MAX_RANK_SCORE}（已达少将）`
-          : `战果：${count}/${next}`;
-      const pct = Math.min(100, (count / MAX_RANK_SCORE) * 100);
-      document.getElementById("rankBarFill").style.width = pct + "%";
+        idx >= RANKS.length - 1 ? `战果：${count}/${MAX_RANK_SCORE}（已达少将）` : `战果：${count}/${next}`;
+      document.getElementById("rankBarFill").style.width = Math.min(100, (count / MAX_RANK_SCORE) * 100) + "%";
     }
-
     function maybePromote(oldCount, newCount) {
       const oldIdx = getRankIndex(oldCount);
       const newIdx = getRankIndex(newCount);
@@ -2049,123 +1306,52 @@
             progress.promotedAnnounced.push(i);
             saveProgress();
             const line = PROMOTE_SPEECH[i];
-            if (line) {
-              const file = `voice/promote-${i}.mp3`;
-              enqueueVoice(() => speak(line, { file }));
-            }
+            if (line) enqueueVoice(() => speak(line, { file: `voice/promote-${i}.mp3` }));
           }
         }
       }
       refreshRankUI();
     }
 
-    /* ========== 题目解析 ========== */
-    function parseQid(id) {
-      const m = /^d(\d+)-q(\d+)$/.exec(id);
-      if (!m) {
-        const legacy = /^w(\d+)-d(\d+)-q(\d+)$/.exec(id);
-        if (!legacy) return null;
-        return { dayNum: null, week: +legacy[1], day: +legacy[2], index: +legacy[3], legacy: true };
-      }
-      return { dayNum: +m[1], index: +m[2], legacy: false };
-    }
-
-    function lookupQuestion(id) {
-      const p = parseQid(id);
-      if (!p) return null;
-      let course = null;
-      if (p.dayNum != null) course = findCourseByDay(p.dayNum);
-      else if (p.legacy) course = courses.find((c) => c.week === p.week && c.day === p.day);
-      if (!course || !course.questions) return null;
-      const q = course.questions[p.index];
-      if (!q) return null;
-      return { course, q, dayNum: course.dayNum, index: p.index };
-    }
-
-    function activeQuestionEntries(course) {
-      if (!course || !course.questions) return [];
-      return course.questions.slice(0, QUESTIONS_PER_DAY).map((q, i) => ({ q, index: i, core: false }));
-    }
-
-    function topicKey(dayNum) {
-      return String(dayNum);
-    }
-
-    /* ========== 彩纸 ========== */
     let confettiTimer = null;
     function runConfetti(durationMs = 3500) {
       const canvas = document.getElementById("confetti-canvas");
       const ctx = canvas.getContext("2d");
-      const resize = () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-      };
-      resize();
-      const pieces = Array.from({ length: 120 }, () => ({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height - canvas.height,
-        w: 6 + Math.random() * 8,
-        h: 8 + Math.random() * 10,
-        vy: 2 + Math.random() * 4,
-        vx: -2 + Math.random() * 4,
-        rot: Math.random() * Math.PI,
-        vr: -0.2 + Math.random() * 0.4,
-        color: ["#FF6A00", "#ffd08a", "#5c9a5c", "#e0e0e0", "#ff4d4d"][Math.floor(Math.random() * 5)]
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const pieces = Array.from({ length: 100 }, () => ({
+        x: Math.random() * canvas.width, y: Math.random() * canvas.height - canvas.height,
+        w: 6 + Math.random() * 8, h: 8 + Math.random() * 10,
+        vy: 2 + Math.random() * 4, vx: -2 + Math.random() * 4,
+        rot: Math.random() * Math.PI, vr: -0.2 + Math.random() * 0.4,
+        color: ["#FF6A00", "#ffd08a", "#4a7a4a", "#e0e0e0"][Math.floor(Math.random() * 4)]
       }));
       const start = performance.now();
       cancelAnimationFrame(confettiTimer);
       function frame(now) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         pieces.forEach((p) => {
-          p.x += p.vx;
-          p.y += p.vy;
-          p.rot += p.vr;
+          p.x += p.vx; p.y += p.vy; p.rot += p.vr;
           if (p.y > canvas.height) p.y = -20;
-          ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate(p.rot);
-          ctx.fillStyle = p.color;
-          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
-          ctx.restore();
+          ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+          ctx.fillStyle = p.color; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); ctx.restore();
         });
-        if (now - start < durationMs) {
-          confettiTimer = requestAnimationFrame(frame);
-        } else {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
+        if (now - start < durationMs) confettiTimer = requestAnimationFrame(frame);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
       confettiTimer = requestAnimationFrame(frame);
     }
 
-    /* ========== 作答逻辑 ========== */
-    let advanceTimer = null;
 
     function clearAdvanceTimer() {
-      if (advanceTimer) {
-        clearTimeout(advanceTimer);
-        advanceTimer = null;
-      }
+      if (advanceTimer) { clearTimeout(advanceTimer); advanceTimer = null; }
     }
-
-    function goToQuestion(dayNum, course, qIndex) {
-      clearAdvanceTimer();
-      closeBriefing();
-      currentQIndex = qIndex;
-      const slotEl = document.getElementById("quizSlot");
-      if (!slotEl) return;
-      slotEl.innerHTML = renderQuizCard(dayNum, course, qIndex);
-      bindActiveQuestion(dayNum, course, qIndex);
-    }
-
     function playHitStreak(hitIndex) {
       const speechIdx = Math.min(Math.max(hitIndex, 0), HIT_SPEECH.length - 1);
-      showToast(HIT_TOAST[speechIdx] || HIT_SPEECH[speechIdx]);
+      showToast(HIT_TOAST[speechIdx]);
       playBgmBurst(4500 + speechIdx * 900, 0.28 + speechIdx * 0.03);
-      enqueueVoice(() =>
-        speak(HIT_SPEECH[speechIdx], { file: `voice/hit-${speechIdx}.mp3`, noSynth: true })
-      );
+      enqueueVoice(() => speak(HIT_SPEECH[speechIdx], { file: `voice/hit-${speechIdx}.mp3` }));
     }
-
     function markCorrect(id, hitIndex) {
       const prev = getQState(id);
       const oldCount = progress.correctCount;
@@ -2182,40 +1368,32 @@
       playHitStreak(hitIndex);
       if (first) maybePromote(oldCount, progress.correctCount);
     }
-
     function speakMissEncourage() {
       const idx = Math.floor(Math.random() * MISS_SPEECH.length);
-      return speak(MISS_SPEECH[idx], { file: `voice/miss-${idx}.mp3`, noSynth: true });
+      const line = MISS_SPEECH[idx];
+      showToast(line);
+      return speak(line, { file: `voice/miss-${idx}.mp3` });
     }
-
     function stopMissionTimer() {
-      if (timerId) {
-        clearInterval(timerId);
-        timerId = null;
-      }
+      if (timerId) { clearInterval(timerId); timerId = null; }
       timerRunning = false;
       timerStoppedAt = Date.now();
-      document.getElementById("timerBtn").disabled = false;
-      document.getElementById("timerBtn").textContent = "⏱️ 任务结束";
+      const btn = document.getElementById("timerBtn");
+      if (btn) { btn.disabled = false; btn.textContent = "⏱️ 任务结束"; }
     }
-
     function getElapsedSec() {
       if (!timerStartedAt) return 0;
-      const end = timerStoppedAt || Date.now();
-      return Math.floor((end - timerStartedAt) / 1000);
+      return Math.floor(((timerStoppedAt || Date.now()) - timerStartedAt) / 1000);
     }
-
     function checkDailyClear(dayNum, course) {
-      if (!course || course.type) return;
+      if (!course || course.type || historyReadonly) return;
       if (progress.clearedDays.includes(dayNum)) return;
       const entries = activeQuestionEntries(course);
       const allOk = entries.every(({ index }) => getQState(qid(dayNum, index)).status === "correct");
-      if (!allOk || entries.length === 0) return;
-
+      if (!allOk || !entries.length) return;
       progress.clearedDays.push(dayNum);
       const tk = topicKey(dayNum);
       if (!progress.clearedTopics.includes(tk)) progress.clearedTopics.push(tk);
-
       let gotBonus = false;
       const elapsed = getElapsedSec();
       if (elapsed > 0 && elapsed <= BONUS_TIME_SEC) {
@@ -2227,16 +1405,53 @@
       document.getElementById("timerAlert").classList.add("show");
       showClearOverlay(gotBonus, elapsed);
     }
+    function showClearOverlay(gotBonus, elapsedSec) {
+      document.getElementById("clearTitle").textContent = gotBonus ? "🎉 神速通关！" : "🎉 今日通关！";
+      const msg = gotBonus
+        ? `20分钟内完成！额外获得 ${BONUS_ENERGY} 点能源奖励！`
+        : "你已获得【今日数学之星】称号！";
+      document.getElementById("clearMsg").textContent = msg;
+      const bonusEl = document.getElementById("clearBonus");
+      if (gotBonus) {
+        bonusEl.hidden = false;
+        bonusEl.textContent = `⚡ 能源 +${BONUS_ENERGY}（用时 ${Math.floor(elapsedSec / 60)} 分 ${elapsedSec % 60} 秒）`;
+      } else bonusEl.hidden = true;
+      document.getElementById("clearOverlay").classList.add("show");
+      runConfetti();
+      if (gotBonus) {
+        playBgmBurst(14000, 0.38);
+        enqueueVoice(() => speak(msg, { rate: 0.78 }));
+      } else playClearFanfare();
+      refreshEnergyUI();
+    }
 
-    function checkReviewClear() {
-      const remaining = progress.wrongList.filter((id) => getQState(id).status === "wrong");
-      if (remaining.length === 0 && document.getElementById("missionRoot").dataset.mode === "review") {
-        const box = document.getElementById("reviewDone");
-        if (box) {
-          box.hidden = false;
-          speak("恭喜你，士兵！错题本已全部清扫干净。", { file: "voice/review-done.mp3" });
-        }
+    function updateCommandBar(dayNum, course) {
+      const video = document.getElementById("cmdVideoBtn");
+      if (course && course.videoUrl) {
+        video.href = course.videoUrl;
+        video.style.display = "";
+      } else {
+        video.removeAttribute("href");
+        video.style.display = "none";
       }
+      const inQuiz = missionPhase === "quiz" && course && !course.type;
+      document.getElementById("cmdPrevBtn").disabled = !inQuiz || currentQIndex <= 0;
+      document.getElementById("cmdNextBtn").disabled = !inQuiz || currentQIndex >= QUESTIONS_PER_DAY - 1;
+      const id = course && !course.type ? qid(dayNum, currentQIndex) : null;
+      const locked = id ? getQState(id).status === "correct" : true;
+      document.getElementById("cmdCheckBtn").disabled = !inQuiz || locked || historyReadonly;
+      document.getElementById("cmdHintBtn").disabled = !inQuiz;
+    }
+
+    function goToQuestion(dayNum, course, qIndex) {
+      clearAdvanceTimer();
+      closeBriefing();
+      currentQIndex = Math.max(0, Math.min(QUESTIONS_PER_DAY - 1, qIndex));
+      const slotEl = document.getElementById("quizSlot");
+      if (!slotEl) return;
+      slotEl.innerHTML = renderQuizCard(dayNum, course, currentQIndex);
+      bindActiveQuestion(dayNum, course, currentQIndex);
+      updateCommandBar(dayNum, course);
     }
 
     function renderQuizCard(dayNum, course, qIndex) {
@@ -2250,95 +1465,80 @@
         const cls = getQState(qid(dayNum, i)).status === "correct" ? "done" : i === qIndex ? "current" : "";
         dots += `<span class="quiz-dot ${cls}"></span>`;
       }
+      let feedback = "";
+      if (locked) feedback = `<p class="feedback ok">✔️ 已攻克</p>`;
+      else if (state.status === "wrong") feedback = `<p class="feedback bad">💥 未命中！可点「听讲解」或再试一次。</p>`;
       return `
         <div class="quiz-card" data-qid="${escapeHtml(id)}" data-hit="${qIndex}">
           <div class="quiz-dots">${dots}</div>
           <p class="q-badge">第 ${qIndex + 1} / ${QUESTIONS_PER_DAY} 题</p>
           <p class="q-text">${escapeHtml(entry.q)}</p>
-          <input class="answer-input answer-input-lg" type="text" inputmode="numeric" placeholder="输入答案" ${locked ? "disabled" : ""} id="activeAnswer" />
-          <button type="button" class="btn btn-orange btn-check-lg" id="activeCheckBtn" ${locked ? "disabled" : ""}>✅ 确认战果</button>
-          <button type="button" class="btn btn-ghost" id="activeHintBtn" style="width:100%;margin-top:8px;">📢 长官讲解（自选）</button>
-          ${qIndex > 0 ? '<button type="button" class="btn btn-ghost" id="prevQBtn" style="width:100%;margin-top:8px;">⬅ 返回上一题</button>' : ""}
-          <div class="feedback-slot" id="activeFeedback">${locked ? '<p class="feedback ok">✔️ 已攻克</p>' : ""}</div>
+          <input class="answer-input-lg" type="text" inputmode="numeric" placeholder="在这里输入你的答案" id="activeAnswer" ${locked || historyReadonly ? "disabled" : ""} />
+          <div class="feedback-slot" id="activeFeedback">${feedback}</div>
         </div>`;
     }
 
     function bindActiveQuestion(dayNum, course, qIndex) {
-      const id = qid(dayNum, qIndex);
-      const entry = course.questions[qIndex];
+      activeDayNum = dayNum;
+      activeCourse = course;
+      currentQIndex = qIndex;
       const input = document.getElementById("activeAnswer");
-      const checkBtn = document.getElementById("activeCheckBtn");
-      const hintBtn = document.getElementById("activeHintBtn");
-      const prevBtn = document.getElementById("prevQBtn");
+      if (input && !input.disabled) input.focus();
+      updateCommandBar(dayNum, course);
+    }
+
+    function submitActiveAnswer() {
+      if (!activeCourse || historyReadonly) return;
+      const qIndex = currentQIndex;
+      const dayNum = activeDayNum;
+      const course = activeCourse;
+      const entry = course.questions[qIndex];
+      const id = qid(dayNum, qIndex);
+      const input = document.getElementById("activeAnswer");
       const slot = document.getElementById("activeFeedback");
-      if (!input || !checkBtn || !entry) return;
-
-      const snapInfo = () => ({
-        course,
-        q: course.questions[qIndex],
-        dayNum,
-        index: qIndex
-      });
-
-      hintBtn.onclick = () => {
-        clearAdvanceTimer();
-        const s = snapInfo();
-        runBriefing(s.q, s);
-      };
-
-      if (prevBtn) {
-        prevBtn.onclick = () => goToQuestion(dayNum, course, qIndex - 1);
+      if (!entry || !input || input.disabled) return;
+      const user = input.value;
+      if (!normalizeAnswer(user)) {
+        slot.innerHTML = `<p class="feedback bad">请先输入答案。</p>`;
+        return;
       }
-
-      if (checkBtn.disabled) return;
-
-      const submit = async () => {
-        const user = input.value;
-        if (!normalizeAnswer(user)) {
-          slot.innerHTML = `<p class="feedback bad">请先输入答案。</p>`;
-          return;
-        }
-        const curEntry = course.questions[qIndex];
-        const curInfo = snapInfo();
-        if (answersEqual(user, curEntry.answer)) {
-          markCorrect(id, qIndex);
-          input.disabled = true;
-          checkBtn.disabled = true;
-          hintBtn.textContent = "📢 听本题讲解（可选）";
-          hintBtn.onclick = () => {
-            clearAdvanceTimer();
-            runBriefing(curEntry, curInfo);
-          };
-          refreshDayProgressUI(dayNum);
-          refreshEnergyUI();
-
-          const next = qIndex + 1;
-          if (next >= QUESTIONS_PER_DAY) {
-            slot.innerHTML = `<p class="feedback ok">✔️ 命中目标！即将结算……</p>`;
-            clearAdvanceTimer();
-            advanceTimer = setTimeout(() => checkDailyClear(dayNum, course), 1200);
-          } else {
-            slot.innerHTML = `<p class="feedback ok">✔️ 命中目标！1.5 秒后进入下一题……</p>`;
-            clearAdvanceTimer();
-            advanceTimer = setTimeout(() => goToQuestion(dayNum, course, next), 1500);
-          }
-        } else {
-          const st = getQState(id);
-          st.status = "wrong";
-          st.lastReveal = String(curEntry.answer);
-          setQState(id, st);
-          addWrong(id);
+      if (answersEqual(user, entry.answer)) {
+        markCorrect(id, qIndex);
+        input.disabled = true;
+        slot.innerHTML = `<p class="feedback ok">✔️ 命中目标！</p>`;
+        refreshDayProgressUI(dayNum);
+        refreshEnergyUI();
+        updateCommandBar(dayNum, course);
+        const next = qIndex + 1;
+        if (next >= QUESTIONS_PER_DAY) {
           clearAdvanceTimer();
-          slot.innerHTML = `<p class="feedback bad">💥 未命中！正确答案是 ${escapeHtml(curEntry.answer)}。<br />需要讲解请点下方按钮，改好答案再提交。</p>`;
-          input.value = "";
-          input.focus();
-          await speakMissEncourage();
+          advanceTimer = setTimeout(() => checkDailyClear(dayNum, course), 1200);
+        } else {
+          slot.innerHTML = `<p class="feedback ok">✔️ 命中目标！1.5 秒后进入下一题……</p>`;
+          clearAdvanceTimer();
+          advanceTimer = setTimeout(() => goToQuestion(dayNum, course, next), 1500);
         }
-      };
+      } else {
+        const st = getQState(id);
+        st.status = "wrong";
+        st.lastReveal = String(entry.answer);
+        setQState(id, st);
+        addWrong(id);
+        slot.innerHTML = `<p class="feedback bad">💥 未命中！正确答案是 ${escapeHtml(entry.answer)}。需要讲解请点「听讲解」。</p>`;
+        input.value = "";
+        input.focus();
+        speakMissEncourage();
+      }
+    }
 
-      checkBtn.onclick = submit;
-      input.onkeydown = (e) => { if (e.key === "Enter") submit(); };
-      input.focus();
+    function hintActiveQuestion() {
+      if (!activeCourse) return;
+      clearAdvanceTimer();
+      const entry = activeCourse.questions[currentQIndex];
+      if (!entry) return;
+      const info = { course: activeCourse, q: entry, dayNum: activeDayNum, index: currentQIndex };
+      // Prefer animated briefing; always speak the same visible caption text
+      runBriefing(entry, info);
     }
 
     function renderDayPicker(activeDay) {
@@ -2353,29 +1553,151 @@
       return html;
     }
 
-    function renderQuestionBlock(meta) {
-      const { id, q, hitIndex, dayNum, index } = meta;
-      const state = getQState(id);
-      const locked = state.status === "correct";
-      let feedback = locked
-        ? `<p class="feedback done">✔️ 已攻克</p>`
-        : state.status === "wrong"
-          ? `<p class="feedback bad">💥 未命中！正确答案是 ${escapeHtml(state.lastReveal || q.answer)}。</p>`
-          : "";
-      return `
-        <article class="question" data-qid="${escapeHtml(id)}" data-hit="${hitIndex}">
-          <span class="q-badge">作战指令 · 第${index + 1}题</span>
-          <p class="q-text">${escapeHtml(q.q)}</p>
-          <div class="answer-row">
-            <input class="answer-input" type="text" inputmode="numeric" placeholder="输入答案" ${locked ? "disabled" : ""} />
-            <button type="button" class="btn btn-check" ${locked ? "disabled" : ""}>✅ 确认战果</button>
-            <button type="button" class="btn btn-ghost btn-hint">📢 长官讲解（自选）</button>
+    function renderMission(dayNum, course) {
+      const phaseCls = course.phase === "foundation" ? "foundation" : "advancement";
+      const phaseText = phaseLabel(course.phase);
+      const scoutedKey = dayKey(dayNum);
+      const scouted = progress.scoutedDays.includes(scoutedKey);
+      const done = dayQuestionDoneCount(dayNum);
+      const allDone = done >= QUESTIONS_PER_DAY;
+      const label = course.videoLabel || "";
+      const metaBits = [course.videoTitle, course.videoDuration ? "约 " + course.videoDuration : ""].filter(Boolean);
+
+      if (historyReadonly) {
+        missionPhase = "quiz";
+      } else if (allDone && progress.clearedDays.includes(dayNum)) {
+        missionPhase = "done";
+      } else if (scouted || done > 0) {
+        missionPhase = "quiz";
+      } else {
+        missionPhase = "video";
+      }
+
+      if (!historyReadonly) {
+        currentQIndex = firstUnfinishedQIndex(dayNum);
+        if (currentQIndex >= QUESTIONS_PER_DAY) currentQIndex = QUESTIONS_PER_DAY - 1;
+      } else {
+        currentQIndex = Math.min(currentQIndex, QUESTIONS_PER_DAY - 1);
+      }
+
+      let body = "";
+      if (historyReadonly) {
+        body = `<div class="readonly-banner">📅 历史回看（只读）· 可听讲解，不可再次提交<br /><button type="button" class="btn btn-orange" id="exitHistoryBtn" style="margin-top:10px;">返回今日任务</button></div>`;
+      }
+      if (missionPhase === "video") {
+        body += `
+          <div class="video-hero">
+            <p style="margin:0 0 8px;color:#ffd08a;">第①步：先看教学视频（新标签页打开，本页不离开）</p>
+            <p class="video-meta">${escapeHtml(metaBits.join(" · "))}</p>
+            <a class="btn btn-orange" id="videoBtn" href="${escapeHtml(course.videoUrl)}" target="_blank" rel="noopener noreferrer">🎬 前往B站观看</a>
+            <p style="margin:14px 0 0;color:var(--muted);font-size:0.9rem;">看完后关掉B站标签，回到这里点下面按钮开始做题</p>
+            <button type="button" class="btn btn-ghost" id="startQuizBtn" style="margin-top:12px;min-width:200px;">我看完了，开始做题</button>
+          </div>`;
+      } else if (missionPhase === "quiz") {
+        body += `<div id="quizSlot">${renderQuizCard(dayNum, course, currentQIndex)}</div>`;
+      } else {
+        body += `<div class="rest-box">✅ 第${padDay(dayNum)}天已全部攻克！<br />可点「历史任务」回看，或选择下一天。</div>`;
+      }
+
+      return {
+        html: `
+          ${historyReadonly ? "" : renderDayPicker(dayNum)}
+          <h1 class="mission-title">${escapeHtml(course.name.redAlert)}</h1>
+          <p class="mission-sub">第${padDay(dayNum)}天 · ${escapeHtml(course.topic || course.name.original)}</p>
+          <span class="phase-tag ${phaseCls}">${phaseText}</span>
+          <span class="source-tag">${escapeHtml(label)}</span>
+          <div class="day-progress-wrap">
+            <div class="day-progress-label" id="dayProgressLabel"><span>今日战果</span><span>${done}/${QUESTIONS_PER_DAY}</span></div>
+            <div class="day-progress-bar"><div class="day-progress-fill" id="dayProgressFill" style="width:${(done / QUESTIONS_PER_DAY) * 100}%"></div></div>
           </div>
-          <div class="feedback-slot">${feedback}</div>
-        </article>`;
+          ${body}`,
+        dayNum,
+        course
+      };
     }
 
-    function bindQuestionEvents(root, onAfterAnswer) {
+    function renderReview() {
+      const all = progress.wrongList.filter((id) => getQState(id).status === "wrong");
+      if (!all.length) {
+        return `<h1 class="mission-title">📋 错题复盘</h1><div class="review-empty">🎉 暂无待修复漏洞！</div>`;
+      }
+      let html = `<h1 class="mission-title">📋 错题复盘</h1><p class="mission-sub">共 ${all.length} 题</p><div id="reviewList">`;
+      all.forEach((id, i) => {
+        const info = lookupQuestion(id);
+        if (!info) return;
+        const locked = getQState(id).status === "correct";
+        html += `
+          <article class="question" data-qid="${escapeHtml(id)}" data-hit="${Math.min(i, 3)}">
+            <p class="q-badge">错题 · 第${info.index + 1}题</p>
+            <p class="q-text">${escapeHtml(info.q.q)}</p>
+            <div class="answer-row">
+              <input class="answer-input" type="text" inputmode="numeric" placeholder="输入答案" ${locked ? "disabled" : ""} />
+              <button type="button" class="btn btn-check" ${locked ? "disabled" : ""}>✅ 确认战果</button>
+              <button type="button" class="btn btn-ghost btn-hint">📢 听讲解</button>
+            </div>
+            <div class="feedback-slot"></div>
+          </article>`;
+      });
+      html += `</div>`;
+      return html;
+    }
+
+    function bindMissionEvents(packed) {
+      const { dayNum, course } = packed;
+      activeDayNum = dayNum;
+      activeCourse = course;
+
+      const markScoutedAndQuiz = () => {
+        const key = dayKey(dayNum);
+        if (!progress.scoutedDays.includes(key)) {
+          progress.scoutedDays.push(key);
+          saveProgress();
+        }
+        missionPhase = "quiz";
+        currentQIndex = firstUnfinishedQIndex(dayNum);
+        if (currentQIndex >= QUESTIONS_PER_DAY) currentQIndex = 0;
+        mount(false);
+      };
+
+      const videoBtn = document.getElementById("videoBtn");
+      if (videoBtn) {
+        // <a target=_blank> keeps this page; also mark scouted lightly without remount
+        videoBtn.addEventListener("click", () => {
+          const key = dayKey(dayNum);
+          if (!progress.scoutedDays.includes(key)) {
+            progress.scoutedDays.push(key);
+            saveProgress();
+          }
+        });
+      }
+      const startQuizBtn = document.getElementById("startQuizBtn");
+      if (startQuizBtn) startQuizBtn.addEventListener("click", markScoutedAndQuiz);
+      const exitHistoryBtn = document.getElementById("exitHistoryBtn");
+      if (exitHistoryBtn) {
+        exitHistoryBtn.addEventListener("click", () => {
+          historyReadonly = false;
+          selectedDayNum = null;
+          mount(false);
+        });
+      }
+
+      if (missionPhase === "quiz") {
+        bindActiveQuestion(dayNum, course, currentQIndex);
+        if (!historyReadonly && !timerRunning && !timerStoppedAt) {
+          // do not auto-start timer; kid clicks 开始行动
+        }
+      }
+
+      document.querySelectorAll(".day-chip").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          historyReadonly = false;
+          selectedDayNum = Number(btn.dataset.day);
+          mount(false);
+        });
+      });
+
+      // review bind
+      const root = document.getElementById("missionRoot");
       root.querySelectorAll(".question").forEach((el) => {
         const id = el.dataset.qid;
         const hitIndex = Number(el.dataset.hit || 0);
@@ -2385,8 +1707,8 @@
         const slot = el.querySelector(".feedback-slot");
         const checkBtn = el.querySelector(".btn-check");
         const hintBtn = el.querySelector(".btn-hint");
-        hintBtn.addEventListener("click", () => runBriefing(info.q, info));
-        if (checkBtn.disabled) return;
+        if (hintBtn) hintBtn.addEventListener("click", () => runBriefing(info.q, info));
+        if (!checkBtn || checkBtn.disabled) return;
         checkBtn.addEventListener("click", async () => {
           const user = input.value;
           if (!normalizeAnswer(user)) {
@@ -2398,403 +1720,191 @@
             input.disabled = true;
             checkBtn.disabled = true;
             slot.innerHTML = `<p class="feedback ok">✔️ 命中目标！</p>`;
-            if (onAfterAnswer) onAfterAnswer(true, id);
+            el.remove();
           } else {
             const st = getQState(id);
             st.status = "wrong";
             st.lastReveal = String(info.q.answer);
             setQState(id, st);
             addWrong(id);
-            slot.innerHTML = `<p class="feedback bad">💥 未命中！正确答案是 ${escapeHtml(info.q.answer)}。需要讲解请点「长官讲解」。</p>`;
+            slot.innerHTML = `<p class="feedback bad">💥 未命中！正确答案是 ${escapeHtml(info.q.answer)}。可点听讲解。</p>`;
             input.value = "";
             await speakMissEncourage();
-            if (onAfterAnswer) onAfterAnswer(false, id);
           }
         });
-        input.addEventListener("keydown", (e) => { if (e.key === "Enter") checkBtn.click(); });
       });
+
+      updateCommandBar(dayNum, course);
     }
 
-    function getWrongIdsForReview() {
-      return progress.wrongList.filter((id) => getQState(id).status === "wrong");
+    async function playHomeWelcomeThenMount() {
+      const root = document.getElementById("missionRoot");
+      const banner = document.getElementById("welcomeBanner");
+      const dayNum = getActiveDayNum();
+      const welcomeKey = String(dayNum);
+      updateMuteBtn();
+      refreshRankUI();
+      refreshEnergyUI();
+
+      if (progress.lastWelcomeDay === welcomeKey) {
+        welcomeGateDone = true;
+        banner.hidden = true;
+        root.classList.remove("waiting-welcome");
+        mount(false);
+        maybeStartGuide();
+        return;
+      }
+
+      const line = pickRandom(WELCOME_SPEECH);
+      document.getElementById("encourageText").textContent = line;
+      banner.hidden = false;
+      document.getElementById("welcomeText").textContent = "🎙️ " + line;
+      root.classList.add("waiting-welcome");
+      mount(false); // prepare content behind dimmed card
+
+      await playWelcomeComm(line);
+      if (!progress.enlistedSpoken && progress.correctCount === 0) {
+        progress.enlistedSpoken = true;
+        saveProgress();
+        await enqueueVoice(() => speak(PROMOTE_SPEECH[0], { file: "voice/promote-0.mp3" }));
+      }
+      progress.lastWelcomeDay = welcomeKey;
+      saveProgress();
+      welcomeGateDone = true;
+      banner.hidden = true;
+      root.classList.remove("waiting-welcome");
+      maybeStartGuide();
     }
 
-    function renderReview() {
-      const all = getWrongIdsForReview();
-      if (all.length === 0) {
-        return `
-          <h1 class="mission-title">📋 错题复盘</h1>
-          <p class="mission-sub">战术复盘室</p>
-          <div class="review-empty" id="reviewDone">
-            🎉 暂无待修复漏洞！战场清净。
-          </div>`;
+    function mount(runWelcome) {
+      if (runWelcome) {
+        playHomeWelcomeThenMount();
+        return;
       }
-      let html = `
-        <h1 class="mission-title">📋 错题复盘</h1>
-        <p class="mission-sub">答对即移出错题本 · 共 ${all.length} 题</p>
-        <div id="reviewList">`;
-      all.forEach((id, i) => {
-        const info = lookupQuestion(id);
-        if (!info) return;
-        html += renderQuestionBlock({ id, q: info.q, hitIndex: Math.min(i, 3), dayNum: info.dayNum, index: info.index });
-      });
-      html += `</div><div class="review-empty" id="reviewDone" hidden>🎉 漏洞全部修复！</div>`;
-      return html;
-    }
-
-    function renderMission(dayNum, course) {
-      const phaseCls = course.phase === "foundation" ? "foundation" : "advancement";
-      const phaseText = phaseLabel(course.phase);
-      const scoutedKey = dayKey(dayNum);
-      const scouted = progress.scoutedDays.includes(scoutedKey);
-      const done = dayQuestionDoneCount(dayNum);
-      const allDone = done >= QUESTIONS_PER_DAY;
-      const label = course.videoLabel || "";
-      const metaBits = [course.videoTitle, course.videoDuration ? "约 " + course.videoDuration : ""].filter(Boolean);
-
-      if (allDone && progress.clearedDays.includes(dayNum)) {
-        missionPhase = "done";
-      } else if (scouted || done > 0) {
-        missionPhase = "quiz";
-      } else {
-        missionPhase = "video";
-      }
-      currentQIndex = firstUnfinishedQIndex(dayNum);
-      if (currentQIndex >= QUESTIONS_PER_DAY) currentQIndex = QUESTIONS_PER_DAY - 1;
-
-      let body = "";
-      if (missionPhase === "video") {
-        body = `
-          <div class="video-hero">
-            <p style="margin:0 0 8px;color:#ffd08a;">第①步：先看教学视频</p>
-            <p class="video-meta">${escapeHtml(metaBits.join(" · "))}</p>
-            <button type="button" class="btn btn-orange btn-hero" id="videoBtn">▶ 前往 B 站看视频</button>
-            <label class="scouted-label" style="display:flex;justify-content:center;margin-top:16px;">
-              <input type="checkbox" id="scoutedCheck" />
-              我看完了，准备答题
-            </label>
-          </div>`;
-      } else if (missionPhase === "quiz") {
-        body = `<div id="quizSlot">${renderQuizCard(dayNum, course, currentQIndex)}</div>`;
-      } else {
-        body = `<div class="rest-box">✅ 第${padDay(dayNum)}天已全部攻克！<br />请选择下一天继续。</div>`;
-      }
-
-      const heroLabel = missionPhase === "video"
-        ? "▶ 先看教学视频"
-        : missionPhase === "quiz"
-          ? `▶ 开始第 ${currentQIndex + 1} 题`
-          : "✅ 本日已完成";
-
-      return {
-        html: `
-          ${renderDayPicker(dayNum)}
-          <h1 class="mission-title">${escapeHtml(course.name.redAlert)}</h1>
-          <p class="mission-sub">第${padDay(dayNum)}天 · ${escapeHtml(course.topic || course.name.original)}</p>
-          <span class="phase-tag ${phaseCls}">${phaseText}</span>
-          <span class="source-tag">${escapeHtml(label)}</span>
-          <div class="step-rail">
-            <div class="step-pill ${missionPhase === "video" ? "active" : scouted || done > 0 ? "done" : ""}">① 看视频</div>
-            <div class="step-pill ${missionPhase === "quiz" ? "active" : allDone ? "done" : ""}">② 做3题</div>
-            <div class="step-pill ${allDone ? "done" : ""}">③ 通关</div>
-          </div>
-          <div class="day-progress-wrap">
-            <div class="day-progress-label" id="dayProgressLabel"><span>今日战果</span><span>${done}/${QUESTIONS_PER_DAY}</span></div>
-            <div class="day-progress-bar"><div class="day-progress-fill" id="dayProgressFill" style="width:${(done / QUESTIONS_PER_DAY) * 100}%"></div></div>
-          </div>
-          ${body}
-          <div class="command-dock">
-            <button type="button" class="btn btn-orange btn-hero" id="heroBtn">${heroLabel}</button>
-          </div>`,
-        dayNum,
-        course
-      };
-    }
-
-    function renderEmpty(msg) {
-      return `<div class="empty-box">${msg}</div>`;
-    }
-
-    function startMissionTimerIfNeeded() {
-      if (timerRunning || timerStoppedAt) return;
-      const btn = document.getElementById("timerBtn");
-      if (btn && !btn.disabled) btn.click();
-    }
-
-    function bindMissionEvents(packed) {
-      const { dayNum, course } = packed;
-      const videoBtn = document.getElementById("videoBtn");
-      if (videoBtn) {
-        videoBtn.addEventListener("click", () => window.open(course.videoUrl, "_blank", "noopener,noreferrer"));
-      }
-      const scout = document.getElementById("scoutedCheck");
-      if (scout) {
-        scout.addEventListener("change", () => {
-          const key = dayKey(dayNum);
-          if (scout.checked) {
-            if (!progress.scoutedDays.includes(key)) progress.scoutedDays.push(key);
-            saveProgress();
-            missionPhase = "quiz";
-            mount();
-          }
-        });
-      }
-      const heroBtn = document.getElementById("heroBtn");
-      if (heroBtn) {
-        heroBtn.addEventListener("click", () => {
-          if (missionPhase === "video") {
-            const v = document.getElementById("videoBtn");
-            if (v) v.click();
-            else {
-              const c = document.getElementById("scoutedCheck");
-              if (c) { c.checked = true; c.dispatchEvent(new Event("change")); }
-            }
-          } else if (missionPhase === "quiz") {
-            const inp = document.getElementById("activeAnswer");
-            if (inp) inp.focus();
-          }
-        });
-      }
-      if (missionPhase === "quiz") {
-        bindActiveQuestion(dayNum, course, currentQIndex);
-        startMissionTimerIfNeeded();
-      }
-      document.querySelectorAll(".day-chip").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          selectedDayNum = Number(btn.dataset.day);
-          mount();
-        });
-      });
-    }
-
-    function mount() {
-      if (!accountHash) return;
       const root = document.getElementById("missionRoot");
       const dayNum = getActiveDayNum();
-      document.getElementById("encourageText").textContent = pickRandom(ENCOURAGE_LINES);
+      if (!document.getElementById("encourageText").textContent) {
+        document.getElementById("encourageText").textContent = pickRandom(ENCOURAGE_LINES);
+      }
       refreshRankUI();
       refreshEnergyUI();
       updateMuteBtn();
 
-      const banner = document.getElementById("welcomeBanner");
-      const receiveBtn = document.getElementById("receiveCommBtn");
-      const welcomeKey = String(dayNum);
-      if (progress.lastWelcomeDay !== welcomeKey && !progress.clearedDays.includes(dayNum)) {
-        pendingWelcomeLine = pickRandom(WELCOME_SPEECH);
-        banner.hidden = false;
-        document.getElementById("welcomeText").textContent = "🎙️ 长官通讯待命：" + pendingWelcomeLine;
-        receiveBtn.hidden = false;
-      } else {
-        banner.hidden = true;
-        pendingWelcomeLine = "";
-      }
-
       const course = findCourseByDay(dayNum);
       if (!course) {
-        root.dataset.mode = "empty";
-        root.innerHTML = renderEmpty("作战档案尚未送达。");
+        root.innerHTML = `<div class="empty-box">作战档案尚未送达。</div>`;
         return;
       }
-
       if (course.type === "review") {
         root.dataset.mode = "review";
         root.innerHTML = renderReview();
-        bindQuestionEvents(root, (ok) => {
-          if (ok) {
-            root.querySelectorAll(".question").forEach((node) => {
-              if (getQState(node.dataset.qid).status === "correct") node.remove();
-            });
-            checkReviewClear();
-          }
-        });
+        bindMissionEvents({ dayNum, course });
         return;
       }
-
       root.dataset.mode = "mission";
       const packed = renderMission(dayNum, course);
       root.innerHTML = packed.html;
       bindMissionEvents(packed);
-      if (dayQuestionDoneCount(dayNum) >= QUESTIONS_PER_DAY && !progress.clearedDays.includes(dayNum)) {
-        checkDailyClear(dayNum, course);
-      }
     }
 
-    function showClearOverlay(gotBonus, elapsedSec) {
-      document.getElementById("clearTitle").textContent = gotBonus ? "🎉 神速通关！" : "🎉 今日通关！";
-      document.getElementById("clearMsg").textContent = gotBonus
-        ? `20分钟内完成！额外获得 ${BONUS_ENERGY} 点能源奖励！`
-        : "你已获得【今日数学之星】称号！";
-      const bonusEl = document.getElementById("clearBonus");
-      if (bonusEl) {
-        if (gotBonus) {
-          bonusEl.hidden = false;
-          bonusEl.textContent = `⚡ 能源 +${BONUS_ENERGY}（用时 ${Math.floor(elapsedSec / 60)} 分 ${elapsedSec % 60} 秒）`;
-        } else {
-          bonusEl.hidden = true;
-        }
-      }
-      document.getElementById("clearOverlay").classList.add("show");
-      runConfetti();
-      if (gotBonus) {
-        playBgmBurst(14000, 0.38);
-        enqueueVoice(() => speak("神速！20分钟内完成，能源奖励已到账！", { rate: 0.78 }));
-      } else {
-        playClearFanfare();
-      }
-      refreshEnergyUI();
+    /* ========== Guide ========== */
+    const guideSteps = [
+      { el: "#timerBtn", text: "先点击这里开始今日任务！" },
+      { el: "#cmdVideoBtn", text: "看完视频回来做题！" },
+      { el: "#activeAnswer", text: "在这里输入你的答案" },
+      { el: "#cmdCheckBtn", text: "点击这里检查对不对！" }
+    ];
+    let guideStep = 0;
+    function clearGuideHighlight() {
+      document.querySelectorAll(".guide-highlight").forEach((n) => n.classList.remove("guide-highlight"));
     }
-
-    /* ========== 登录 & 进度同步 ========== */
-    async function sha256Hex(str) {
-      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
-      return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+    function maybeStartGuide() {
+      if (localStorage.getItem(GUIDE_KEY) === "1") return;
+      // Ensure quiz UI exists for later steps — if still on video, still guide timer+video
+      guideStep = 0;
+      const overlay = document.getElementById("guideOverlay");
+      overlay.hidden = false;
+      overlay.classList.add("show");
+      showGuideStep();
     }
-
-    async function deriveAccountHash(name, pass) {
-      return sha256Hex(`${name.trim()}:${pass}:${ACCOUNT_SALT}`);
-    }
-
-    async function exportSyncCode() {
-      const payload = JSON.stringify({ v: STORAGE_VERSION, h: accountHash, p: progress });
-      const key = await sha256Hex(accountHash + ":sync");
-      let out = "";
-      for (let i = 0; i < payload.length; i++) {
-        out += String.fromCharCode(payload.charCodeAt(i) ^ key.charCodeAt(i % key.length));
-      }
-      return "RA1:" + btoa(out);
-    }
-
-    async function importSyncCode(code) {
-      if (!code.startsWith("RA1:")) throw new Error("无效进度码");
-      const raw = atob(code.slice(4));
-      const key = await sha256Hex(accountHash + ":sync");
-      let json = "";
-      for (let i = 0; i < raw.length; i++) {
-        json += String.fromCharCode(raw.charCodeAt(i) ^ key.charCodeAt(i % key.length));
-      }
-      const data = JSON.parse(json);
-      if (data.h !== accountHash) throw new Error("进度码与当前账号不匹配");
-      progress = { ...defaultProgress(), ...data.p, accountName };
-      saveProgress();
-    }
-
-    function showAppShell() {
-      document.getElementById("loginOverlay").hidden = true;
-      const chip = document.getElementById("userChip");
-      chip.hidden = false;
-      chip.textContent = "👤 " + accountName;
-      document.getElementById("loginSyncRow").hidden = false;
-      mount();
-    }
-
-    async function doLogin() {
-      const name = document.getElementById("loginName").value.trim();
-      const pass = document.getElementById("loginPass").value;
-      if (!name || !pass) {
-        alert("请输入名字和密码");
+    function showGuideStep() {
+      clearGuideHighlight();
+      if (guideStep >= guideSteps.length) {
+        document.getElementById("guideText").textContent = "🎖️ 准备好了吗？开始战斗！";
+        document.getElementById("guideNextBtn").textContent = "开始战斗";
         return;
       }
-      accountName = name;
-      accountHash = await deriveAccountHash(name, pass);
-      updateStorageKey();
-      progress = loadProgress();
-      progress.accountName = name;
-      saveProgress();
-      localStorage.setItem(SESSION_KEY, JSON.stringify({ accountHash, accountName }));
-      showAppShell();
-    }
-
-    function doLogout() {
-      localStorage.removeItem(SESSION_KEY);
-      accountHash = "";
-      accountName = "";
-      progress = defaultProgress();
-      document.getElementById("loginOverlay").hidden = false;
-      document.getElementById("userChip").hidden = true;
-      document.getElementById("loginSyncRow").hidden = true;
-    }
-
-    async function tryRestoreSession() {
-      const raw = localStorage.getItem(SESSION_KEY);
-      if (!raw) return false;
-      try {
-        const s = JSON.parse(raw);
-        if (!s.accountHash || !s.accountName) return false;
-        accountHash = s.accountHash;
-        accountName = s.accountName;
-        updateStorageKey();
-        progress = loadProgress();
-        showAppShell();
-        return true;
-      } catch (e) {
-        return false;
+      const step = guideSteps[guideStep];
+      document.getElementById("guideText").textContent = step.text;
+      document.getElementById("guideNextBtn").textContent = "下一步";
+      const target = document.querySelector(step.el);
+      if (target) {
+        target.classList.add("guide-highlight");
+        try { target.scrollIntoView({ block: "center", behavior: "smooth" }); } catch (e) {}
       }
     }
-
-    document.getElementById("loginBtn").addEventListener("click", doLogin);
-    document.getElementById("loginPass").addEventListener("keydown", (e) => { if (e.key === "Enter") doLogin(); });
-    document.getElementById("logoutBtn").addEventListener("click", () => {
-      if (confirm("确定退出？下次需重新登录。")) doLogout();
-    });
-    document.getElementById("syncExportBtn").addEventListener("click", async () => {
-      try {
-        const code = await exportSyncCode();
-        await navigator.clipboard.writeText(code);
-        showToast("📋 进度码已复制！到新设备粘贴恢复。");
-      } catch (e) {
-        prompt("复制此进度码到新设备：", await exportSyncCode());
+    document.getElementById("guideNextBtn").addEventListener("click", () => {
+      if (guideStep >= guideSteps.length) {
+        localStorage.setItem(GUIDE_KEY, "1");
+        clearGuideHighlight();
+        const overlay = document.getElementById("guideOverlay");
+        overlay.classList.remove("show");
+        overlay.hidden = true;
+        const line = "🎖️ 准备好了吗？开始战斗！";
+        document.getElementById("encourageText").textContent = line;
+        speak(line, { rate: 0.8 });
+        return;
       }
-    });
-    document.getElementById("importSyncBtn").addEventListener("click", async () => {
-      const code = document.getElementById("syncCodeInput").value.trim();
-      if (!code) return;
-      try {
-        await importSyncCode(code);
-        showToast("✅ 进度已恢复！");
-        mount();
-      } catch (e) {
-        alert(e.message || "恢复失败");
+      guideStep += 1;
+      // If entering answer step but still on video, auto enter quiz for demo highlight
+      if (guideStep === 2 && missionPhase === "video" && activeCourse) {
+        const key = dayKey(activeDayNum);
+        if (!progress.scoutedDays.includes(key)) {
+          progress.scoutedDays.push(key);
+          saveProgress();
+        }
+        missionPhase = "quiz";
+        mount(false);
       }
+      showGuideStep();
     });
 
-    document.getElementById("receiveCommBtn").addEventListener("click", () => {
-      const line = pendingWelcomeLine || pickRandom(WELCOME_SPEECH);
-      const dayNum = getActiveDayNum();
-      progress.lastWelcomeDay = String(dayNum);
-      saveProgress();
-      document.getElementById("welcomeText").textContent = "🎙️ 长官通讯：" + line;
-      document.getElementById("receiveCommBtn").hidden = true;
-      playWelcomeComm(line);
-      if (!progress.enlistedSpoken && progress.correctCount === 0) {
-        progress.enlistedSpoken = true;
-        saveProgress();
-        enqueueVoice(() => speak(PROMOTE_SPEECH[0], { file: "voice/promote-0.mp3" }));
-      }
-    });
+    /* ========== History ========== */
+    function openHistory() {
+      const list = document.getElementById("historyList");
+      list.innerHTML = "";
+      courses.filter((c) => !c.type).forEach((c) => {
+        const done = dayQuestionDoneCount(c.dayNum);
+        const cleared = progress.clearedDays.includes(c.dayNum);
+        const status = cleared ? "✅ 已通关" : done > 0 ? `进行中 ${done}/${QUESTIONS_PER_DAY}` : "未开始";
+        const li = document.createElement("li");
+        li.innerHTML = `<div><strong>第${padDay(c.dayNum)}天</strong> · ${escapeHtml(c.topic || c.name.original)}<br/><span style="color:#ffd08a;font-size:0.9rem;">${status}</span></div>`;
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn btn-ghost";
+        btn.textContent = "回看";
+        btn.addEventListener("click", () => {
+          historyReadonly = true;
+          selectedDayNum = c.dayNum;
+          currentQIndex = 0;
+          document.getElementById("historyOverlay").classList.remove("show");
+          mount(false);
+        });
+        li.appendChild(btn);
+        list.appendChild(li);
+      });
+      document.getElementById("historyOverlay").classList.add("show");
+    }
 
-    document.getElementById("resetProgressBtn").addEventListener("click", () => {
-      const ok = confirm("确定清空全部进度？将从列兵、第01天重新开始。");
-      if (!ok) return;
-      progress = defaultProgress();
-      progress.accountName = accountName;
-      saveProgress();
-      selectedDayNum = null;
-      location.reload();
-    });
-
-    document.getElementById("muteBtn").addEventListener("click", () => setMuted(!soundMuted));
-
-    /* ========== 倒计时 ========== */
+    /* ========== Timer ========== */
     let timerRemain = TIMER_TOTAL_SEC;
     let timerId = null;
     let timerRunning = false;
-
     function formatTime(sec) {
       const m = Math.floor(sec / 60);
       const s = sec % 60;
       return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
     }
-
     function updateTimerUI() {
       document.getElementById("timerDisplay").textContent = formatTime(timerRemain);
     }
@@ -2815,16 +1925,62 @@
         if (timerRemain <= 0) {
           stopMissionTimer();
           document.getElementById("timerAlert").classList.add("show");
-          speak("时间到！任务结束，撤退休整！", { file: "voice/timer.mp3" });
+          const line = "时间到！任务结束，撤退休整！";
+          document.getElementById("timerAlert").textContent = "⏰ " + line;
+          speak(line, { file: "voice/timer.mp3" });
         }
       }, 1000);
     });
 
+    document.getElementById("cmdPrevBtn").addEventListener("click", () => {
+      if (!activeCourse) return;
+      goToQuestion(activeDayNum, activeCourse, currentQIndex - 1);
+    });
+    document.getElementById("cmdNextBtn").addEventListener("click", () => {
+      if (!activeCourse) return;
+      goToQuestion(activeDayNum, activeCourse, currentQIndex + 1);
+    });
+    document.getElementById("cmdCheckBtn").addEventListener("click", submitActiveAnswer);
+    document.getElementById("cmdHintBtn").addEventListener("click", hintActiveQuestion);
+    document.getElementById("cmdVideoBtn").addEventListener("click", () => {
+      if (!activeCourse) return;
+      const key = dayKey(activeDayNum);
+      if (!progress.scoutedDays.includes(key)) {
+        progress.scoutedDays.push(key);
+        saveProgress();
+      }
+    });
+
+    document.getElementById("historyOpenBtn").addEventListener("click", openHistory);
+    document.getElementById("historyCloseBtn").addEventListener("click", () => {
+      document.getElementById("historyOverlay").classList.remove("show");
+    });
+    document.getElementById("historyOverlay").addEventListener("click", (e) => {
+      if (e.target.id === "historyOverlay") document.getElementById("historyOverlay").classList.remove("show");
+    });
+
+    document.getElementById("muteBtn").addEventListener("click", () => setMuted(!soundMuted));
+    document.getElementById("resetProgressBtn").addEventListener("click", () => {
+      if (!confirm("确定清空全部进度？将从列兵、第01天重新开始。")) return;
+      progress = defaultProgress();
+      saveProgress();
+      localStorage.removeItem(GUIDE_KEY);
+      selectedDayNum = null;
+      historyReadonly = false;
+      location.reload();
+    });
     document.getElementById("closeOverlayBtn").addEventListener("click", () => {
       document.getElementById("clearOverlay").classList.remove("show");
       stopBgm();
+      historyReadonly = false;
       selectedDayNum = null;
-      mount();
+      mount(false);
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && document.activeElement && document.activeElement.id === "activeAnswer") {
+        submitActiveAnswer();
+      }
     });
 
     (function initDebugDay() {
@@ -2837,35 +1993,15 @@
         sel.appendChild(opt);
       });
       document.getElementById("debugDayApply").addEventListener("click", () => {
+        historyReadonly = false;
         selectedDayNum = Number(sel.value);
-        mount();
+        mount(false);
       });
     })();
 
-    (function ensureMuteAlwaysVisible() {
-      const wrap = document.querySelector(".timer-wrap");
-      if (!wrap || document.getElementById("muteBtnStatus")) return;
-      const b = document.createElement("button");
-      b.type = "button";
-      b.className = "btn btn-ghost mute-btn";
-      b.id = "muteBtnStatus";
-      b.textContent = soundMuted ? "🔇 音效关" : "🔊 音效开";
-      b.addEventListener("click", () => {
-        setMuted(!soundMuted);
-        b.textContent = soundMuted ? "🔇 音效关" : "🔊 音效开";
-        const other = document.getElementById("muteBtn");
-        if (other) other.textContent = b.textContent;
-      });
-      wrap.appendChild(b);
-      const orig = updateMuteBtn;
-      updateMuteBtn = function () {
-        orig();
-        const sb = document.getElementById("muteBtnStatus");
-        if (sb) sb.textContent = soundMuted ? "🔇 音效关" : "🔊 音效开";
-      };
-    })();
+    // boot
+    mount(true);
 
-    tryRestoreSession();
   </script>
 </body>
 </html>
