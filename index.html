@@ -352,24 +352,29 @@
     <div class="history-panel">
       <h2 style="color:var(--accent);margin:0 0 8px;">🔑 家庭通行码</h2>
       <p style="margin:0 0 12px;color:var(--muted);font-size:0.92rem;line-height:1.55;">
-        孩子不用登录。家长设一个通行码后，进度会自动同步到云端；换手机输入<strong style="color:#ffd08a;">同一个通行码</strong>即可继续。
+        国内可直接用，一般<strong style="color:#ffd08a;">不需要 VPN</strong>。孩子平时不用登录；家长设通行码后，换手机也能同步进度。
       </p>
       <p id="familyStatus" style="margin:0 0 12px;color:#ffd08a;font-weight:700;">状态：未开启云同步</p>
 
       <details style="margin-bottom:14px;color:var(--muted);font-size:0.88rem;line-height:1.6;">
-        <summary style="cursor:pointer;color:#ffd08a;font-weight:700;">第一次使用？点这里配置云数据库（约5分钟）</summary>
+        <summary style="cursor:pointer;color:#ffd08a;font-weight:700;">第一次使用？点这里（国内可打开，约5分钟）</summary>
         <ol style="padding-left:1.2em;margin:8px 0;">
-          <li>用电脑打开 <a href="https://console.firebase.google.com/" target="_blank" rel="noopener" style="color:var(--accent);">Firebase 控制台</a>（可用 Google 账号）</li>
-          <li>创建项目 → 左侧「Realtime Database」→ 创建数据库 → 选国外节点也可</li>
-          <li>规则改成下面这样并发布：
-            <pre style="white-space:pre-wrap;background:#111;padding:8px;border:1px solid var(--border);">{"rules":{"families":{"$id":{".read":true,".write":true}}}}</pre>
-          </li>
-          <li>复制数据库地址（类似 https://xxx-default-rtdb.firebaseio.com ）粘贴到下方</li>
+          <li>电脑打开 <a href="https://console.leancloud.cn/" target="_blank" rel="noopener" style="color:var(--accent);">LeanCloud 控制台</a>（可用手机号注册）</li>
+          <li>创建应用 → 进入应用 → 左下「设置」→「应用凭证」</li>
+          <li>复制 <strong>AppID</strong>、<strong>AppKey</strong>，以及「域名」里的 <strong>API 自定义域名 / 云端共用域名</strong>（类似 https://xxx.lc-cn-n1-shared.com）</li>
+          <li>粘贴到下方三个框，再设家庭通行码，点保存同步</li>
         </ol>
+        <p style="margin:0;color:#ffd08a;">提示：Firebase（谷歌）在国内常打不开；我们已改用 LeanCloud。</p>
       </details>
 
-      <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">云数据库地址</label>
-      <input id="familyDbUrl" type="url" placeholder="https://你的项目-default-rtdb.firebaseio.com" style="width:100%;padding:12px;margin-bottom:12px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;" />
+      <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">AppID</label>
+      <input id="familyAppId" type="text" placeholder="LeanCloud AppID" style="width:100%;padding:12px;margin-bottom:10px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;" />
+
+      <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">AppKey</label>
+      <input id="familyAppKey" type="text" placeholder="LeanCloud AppKey" style="width:100%;padding:12px;margin-bottom:10px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;" />
+
+      <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">API 服务器地址</label>
+      <input id="familyServerUrl" type="url" placeholder="https://xxx.lc-cn-n1-shared.com" style="width:100%;padding:12px;margin-bottom:12px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;" />
 
       <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">家庭通行码（至少6位，自己记住）</label>
       <input id="familyCodeInput" type="text" autocomplete="off" placeholder="例如：xiaoming2026" maxlength="32" style="width:100%;padding:12px;margin-bottom:12px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;font-size:1.05rem;" />
@@ -660,15 +665,23 @@
     }
 
     const FAMILY_CODE_KEY = "redAlert_family_code";
-    const FAMILY_DB_KEY = "redAlert_cloud_db";
+    const FAMILY_APPID_KEY = "redAlert_lc_appId";
+    const FAMILY_APPKEY_KEY = "redAlert_lc_appKey";
+    const FAMILY_SERVER_KEY = "redAlert_lc_server";
     const FAMILY_SALT = "redAlert_family_salt_2026";
     let cloudPushTimer = null;
 
-    function getCloudDbUrl() {
-      const fromLocal = (localStorage.getItem(FAMILY_DB_KEY) || "").trim().replace(/\/$/, "");
-      if (fromLocal) return fromLocal;
-      const fromCfg = (window.RED_ALERT_CLOUD && window.RED_ALERT_CLOUD.databaseURL) || "";
-      return String(fromCfg).trim().replace(/\/$/, "");
+    function getLeanCloudCfg() {
+      const cfg = (window.RED_ALERT_CLOUD && window.RED_ALERT_CLOUD.leancloud) || {};
+      return {
+        appId: (localStorage.getItem(FAMILY_APPID_KEY) || cfg.appId || "").trim(),
+        appKey: (localStorage.getItem(FAMILY_APPKEY_KEY) || cfg.appKey || "").trim(),
+        serverURL: (localStorage.getItem(FAMILY_SERVER_KEY) || cfg.serverURL || "").trim().replace(/\/$/, "")
+      };
+    }
+    function cloudReady() {
+      const c = getLeanCloudCfg();
+      return !!(c.appId && c.appKey && c.serverURL);
     }
     function getFamilyCode() {
       return (localStorage.getItem(FAMILY_CODE_KEY) || "").trim();
@@ -698,38 +711,67 @@
     function refreshFamilyStatus() {
       const el = document.getElementById("familyStatus");
       if (!el) return;
-      const db = getCloudDbUrl();
       const code = getFamilyCode();
-      if (!db) el.textContent = "状态：未配置云数据库";
-      else if (!code) el.textContent = "状态：已配置云库，请设置通行码";
+      if (!cloudReady()) el.textContent = "状态：未配置 LeanCloud（国内可开，无需 VPN）";
+      else if (!code) el.textContent = "状态：云服务已配置，请设置通行码";
       else el.textContent = "状态：云同步已开启（通行码已记住）";
     }
+    function leanHeaders() {
+      const c = getLeanCloudCfg();
+      return {
+        "X-LC-Id": c.appId,
+        "X-LC-Key": c.appKey,
+        "Content-Type": "application/json"
+      };
+    }
+    async function findCloudRecord(familyId) {
+      const c = getLeanCloudCfg();
+      const where = encodeURIComponent(JSON.stringify({ familyId }));
+      const url = c.serverURL + "/1.1/classes/FamilyProgress?where=" + where + "&limit=1";
+      const res = await fetch(url, { headers: leanHeaders() });
+      if (!res.ok) throw new Error("云同步查询失败");
+      const data = await res.json();
+      const list = (data && data.results) || [];
+      return list[0] || null;
+    }
     async function pushProgressToCloud() {
-      const db = getCloudDbUrl();
       const code = getFamilyCode();
-      if (!db || !code) return false;
-      const id = await familyHash(code);
-      const url = db + "/families/" + id + ".json";
-      const body = { updatedAt: progress.updatedAt || Date.now(), progress };
-      const res = await fetch(url, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
-      });
+      if (!cloudReady() || !code) return false;
+      const familyId = await familyHash(code);
+      const c = getLeanCloudCfg();
+      const existing = await findCloudRecord(familyId);
+      const body = {
+        familyId,
+        syncAt: progress.updatedAt || Date.now(),
+        progress
+      };
+      let res;
+      if (existing && existing.objectId) {
+        res = await fetch(c.serverURL + "/1.1/classes/FamilyProgress/" + existing.objectId, {
+          method: "PUT",
+          headers: leanHeaders(),
+          body: JSON.stringify(body)
+        });
+      } else {
+        res = await fetch(c.serverURL + "/1.1/classes/FamilyProgress", {
+          method: "POST",
+          headers: leanHeaders(),
+          body: JSON.stringify(body)
+        });
+      }
       if (!res.ok) throw new Error("云同步上传失败");
       return true;
     }
     async function pullProgressFromCloud(codeOverride) {
-      const db = getCloudDbUrl();
       const code = (codeOverride || getFamilyCode()).trim();
-      if (!db || !code) throw new Error("请先填写云数据库地址和通行码");
-      const id = await familyHash(code);
-      const url = db + "/families/" + id + ".json";
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("云同步读取失败");
-      const data = await res.json();
-      if (!data || !data.progress) return null;
-      return { updatedAt: data.updatedAt || 0, progress: normalizeProgressData(data.progress) };
+      if (!cloudReady() || !code) throw new Error("请先填写 LeanCloud 凭证和通行码");
+      const familyId = await familyHash(code);
+      const existing = await findCloudRecord(familyId);
+      if (!existing || !existing.progress) return null;
+      return {
+        updatedAt: existing.syncAt || existing.progress.updatedAt || 0,
+        progress: normalizeProgressData(existing.progress)
+      };
     }
     function scheduleCloudPush() {
       if (cloudPushTimer) clearTimeout(cloudPushTimer);
@@ -745,11 +787,11 @@
     }
 
     let progress = loadProgress();
-    saveProgress(); // 首次访问自动初始化；若刚迁移则写入正式 key
+    saveProgress();
 
     async function bootCloudSync() {
       try {
-        if (!getCloudDbUrl() || !getFamilyCode()) return false;
+        if (!cloudReady() || !getFamilyCode()) return false;
         const remote = await pullProgressFromCloud();
         if (!remote) {
           await pushProgressToCloud();
@@ -764,7 +806,7 @@
         if ((progress.updatedAt || 0) > (remote.updatedAt || 0)) {
           await pushProgressToCloud();
         }
-      } catch (e) { /* 离线时忽略 */ }
+      } catch (e) { /* 离线忽略 */ }
       return false;
     }
 
@@ -2191,7 +2233,10 @@
     });
 
     document.getElementById("familyOpenBtn").addEventListener("click", () => {
-      document.getElementById("familyDbUrl").value = getCloudDbUrl();
+      const c = getLeanCloudCfg();
+      document.getElementById("familyAppId").value = c.appId;
+      document.getElementById("familyAppKey").value = c.appKey;
+      document.getElementById("familyServerUrl").value = c.serverURL;
       document.getElementById("familyCodeInput").value = getFamilyCode();
       refreshFamilyStatus();
       document.getElementById("familyOverlay").classList.add("show");
@@ -2203,17 +2248,21 @@
       if (e.target.id === "familyOverlay") document.getElementById("familyOverlay").classList.remove("show");
     });
     document.getElementById("familySaveBtn").addEventListener("click", async () => {
-      const db = document.getElementById("familyDbUrl").value.trim().replace(/\/$/, "");
+      const appId = document.getElementById("familyAppId").value.trim();
+      const appKey = document.getElementById("familyAppKey").value.trim();
+      const serverURL = document.getElementById("familyServerUrl").value.trim().replace(/\/$/, "");
       const code = document.getElementById("familyCodeInput").value.trim();
-      if (!db || !/^https:\/\//i.test(db) || (!/firebaseio\.com$/i.test(db) && !/firebasedatabase\.app$/i.test(db))) {
-        alert("请填写正确的 Firebase Realtime Database 地址（以 firebaseio.com 或 firebasedatabase.app 结尾）");
+      if (!appId || !appKey || !/^https:\/\//i.test(serverURL)) {
+        alert("请填写完整的 LeanCloud AppID、AppKey 和 API 服务器地址");
         return;
       }
       if (code.length < 6) {
         alert("通行码至少 6 位");
         return;
       }
-      localStorage.setItem(FAMILY_DB_KEY, db);
+      localStorage.setItem(FAMILY_APPID_KEY, appId);
+      localStorage.setItem(FAMILY_APPKEY_KEY, appKey);
+      localStorage.setItem(FAMILY_SERVER_KEY, serverURL);
       localStorage.setItem(FAMILY_CODE_KEY, code);
       refreshFamilyStatus();
       try {
@@ -2221,13 +2270,17 @@
         showToast("✅ 已保存，进度已同步到云端");
         document.getElementById("familyOverlay").classList.remove("show");
       } catch (e) {
-        alert("上传失败。请检查数据库地址和规则是否已发布为允许 families 读写。");
+        alert("上传失败。请检查 AppID / AppKey / 服务器地址是否正确，并确认应用已创建。");
       }
     });
     document.getElementById("familyPullBtn").addEventListener("click", async () => {
-      const db = document.getElementById("familyDbUrl").value.trim().replace(/\/$/, "");
+      const appId = document.getElementById("familyAppId").value.trim();
+      const appKey = document.getElementById("familyAppKey").value.trim();
+      const serverURL = document.getElementById("familyServerUrl").value.trim().replace(/\/$/, "");
       const code = document.getElementById("familyCodeInput").value.trim();
-      if (db) localStorage.setItem(FAMILY_DB_KEY, db);
+      if (appId) localStorage.setItem(FAMILY_APPID_KEY, appId);
+      if (appKey) localStorage.setItem(FAMILY_APPKEY_KEY, appKey);
+      if (serverURL) localStorage.setItem(FAMILY_SERVER_KEY, serverURL);
       if (code.length >= 6) localStorage.setItem(FAMILY_CODE_KEY, code);
       refreshFamilyStatus();
       try {
