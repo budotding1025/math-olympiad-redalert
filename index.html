@@ -352,38 +352,37 @@
     <div class="history-panel">
       <h2 style="color:var(--accent);margin:0 0 8px;">🔑 家庭通行码</h2>
       <p style="margin:0 0 12px;color:var(--muted);font-size:0.92rem;line-height:1.55;">
-        国内可直接用，一般<strong style="color:#ffd08a;">不需要 VPN</strong>。孩子平时不用登录；家长设通行码后，换手机也能同步进度。
+        进度存在云端。浏览器清缓存、换手机、换浏览器，只要输入<strong style="color:#ffd08a;">同一个通行码</strong>就能找回。
       </p>
-      <p id="familyStatus" style="margin:0 0 12px;color:#ffd08a;font-weight:700;">状态：未开启云同步</p>
+      <p id="familyStatus" style="margin:0 0 12px;color:#ffd08a;font-weight:700;">状态：未开启</p>
 
-      <details style="margin-bottom:14px;color:var(--muted);font-size:0.88rem;line-height:1.6;">
-        <summary style="cursor:pointer;color:#ffd08a;font-weight:700;">第一次使用？点这里（国内可打开，约5分钟）</summary>
+      <div id="familySimpleBox">
+        <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">家庭通行码（至少6位）</label>
+        <input id="familyCodeInput" type="text" autocomplete="off" placeholder="例如：xiaoming2016" maxlength="32" style="width:100%;padding:14px;margin-bottom:12px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;font-size:1.15rem;" />
+        <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:12px;">
+          <button type="button" class="btn btn-orange" id="familySaveBtn">💾 保存并同步</button>
+          <button type="button" class="btn btn-ghost" id="familyPullBtn">☁️ 拉取云端进度</button>
+        </div>
+      </div>
+
+      <details id="familySetupDetails" style="margin-bottom:14px;color:var(--muted);font-size:0.88rem;line-height:1.6;">
+        <summary style="cursor:pointer;color:#ffd08a;font-weight:700;">家长首次开通云同步（只需一次，国内可开）</summary>
         <ol style="padding-left:1.2em;margin:8px 0;">
-          <li>电脑打开 <a href="https://console.leancloud.cn/" target="_blank" rel="noopener" style="color:var(--accent);">LeanCloud 控制台</a>（可用手机号注册）</li>
-          <li>创建应用 → 进入应用 → 左下「设置」→「应用凭证」</li>
-          <li>复制 <strong>AppID</strong>、<strong>AppKey</strong>，以及「域名」里的 <strong>API 自定义域名 / 云端共用域名</strong>（类似 https://xxx.lc-cn-n1-shared.com）</li>
-          <li>粘贴到下方三个框，再设家庭通行码，点保存同步</li>
+          <li>打开 <a href="https://console.leancloud.cn/" target="_blank" rel="noopener" style="color:var(--accent);">console.leancloud.cn</a>，手机号注册</li>
+          <li>创建应用 → 设置 → 应用凭证</li>
+          <li>把 AppID、AppKey、API 域名填到下面，再设通行码</li>
+          <li>点「保存并同步」后，可再点「复制全家配置链接」，发到家里其他手机/浏览器，打开即自动配好</li>
         </ol>
-        <p style="margin:0;color:#ffd08a;">提示：Firebase（谷歌）在国内常打不开；我们已改用 LeanCloud。</p>
+        <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">AppID</label>
+        <input id="familyAppId" type="text" placeholder="LeanCloud AppID" style="width:100%;padding:10px;margin-bottom:8px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;" />
+        <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">AppKey</label>
+        <input id="familyAppKey" type="text" placeholder="LeanCloud AppKey" style="width:100%;padding:10px;margin-bottom:8px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;" />
+        <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">API 服务器地址</label>
+        <input id="familyServerUrl" type="url" placeholder="https://xxx.lc-cn-n1-shared.com" style="width:100%;padding:10px;margin-bottom:10px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;" />
+        <button type="button" class="btn btn-ghost" id="familyConfigLinkBtn" style="width:100%;margin-bottom:8px;">📋 复制全家配置链接</button>
       </details>
 
-      <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">AppID</label>
-      <input id="familyAppId" type="text" placeholder="LeanCloud AppID" style="width:100%;padding:12px;margin-bottom:10px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;" />
-
-      <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">AppKey</label>
-      <input id="familyAppKey" type="text" placeholder="LeanCloud AppKey" style="width:100%;padding:12px;margin-bottom:10px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;" />
-
-      <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">API 服务器地址</label>
-      <input id="familyServerUrl" type="url" placeholder="https://xxx.lc-cn-n1-shared.com" style="width:100%;padding:12px;margin-bottom:12px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;" />
-
-      <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">家庭通行码（至少6位，自己记住）</label>
-      <input id="familyCodeInput" type="text" autocomplete="off" placeholder="例如：xiaoming2026" maxlength="32" style="width:100%;padding:12px;margin-bottom:12px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;font-size:1.05rem;" />
-
-      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:12px;">
-        <button type="button" class="btn btn-orange" id="familySaveBtn">💾 保存并同步到云端</button>
-        <button type="button" class="btn btn-ghost" id="familyPullBtn">☁️ 用通行码从云端拉取</button>
-      </div>
-      <button type="button" class="btn btn-ghost" id="familyClearBtn" style="width:100%;margin-bottom:8px;">清除本机通行码（不删云端）</button>
+      <button type="button" class="btn btn-ghost" id="familyClearBtn" style="width:100%;margin-bottom:8px;">清除本机通行码</button>
       <button type="button" class="btn btn-ghost" id="familyCloseBtn" style="width:100%;">关闭</button>
     </div>
   </div>
@@ -712,9 +711,62 @@
       const el = document.getElementById("familyStatus");
       if (!el) return;
       const code = getFamilyCode();
-      if (!cloudReady()) el.textContent = "状态：未配置 LeanCloud（国内可开，无需 VPN）";
-      else if (!code) el.textContent = "状态：云服务已配置，请设置通行码";
-      else el.textContent = "状态：云同步已开启（通行码已记住）";
+      const details = document.getElementById("familySetupDetails");
+      if (!cloudReady()) {
+        el.textContent = "状态：还差一步——请展开下方「家长首次开通」";
+        if (details) details.open = true;
+      } else if (!code) {
+        el.textContent = "状态：云已开通，请设置通行码并保存";
+        if (details) details.open = false;
+      } else {
+        el.textContent = "状态：已开启云同步，清缓存也不怕";
+        if (details) details.open = false;
+      }
+    }
+    function encodeFamilyConfigPayload() {
+      const c = getLeanCloudCfg();
+      const code = getFamilyCode();
+      const json = JSON.stringify({
+        v: 1,
+        appId: c.appId,
+        appKey: c.appKey,
+        serverURL: c.serverURL,
+        code
+      });
+      return btoa(unescape(encodeURIComponent(json))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    }
+    function decodeFamilyConfigPayload(raw) {
+      let s = String(raw || "").trim();
+      s = s.replace(/-/g, "+").replace(/_/g, "/");
+      while (s.length % 4) s += "=";
+      const data = JSON.parse(decodeURIComponent(escape(atob(s))));
+      if (!data || !data.appId || !data.appKey || !data.serverURL) throw new Error("配置无效");
+      return data;
+    }
+    function applyFamilyConfig(data) {
+      localStorage.setItem(FAMILY_APPID_KEY, data.appId);
+      localStorage.setItem(FAMILY_APPKEY_KEY, data.appKey);
+      localStorage.setItem(FAMILY_SERVER_KEY, String(data.serverURL).replace(/\/$/, ""));
+      if (data.code && String(data.code).trim().length >= 6) {
+        localStorage.setItem(FAMILY_CODE_KEY, String(data.code).trim());
+      }
+    }
+    function buildFamilyConfigUrl() {
+      if (!cloudReady()) throw new Error("请先填写 LeanCloud 信息并保存");
+      const base = location.href.split(/[?#]/)[0];
+      return base + "?cfg=" + encodeFamilyConfigPayload();
+    }
+    function tryApplyConfigFromUrl() {
+      try {
+        const params = new URLSearchParams(location.search);
+        const cfg = params.get("cfg");
+        if (!cfg) return false;
+        applyFamilyConfig(decodeFamilyConfigPayload(cfg));
+        history.replaceState(null, "", location.pathname);
+        return true;
+      } catch (e) {
+        return false;
+      }
     }
     function leanHeaders() {
       const c = getLeanCloudCfg();
@@ -2247,30 +2299,61 @@
     document.getElementById("familyOverlay").addEventListener("click", (e) => {
       if (e.target.id === "familyOverlay") document.getElementById("familyOverlay").classList.remove("show");
     });
+    document.getElementById("familyConfigLinkBtn").addEventListener("click", async () => {
+      const appId = document.getElementById("familyAppId").value.trim();
+      const appKey = document.getElementById("familyAppKey").value.trim();
+      const serverURL = document.getElementById("familyServerUrl").value.trim().replace(/\/$/, "");
+      const code = document.getElementById("familyCodeInput").value.trim();
+      if (appId && appKey && serverURL) {
+        localStorage.setItem(FAMILY_APPID_KEY, appId);
+        localStorage.setItem(FAMILY_APPKEY_KEY, appKey);
+        localStorage.setItem(FAMILY_SERVER_KEY, serverURL);
+      }
+      if (code.length >= 6) localStorage.setItem(FAMILY_CODE_KEY, code);
+      try {
+        const url = buildFamilyConfigUrl();
+        await navigator.clipboard.writeText(url);
+        showToast("📋 配置链接已复制，发到其他手机打开即可");
+      } catch (e) {
+        try {
+          prompt("请复制此配置链接：", buildFamilyConfigUrl());
+        } catch (err) {
+          alert("请先填好 LeanCloud 信息和通行码");
+        }
+      }
+    });
     document.getElementById("familySaveBtn").addEventListener("click", async () => {
       const appId = document.getElementById("familyAppId").value.trim();
       const appKey = document.getElementById("familyAppKey").value.trim();
       const serverURL = document.getElementById("familyServerUrl").value.trim().replace(/\/$/, "");
       const code = document.getElementById("familyCodeInput").value.trim();
-      if (!appId || !appKey || !/^https:\/\//i.test(serverURL)) {
-        alert("请填写完整的 LeanCloud AppID、AppKey 和 API 服务器地址");
-        return;
+      if (!cloudReady()) {
+        if (!appId || !appKey || !/^https:\/\//i.test(serverURL)) {
+          const details = document.getElementById("familySetupDetails");
+          if (details) details.open = true;
+          alert("第一次使用请先展开「家长首次开通」，填写 LeanCloud 三项信息（国内可开，不用 VPN）");
+          return;
+        }
+        localStorage.setItem(FAMILY_APPID_KEY, appId);
+        localStorage.setItem(FAMILY_APPKEY_KEY, appKey);
+        localStorage.setItem(FAMILY_SERVER_KEY, serverURL);
+      } else if (appId && appKey && serverURL) {
+        localStorage.setItem(FAMILY_APPID_KEY, appId);
+        localStorage.setItem(FAMILY_APPKEY_KEY, appKey);
+        localStorage.setItem(FAMILY_SERVER_KEY, serverURL);
       }
       if (code.length < 6) {
-        alert("通行码至少 6 位");
+        alert("通行码至少 6 位，建议用孩子名字+数字，全家共用一个");
         return;
       }
-      localStorage.setItem(FAMILY_APPID_KEY, appId);
-      localStorage.setItem(FAMILY_APPKEY_KEY, appKey);
-      localStorage.setItem(FAMILY_SERVER_KEY, serverURL);
       localStorage.setItem(FAMILY_CODE_KEY, code);
       refreshFamilyStatus();
       try {
         await pushProgressToCloud();
-        showToast("✅ 已保存，进度已同步到云端");
+        showToast("✅ 已同步到云端。换浏览器输入同一通行码即可");
         document.getElementById("familyOverlay").classList.remove("show");
       } catch (e) {
-        alert("上传失败。请检查 AppID / AppKey / 服务器地址是否正确，并确认应用已创建。");
+        alert("上传失败。请检查 LeanCloud 三项是否填对。");
       }
     });
     document.getElementById("familyPullBtn").addEventListener("click", async () => {
@@ -2283,20 +2366,28 @@
       if (serverURL) localStorage.setItem(FAMILY_SERVER_KEY, serverURL);
       if (code.length >= 6) localStorage.setItem(FAMILY_CODE_KEY, code);
       refreshFamilyStatus();
+      if (!cloudReady()) {
+        alert("请先完成「家长首次开通」或打开全家配置链接");
+        return;
+      }
+      if (code.length < 6) {
+        alert("请输入家庭通行码");
+        return;
+      }
       try {
         const remote = await pullProgressFromCloud(code);
         if (!remote) {
-          alert("云端还没有这个通行码的进度。请先在旧手机点「保存并同步到云端」。");
+          alert("云端还没有进度。请先在有数据的手机上点「保存并同步」。");
           return;
         }
         progress = remote.progress;
         progress.updatedAt = remote.updatedAt || Date.now();
         localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-        showToast("✅ 已从云端拉取进度");
+        showToast("✅ 已从云端找回进度");
         document.getElementById("familyOverlay").classList.remove("show");
         location.reload();
       } catch (e) {
-        alert(e.message || "拉取失败，请检查网络和配置");
+        alert(e.message || "拉取失败，请检查网络和通行码");
       }
     });
     document.getElementById("familyClearBtn").addEventListener("click", () => {
@@ -2421,16 +2512,23 @@
       });
     })();
 
-    // boot：URL恢复 → 云同步 → 今日任务
+    // boot：配置链接 → 进度链接 → 云同步 → 今日任务
     (async function boot() {
+      const cfgApplied = tryApplyConfigFromUrl();
       const restored = tryRestoreFromUrl();
       let cloudPulled = false;
       try {
         cloudPulled = await bootCloudSync();
       } catch (e) { /* ignore */ }
       mount(true);
-      if (restored) setTimeout(() => showToast("✅ 进度已从链接恢复到本机"), 600);
-      else if (cloudPulled) setTimeout(() => showToast("☁️ 已从云端同步最新进度"), 600);
+      if (cfgApplied) setTimeout(() => showToast("🔑 家庭云同步已自动配置"), 500);
+      if (restored) setTimeout(() => showToast("✅ 进度已从链接恢复到本机"), 700);
+      else if (cloudPulled) setTimeout(() => showToast("☁️ 已从云端同步最新进度"), 700);
+      else if (!getFamilyCode() || !cloudReady()) {
+        setTimeout(() => {
+          showToast("建议开通家庭通行码，防止清缓存丢进度");
+        }, 1800);
+      }
     })();
 
   </script>
