@@ -244,6 +244,7 @@
     <div>
       <div class="status-title">📡 数学指挥部</div>
       <div class="encourage" id="encourageText"></div>
+      <span class="energy-chip" id="userChip" hidden>👤 </span>
       <span class="energy-chip" id="energyChip">⚡ 能源 0</span>
       <div style="margin-top:8px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
         <span class="timer-display" id="timerDisplay">30:00</span>
@@ -260,7 +261,7 @@
       <div class="score-line" id="scoreLabel">战果：0/3</div>
       <div class="rank-bar"><div class="rank-bar-fill" id="rankBarFill"></div></div>
       <button type="button" class="btn btn-ghost reset-btn" id="historyOpenBtn">📅 历史任务</button>
-      <button type="button" class="btn btn-ghost reset-btn" id="familyOpenBtn">🔑 家庭通行码</button>
+      <button type="button" class="btn btn-ghost reset-btn" id="accountOpenBtn">👤 账号</button>
       <button type="button" class="btn btn-ghost reset-btn" id="transferOpenBtn">📱 换机带走进度</button>
       <button type="button" class="btn btn-ghost reset-btn" id="muteBtn">🔊 音效开</button>
       <button type="button" class="btn btn-ghost reset-btn" id="resetProgressBtn">🔄 重置进度</button>
@@ -348,30 +349,28 @@
     </div>
   </div>
 
-  <div class="history-overlay" id="familyOverlay" role="dialog" aria-modal="true">
+  <div class="history-overlay show" id="accountOverlay" role="dialog" aria-modal="true">
     <div class="history-panel">
-      <h2 style="color:var(--accent);margin:0 0 8px;">🔑 家庭通行码</h2>
+      <h2 style="color:var(--accent);margin:0 0 8px;">👤 账号登录</h2>
       <p style="margin:0 0 12px;color:var(--muted);font-size:0.92rem;line-height:1.55;">
-        进度存在云端。浏览器清缓存、换手机、换浏览器，只要输入<strong style="color:#ffd08a;">同一个通行码</strong>就能找回。
+        用<strong style="color:#ffd08a;">账号 + 密码</strong>保存进度。换浏览器、清缓存后，再用同一账号密码登录就能继续。
       </p>
-      <p id="familyStatus" style="margin:0 0 12px;color:#ffd08a;font-weight:700;">状态：未开启</p>
+      <p id="accountStatus" style="margin:0 0 12px;color:#ffd08a;font-weight:700;">第一次使用会自动建档</p>
 
-      <div id="familySimpleBox">
-        <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">家庭通行码（至少6位）</label>
-        <input id="familyCodeInput" type="text" autocomplete="off" placeholder="例如：xiaoming2016" maxlength="32" style="width:100%;padding:14px;margin-bottom:12px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;font-size:1.15rem;" />
-        <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:12px;">
-          <button type="button" class="btn btn-orange" id="familySaveBtn">💾 保存并同步</button>
-          <button type="button" class="btn btn-ghost" id="familyPullBtn">☁️ 拉取云端进度</button>
-        </div>
-      </div>
+      <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">账号</label>
+      <input id="accountUserInput" type="text" autocomplete="username" placeholder="例如：小明" maxlength="20" style="width:100%;padding:14px;margin-bottom:10px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;font-size:1.1rem;" />
 
-      <details id="familySetupDetails" style="margin-bottom:14px;color:var(--muted);font-size:0.88rem;line-height:1.6;">
+      <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">密码</label>
+      <input id="accountPassInput" type="password" autocomplete="current-password" placeholder="自己设一个，至少6位" maxlength="32" style="width:100%;padding:14px;margin-bottom:12px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;font-size:1.1rem;" />
+
+      <button type="button" class="btn btn-orange" id="accountLoginBtn" style="width:100%;margin-bottom:12px;min-height:48px;">▶ 进入指挥部</button>
+
+      <details id="accountSetupDetails" style="margin-bottom:12px;color:var(--muted);font-size:0.88rem;line-height:1.6;">
         <summary style="cursor:pointer;color:#ffd08a;font-weight:700;">家长首次开通云同步（只需一次，国内可开）</summary>
         <ol style="padding-left:1.2em;margin:8px 0;">
           <li>打开 <a href="https://console.leancloud.cn/" target="_blank" rel="noopener" style="color:var(--accent);">console.leancloud.cn</a>，手机号注册</li>
-          <li>创建应用 → 设置 → 应用凭证</li>
-          <li>把 AppID、AppKey、API 域名填到下面，再设通行码</li>
-          <li>点「保存并同步」后，可再点「复制全家配置链接」，发到家里其他手机/浏览器，打开即自动配好</li>
+          <li>创建应用 → 设置 → 应用凭证，复制 AppID、AppKey、API 域名</li>
+          <li>填到下面，再登录账号。也可点「复制配置链接」发到其他设备</li>
         </ol>
         <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">AppID</label>
         <input id="familyAppId" type="text" placeholder="LeanCloud AppID" style="width:100%;padding:10px;margin-bottom:8px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;" />
@@ -379,11 +378,11 @@
         <input id="familyAppKey" type="text" placeholder="LeanCloud AppKey" style="width:100%;padding:10px;margin-bottom:8px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;" />
         <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">API 服务器地址</label>
         <input id="familyServerUrl" type="url" placeholder="https://xxx.lc-cn-n1-shared.com" style="width:100%;padding:10px;margin-bottom:10px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;" />
-        <button type="button" class="btn btn-ghost" id="familyConfigLinkBtn" style="width:100%;margin-bottom:8px;">📋 复制全家配置链接</button>
+        <button type="button" class="btn btn-ghost" id="familyConfigLinkBtn" style="width:100%;">📋 复制全家配置链接</button>
       </details>
 
-      <button type="button" class="btn btn-ghost" id="familyClearBtn" style="width:100%;margin-bottom:8px;">清除本机通行码</button>
-      <button type="button" class="btn btn-ghost" id="familyCloseBtn" style="width:100%;">关闭</button>
+      <button type="button" class="btn btn-ghost" id="accountLogoutBtn" style="width:100%;margin-bottom:8px;" hidden>退出账号</button>
+      <button type="button" class="btn btn-ghost" id="accountCloseBtn" style="width:100%;" hidden>关闭</button>
     </div>
   </div>
 
@@ -663,12 +662,14 @@
       }
     }
 
-    const FAMILY_CODE_KEY = "redAlert_family_code";
+    const ACCOUNT_USER_KEY = "redAlert_account_user";
+    const ACCOUNT_PASS_KEY = "redAlert_account_pass";
     const FAMILY_APPID_KEY = "redAlert_lc_appId";
     const FAMILY_APPKEY_KEY = "redAlert_lc_appKey";
     const FAMILY_SERVER_KEY = "redAlert_lc_server";
     const FAMILY_SALT = "redAlert_family_salt_2026";
     let cloudPushTimer = null;
+    let accountReady = false;
 
     function getLeanCloudCfg() {
       const cfg = (window.RED_ALERT_CLOUD && window.RED_ALERT_CLOUD.leancloud) || {};
@@ -682,13 +683,26 @@
       const c = getLeanCloudCfg();
       return !!(c.appId && c.appKey && c.serverURL);
     }
-    function getFamilyCode() {
-      return (localStorage.getItem(FAMILY_CODE_KEY) || "").trim();
+    function getAccountUser() {
+      return (localStorage.getItem(ACCOUNT_USER_KEY) || "").trim();
     }
-    async function familyHash(code) {
+    function getAccountPass() {
+      return localStorage.getItem(ACCOUNT_PASS_KEY) || "";
+    }
+    function isLoggedIn() {
+      return getAccountUser().length > 0 && getAccountPass().length >= 6;
+    }
+    /** 账号+密码合成同步密钥（兼容旧版单通行码） */
+    function getAccountSecret() {
+      const u = getAccountUser();
+      const p = getAccountPass();
+      if (u && p) return u + ":" + p;
+      return (localStorage.getItem("redAlert_family_code") || "").trim();
+    }
+    async function familyHash(secret) {
       const buf = await crypto.subtle.digest(
         "SHA-256",
-        new TextEncoder().encode(String(code).trim() + ":" + FAMILY_SALT)
+        new TextEncoder().encode(String(secret).trim() + ":" + FAMILY_SALT)
       );
       return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
     }
@@ -707,31 +721,43 @@
         updatedAt: data.updatedAt || 0
       };
     }
-    function refreshFamilyStatus() {
-      const el = document.getElementById("familyStatus");
-      if (!el) return;
-      const code = getFamilyCode();
-      const details = document.getElementById("familySetupDetails");
+    function refreshAccountUI() {
+      const status = document.getElementById("accountStatus");
+      const chip = document.getElementById("userChip");
+      const logoutBtn = document.getElementById("accountLogoutBtn");
+      const closeBtn = document.getElementById("accountCloseBtn");
+      const details = document.getElementById("accountSetupDetails");
+      const user = getAccountUser();
+      if (chip) {
+        if (user) {
+          chip.hidden = false;
+          chip.textContent = "👤 " + user;
+        } else {
+          chip.hidden = true;
+        }
+      }
+      if (logoutBtn) logoutBtn.hidden = !isLoggedIn();
+      if (closeBtn) closeBtn.hidden = !isLoggedIn();
       if (!cloudReady()) {
-        el.textContent = "状态：还差一步——请展开下方「家长首次开通」";
+        if (status) status.textContent = "请先展开下方「家长首次开通云同步」";
         if (details) details.open = true;
-      } else if (!code) {
-        el.textContent = "状态：云已开通，请设置通行码并保存";
+      } else if (!isLoggedIn()) {
+        if (status) status.textContent = "输入账号密码进入（第一次会自动建档）";
         if (details) details.open = false;
       } else {
-        el.textContent = "状态：已开启云同步，清缓存也不怕";
+        if (status) status.textContent = "已登录：" + user + "（进度会自动同步云端）";
         if (details) details.open = false;
       }
     }
     function encodeFamilyConfigPayload() {
       const c = getLeanCloudCfg();
-      const code = getFamilyCode();
       const json = JSON.stringify({
-        v: 1,
+        v: 2,
         appId: c.appId,
         appKey: c.appKey,
         serverURL: c.serverURL,
-        code
+        user: getAccountUser(),
+        pass: getAccountPass()
       });
       return btoa(unescape(encodeURIComponent(json))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
     }
@@ -747,12 +773,12 @@
       localStorage.setItem(FAMILY_APPID_KEY, data.appId);
       localStorage.setItem(FAMILY_APPKEY_KEY, data.appKey);
       localStorage.setItem(FAMILY_SERVER_KEY, String(data.serverURL).replace(/\/$/, ""));
-      if (data.code && String(data.code).trim().length >= 6) {
-        localStorage.setItem(FAMILY_CODE_KEY, String(data.code).trim());
-      }
+      if (data.user) localStorage.setItem(ACCOUNT_USER_KEY, String(data.user).trim());
+      if (data.pass && String(data.pass).length >= 6) localStorage.setItem(ACCOUNT_PASS_KEY, String(data.pass));
+      if (data.code && !data.user) localStorage.setItem("redAlert_family_code", String(data.code).trim());
     }
     function buildFamilyConfigUrl() {
-      if (!cloudReady()) throw new Error("请先填写 LeanCloud 信息并保存");
+      if (!cloudReady()) throw new Error("请先填写 LeanCloud 信息");
       const base = location.href.split(/[?#]/)[0];
       return base + "?cfg=" + encodeFamilyConfigPayload();
     }
@@ -787,13 +813,14 @@
       return list[0] || null;
     }
     async function pushProgressToCloud() {
-      const code = getFamilyCode();
-      if (!cloudReady() || !code) return false;
-      const familyId = await familyHash(code);
+      const secret = getAccountSecret();
+      if (!cloudReady() || !secret) return false;
+      const familyId = await familyHash(secret);
       const c = getLeanCloudCfg();
       const existing = await findCloudRecord(familyId);
       const body = {
         familyId,
+        accountName: getAccountUser() || "",
         syncAt: progress.updatedAt || Date.now(),
         progress
       };
@@ -814,10 +841,10 @@
       if (!res.ok) throw new Error("云同步上传失败");
       return true;
     }
-    async function pullProgressFromCloud(codeOverride) {
-      const code = (codeOverride || getFamilyCode()).trim();
-      if (!cloudReady() || !code) throw new Error("请先填写 LeanCloud 凭证和通行码");
-      const familyId = await familyHash(code);
+    async function pullProgressFromCloud(secretOverride) {
+      const secret = (secretOverride || getAccountSecret()).trim();
+      if (!cloudReady() || !secret) throw new Error("请先开通云同步并登录账号");
+      const familyId = await familyHash(secret);
       const existing = await findCloudRecord(familyId);
       if (!existing || !existing.progress) return null;
       return {
@@ -826,6 +853,7 @@
       };
     }
     function scheduleCloudPush() {
+      if (!accountReady || !isLoggedIn()) return;
       if (cloudPushTimer) clearTimeout(cloudPushTimer);
       cloudPushTimer = setTimeout(() => {
         pushProgressToCloud().catch(() => {});
@@ -839,11 +867,12 @@
     }
 
     let progress = loadProgress();
-    saveProgress();
+    // 未登录时只保本地，不强制写云
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
 
     async function bootCloudSync() {
       try {
-        if (!cloudReady() || !getFamilyCode()) return false;
+        if (!cloudReady() || !getAccountSecret()) return false;
         const remote = await pullProgressFromCloud();
         if (!remote) {
           await pushProgressToCloud();
@@ -860,6 +889,23 @@
         }
       } catch (e) { /* 离线忽略 */ }
       return false;
+    }
+
+    function showAccountGate(force) {
+      const overlay = document.getElementById("accountOverlay");
+      if (!overlay) return;
+      const c = getLeanCloudCfg();
+      document.getElementById("familyAppId").value = c.appId;
+      document.getElementById("familyAppKey").value = c.appKey;
+      document.getElementById("familyServerUrl").value = c.serverURL;
+      document.getElementById("accountUserInput").value = getAccountUser();
+      document.getElementById("accountPassInput").value = getAccountPass();
+      refreshAccountUI();
+      if (force || !isLoggedIn() || !cloudReady()) overlay.classList.add("show");
+      else overlay.classList.remove("show");
+    }
+    function hideAccountGate() {
+      document.getElementById("accountOverlay").classList.remove("show");
     }
 
     /* ========== 换机备份 / 恢复（家长操作，无账号） ========== */
@@ -2284,54 +2330,45 @@
       }
     });
 
-    document.getElementById("familyOpenBtn").addEventListener("click", () => {
-      const c = getLeanCloudCfg();
-      document.getElementById("familyAppId").value = c.appId;
-      document.getElementById("familyAppKey").value = c.appKey;
-      document.getElementById("familyServerUrl").value = c.serverURL;
-      document.getElementById("familyCodeInput").value = getFamilyCode();
-      refreshFamilyStatus();
-      document.getElementById("familyOverlay").classList.add("show");
+    document.getElementById("accountOpenBtn").addEventListener("click", () => showAccountGate(true));
+    document.getElementById("accountCloseBtn").addEventListener("click", () => {
+      if (isLoggedIn()) hideAccountGate();
     });
-    document.getElementById("familyCloseBtn").addEventListener("click", () => {
-      document.getElementById("familyOverlay").classList.remove("show");
-    });
-    document.getElementById("familyOverlay").addEventListener("click", (e) => {
-      if (e.target.id === "familyOverlay") document.getElementById("familyOverlay").classList.remove("show");
+    document.getElementById("accountOverlay").addEventListener("click", (e) => {
+      if (e.target.id === "accountOverlay" && isLoggedIn() && accountReady) hideAccountGate();
     });
     document.getElementById("familyConfigLinkBtn").addEventListener("click", async () => {
       const appId = document.getElementById("familyAppId").value.trim();
       const appKey = document.getElementById("familyAppKey").value.trim();
       const serverURL = document.getElementById("familyServerUrl").value.trim().replace(/\/$/, "");
-      const code = document.getElementById("familyCodeInput").value.trim();
+      const user = document.getElementById("accountUserInput").value.trim();
+      const pass = document.getElementById("accountPassInput").value;
       if (appId && appKey && serverURL) {
         localStorage.setItem(FAMILY_APPID_KEY, appId);
         localStorage.setItem(FAMILY_APPKEY_KEY, appKey);
         localStorage.setItem(FAMILY_SERVER_KEY, serverURL);
       }
-      if (code.length >= 6) localStorage.setItem(FAMILY_CODE_KEY, code);
+      if (user) localStorage.setItem(ACCOUNT_USER_KEY, user);
+      if (pass.length >= 6) localStorage.setItem(ACCOUNT_PASS_KEY, pass);
       try {
         const url = buildFamilyConfigUrl();
         await navigator.clipboard.writeText(url);
-        showToast("📋 配置链接已复制，发到其他手机打开即可");
+        showToast("📋 配置链接已复制，发到其他设备打开即可");
       } catch (e) {
-        try {
-          prompt("请复制此配置链接：", buildFamilyConfigUrl());
-        } catch (err) {
-          alert("请先填好 LeanCloud 信息和通行码");
-        }
+        try { prompt("请复制此配置链接：", buildFamilyConfigUrl()); }
+        catch (err) { alert("请先填好云同步信息和账号密码"); }
       }
     });
-    document.getElementById("familySaveBtn").addEventListener("click", async () => {
+    async function doAccountLogin() {
       const appId = document.getElementById("familyAppId").value.trim();
       const appKey = document.getElementById("familyAppKey").value.trim();
       const serverURL = document.getElementById("familyServerUrl").value.trim().replace(/\/$/, "");
-      const code = document.getElementById("familyCodeInput").value.trim();
+      const user = document.getElementById("accountUserInput").value.trim();
+      const pass = document.getElementById("accountPassInput").value;
       if (!cloudReady()) {
         if (!appId || !appKey || !/^https:\/\//i.test(serverURL)) {
-          const details = document.getElementById("familySetupDetails");
-          if (details) details.open = true;
-          alert("第一次使用请先展开「家长首次开通」，填写 LeanCloud 三项信息（国内可开，不用 VPN）");
+          document.getElementById("accountSetupDetails").open = true;
+          alert("第一次使用：请先展开「家长首次开通云同步」，填好三项（国内可开）");
           return;
         }
         localStorage.setItem(FAMILY_APPID_KEY, appId);
@@ -2342,60 +2379,46 @@
         localStorage.setItem(FAMILY_APPKEY_KEY, appKey);
         localStorage.setItem(FAMILY_SERVER_KEY, serverURL);
       }
-      if (code.length < 6) {
-        alert("通行码至少 6 位，建议用孩子名字+数字，全家共用一个");
+      if (!user) {
+        alert("请输入账号");
         return;
       }
-      localStorage.setItem(FAMILY_CODE_KEY, code);
-      refreshFamilyStatus();
+      if (pass.length < 6) {
+        alert("密码至少 6 位");
+        return;
+      }
+      localStorage.setItem(ACCOUNT_USER_KEY, user);
+      localStorage.setItem(ACCOUNT_PASS_KEY, pass);
+      refreshAccountUI();
       try {
-        await pushProgressToCloud();
-        showToast("✅ 已同步到云端。换浏览器输入同一通行码即可");
-        document.getElementById("familyOverlay").classList.remove("show");
-      } catch (e) {
-        alert("上传失败。请检查 LeanCloud 三项是否填对。");
-      }
-    });
-    document.getElementById("familyPullBtn").addEventListener("click", async () => {
-      const appId = document.getElementById("familyAppId").value.trim();
-      const appKey = document.getElementById("familyAppKey").value.trim();
-      const serverURL = document.getElementById("familyServerUrl").value.trim().replace(/\/$/, "");
-      const code = document.getElementById("familyCodeInput").value.trim();
-      if (appId) localStorage.setItem(FAMILY_APPID_KEY, appId);
-      if (appKey) localStorage.setItem(FAMILY_APPKEY_KEY, appKey);
-      if (serverURL) localStorage.setItem(FAMILY_SERVER_KEY, serverURL);
-      if (code.length >= 6) localStorage.setItem(FAMILY_CODE_KEY, code);
-      refreshFamilyStatus();
-      if (!cloudReady()) {
-        alert("请先完成「家长首次开通」或打开全家配置链接");
-        return;
-      }
-      if (code.length < 6) {
-        alert("请输入家庭通行码");
-        return;
-      }
-      try {
-        const remote = await pullProgressFromCloud(code);
-        if (!remote) {
-          alert("云端还没有进度。请先在有数据的手机上点「保存并同步」。");
-          return;
+        const remote = await pullProgressFromCloud(user + ":" + pass);
+        if (remote) {
+          progress = remote.progress;
+          progress.updatedAt = remote.updatedAt || Date.now();
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+          showToast("✅ 已登录并恢复云端进度");
+        } else {
+          await pushProgressToCloud();
+          showToast("✅ 账号已创建，进度将自动保存到云端");
         }
-        progress = remote.progress;
-        progress.updatedAt = remote.updatedAt || Date.now();
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-        showToast("✅ 已从云端找回进度");
-        document.getElementById("familyOverlay").classList.remove("show");
-        location.reload();
+        accountReady = true;
+        hideAccountGate();
+        mount(true);
       } catch (e) {
-        alert(e.message || "拉取失败，请检查网络和通行码");
+        alert("登录同步失败。请检查云同步三项是否正确，或网络是否正常。");
       }
+    }
+    document.getElementById("accountLoginBtn").addEventListener("click", doAccountLogin);
+    document.getElementById("accountPassInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") doAccountLogin();
     });
-    document.getElementById("familyClearBtn").addEventListener("click", () => {
-      if (!confirm("清除本机记住的通行码？云端进度不会删除。")) return;
-      localStorage.removeItem(FAMILY_CODE_KEY);
-      document.getElementById("familyCodeInput").value = "";
-      refreshFamilyStatus();
-      showToast("已清除本机通行码");
+    document.getElementById("accountLogoutBtn").addEventListener("click", () => {
+      if (!confirm("退出后本机不再自动同步。云端进度还在，下次用同一账号密码可找回。")) return;
+      localStorage.removeItem(ACCOUNT_USER_KEY);
+      localStorage.removeItem(ACCOUNT_PASS_KEY);
+      accountReady = false;
+      refreshAccountUI();
+      showAccountGate(true);
     });
 
     document.getElementById("historyOpenBtn").addEventListener("click", openHistory);
@@ -2512,23 +2535,27 @@
       });
     })();
 
-    // boot：配置链接 → 进度链接 → 云同步 → 今日任务
+    // boot：配置链接 → 登录门 → 云同步 → 今日任务
     (async function boot() {
       const cfgApplied = tryApplyConfigFromUrl();
       const restored = tryRestoreFromUrl();
+      if (cfgApplied || (isLoggedIn() && cloudReady())) {
+        accountReady = true;
+      }
+      showAccountGate(!accountReady);
+      if (!accountReady) {
+        refreshAccountUI();
+        return; // 等登录后再 mount
+      }
       let cloudPulled = false;
       try {
         cloudPulled = await bootCloudSync();
       } catch (e) { /* ignore */ }
+      hideAccountGate();
       mount(true);
-      if (cfgApplied) setTimeout(() => showToast("🔑 家庭云同步已自动配置"), 500);
-      if (restored) setTimeout(() => showToast("✅ 进度已从链接恢复到本机"), 700);
-      else if (cloudPulled) setTimeout(() => showToast("☁️ 已从云端同步最新进度"), 700);
-      else if (!getFamilyCode() || !cloudReady()) {
-        setTimeout(() => {
-          showToast("建议开通家庭通行码，防止清缓存丢进度");
-        }, 1800);
-      }
+      if (cfgApplied) setTimeout(() => showToast("🔑 云同步已自动配置"), 500);
+      if (restored) setTimeout(() => showToast("✅ 进度已从链接恢复"), 700);
+      else if (cloudPulled) setTimeout(() => showToast("☁️ 已同步云端进度"), 700);
     })();
 
   </script>
