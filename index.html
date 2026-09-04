@@ -260,6 +260,7 @@
       <div class="score-line" id="scoreLabel">战果：0/3</div>
       <div class="rank-bar"><div class="rank-bar-fill" id="rankBarFill"></div></div>
       <button type="button" class="btn btn-ghost reset-btn" id="historyOpenBtn">📅 历史任务</button>
+      <button type="button" class="btn btn-ghost reset-btn" id="familyOpenBtn">🔑 家庭通行码</button>
       <button type="button" class="btn btn-ghost reset-btn" id="transferOpenBtn">📱 换机带走进度</button>
       <button type="button" class="btn btn-ghost reset-btn" id="muteBtn">🔊 音效开</button>
       <button type="button" class="btn btn-ghost reset-btn" id="resetProgressBtn">🔄 重置进度</button>
@@ -347,6 +348,41 @@
     </div>
   </div>
 
+  <div class="history-overlay" id="familyOverlay" role="dialog" aria-modal="true">
+    <div class="history-panel">
+      <h2 style="color:var(--accent);margin:0 0 8px;">🔑 家庭通行码</h2>
+      <p style="margin:0 0 12px;color:var(--muted);font-size:0.92rem;line-height:1.55;">
+        孩子不用登录。家长设一个通行码后，进度会自动同步到云端；换手机输入<strong style="color:#ffd08a;">同一个通行码</strong>即可继续。
+      </p>
+      <p id="familyStatus" style="margin:0 0 12px;color:#ffd08a;font-weight:700;">状态：未开启云同步</p>
+
+      <details style="margin-bottom:14px;color:var(--muted);font-size:0.88rem;line-height:1.6;">
+        <summary style="cursor:pointer;color:#ffd08a;font-weight:700;">第一次使用？点这里配置云数据库（约5分钟）</summary>
+        <ol style="padding-left:1.2em;margin:8px 0;">
+          <li>用电脑打开 <a href="https://console.firebase.google.com/" target="_blank" rel="noopener" style="color:var(--accent);">Firebase 控制台</a>（可用 Google 账号）</li>
+          <li>创建项目 → 左侧「Realtime Database」→ 创建数据库 → 选国外节点也可</li>
+          <li>规则改成下面这样并发布：
+            <pre style="white-space:pre-wrap;background:#111;padding:8px;border:1px solid var(--border);">{"rules":{"families":{"$id":{".read":true,".write":true}}}}</pre>
+          </li>
+          <li>复制数据库地址（类似 https://xxx-default-rtdb.firebaseio.com ）粘贴到下方</li>
+        </ol>
+      </details>
+
+      <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">云数据库地址</label>
+      <input id="familyDbUrl" type="url" placeholder="https://你的项目-default-rtdb.firebaseio.com" style="width:100%;padding:12px;margin-bottom:12px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;" />
+
+      <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">家庭通行码（至少6位，自己记住）</label>
+      <input id="familyCodeInput" type="text" autocomplete="off" placeholder="例如：xiaoming2026" maxlength="32" style="width:100%;padding:12px;margin-bottom:12px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;font-size:1.05rem;" />
+
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:12px;">
+        <button type="button" class="btn btn-orange" id="familySaveBtn">💾 保存并同步到云端</button>
+        <button type="button" class="btn btn-ghost" id="familyPullBtn">☁️ 用通行码从云端拉取</button>
+      </div>
+      <button type="button" class="btn btn-ghost" id="familyClearBtn" style="width:100%;margin-bottom:8px;">清除本机通行码（不删云端）</button>
+      <button type="button" class="btn btn-ghost" id="familyCloseBtn" style="width:100%;">关闭</button>
+    </div>
+  </div>
+
   <div class="guide-overlay" id="guideOverlay" hidden>
     <div class="guide-card">
       <p id="guideText">先点击这里开始今日任务！</p>
@@ -354,6 +390,7 @@
     </div>
   </div>
 
+  <script src="cloud-config.js"></script>
   <script>
 
     const STORAGE_KEY = "redAlert_progress";
@@ -582,7 +619,8 @@
         promotedAnnounced: [],
         lastWelcomeDay: "",
         scoutedDays: [],
-        enlistedSpoken: false
+        enlistedSpoken: false,
+        updatedAt: Date.now()
       };
     }
 
@@ -590,7 +628,6 @@
       try {
         let raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) {
-          // 一次性迁移旧版本地 key，之后只读写 redAlert_progress
           const legacyKeys = [
             "redAlert_progress_v4",
             "redAlert_progress_v3_guest",
@@ -614,19 +651,122 @@
           promotedAnnounced: Array.isArray(data.promotedAnnounced) ? data.promotedAnnounced : [],
           lastWelcomeDay: data.lastWelcomeDay || "",
           scoutedDays: Array.isArray(data.scoutedDays) ? data.scoutedDays : [],
-          enlistedSpoken: !!data.enlistedSpoken
+          enlistedSpoken: !!data.enlistedSpoken,
+          updatedAt: data.updatedAt || 0
         };
       } catch (e) {
         return defaultProgress();
       }
     }
 
+    const FAMILY_CODE_KEY = "redAlert_family_code";
+    const FAMILY_DB_KEY = "redAlert_cloud_db";
+    const FAMILY_SALT = "redAlert_family_salt_2026";
+    let cloudPushTimer = null;
+
+    function getCloudDbUrl() {
+      const fromLocal = (localStorage.getItem(FAMILY_DB_KEY) || "").trim().replace(/\/$/, "");
+      if (fromLocal) return fromLocal;
+      const fromCfg = (window.RED_ALERT_CLOUD && window.RED_ALERT_CLOUD.databaseURL) || "";
+      return String(fromCfg).trim().replace(/\/$/, "");
+    }
+    function getFamilyCode() {
+      return (localStorage.getItem(FAMILY_CODE_KEY) || "").trim();
+    }
+    async function familyHash(code) {
+      const buf = await crypto.subtle.digest(
+        "SHA-256",
+        new TextEncoder().encode(String(code).trim() + ":" + FAMILY_SALT)
+      );
+      return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+    }
+    function normalizeProgressData(data) {
+      return {
+        correctCount: data.correctCount || 0,
+        energy: data.energy || 0,
+        questions: data.questions || {},
+        wrongList: Array.isArray(data.wrongList) ? data.wrongList : [],
+        clearedTopics: Array.isArray(data.clearedTopics) ? data.clearedTopics : [],
+        clearedDays: Array.isArray(data.clearedDays) ? data.clearedDays.filter((d) => typeof d === "number") : [],
+        promotedAnnounced: Array.isArray(data.promotedAnnounced) ? data.promotedAnnounced : [],
+        lastWelcomeDay: data.lastWelcomeDay || "",
+        scoutedDays: Array.isArray(data.scoutedDays) ? data.scoutedDays : [],
+        enlistedSpoken: !!data.enlistedSpoken,
+        updatedAt: data.updatedAt || 0
+      };
+    }
+    function refreshFamilyStatus() {
+      const el = document.getElementById("familyStatus");
+      if (!el) return;
+      const db = getCloudDbUrl();
+      const code = getFamilyCode();
+      if (!db) el.textContent = "状态：未配置云数据库";
+      else if (!code) el.textContent = "状态：已配置云库，请设置通行码";
+      else el.textContent = "状态：云同步已开启（通行码已记住）";
+    }
+    async function pushProgressToCloud() {
+      const db = getCloudDbUrl();
+      const code = getFamilyCode();
+      if (!db || !code) return false;
+      const id = await familyHash(code);
+      const url = db + "/families/" + id + ".json";
+      const body = { updatedAt: progress.updatedAt || Date.now(), progress };
+      const res = await fetch(url, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) throw new Error("云同步上传失败");
+      return true;
+    }
+    async function pullProgressFromCloud(codeOverride) {
+      const db = getCloudDbUrl();
+      const code = (codeOverride || getFamilyCode()).trim();
+      if (!db || !code) throw new Error("请先填写云数据库地址和通行码");
+      const id = await familyHash(code);
+      const url = db + "/families/" + id + ".json";
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("云同步读取失败");
+      const data = await res.json();
+      if (!data || !data.progress) return null;
+      return { updatedAt: data.updatedAt || 0, progress: normalizeProgressData(data.progress) };
+    }
+    function scheduleCloudPush() {
+      if (cloudPushTimer) clearTimeout(cloudPushTimer);
+      cloudPushTimer = setTimeout(() => {
+        pushProgressToCloud().catch(() => {});
+      }, 800);
+    }
+
     function saveProgress() {
+      progress.updatedAt = Date.now();
       localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+      scheduleCloudPush();
     }
 
     let progress = loadProgress();
     saveProgress(); // 首次访问自动初始化；若刚迁移则写入正式 key
+
+    async function bootCloudSync() {
+      try {
+        if (!getCloudDbUrl() || !getFamilyCode()) return false;
+        const remote = await pullProgressFromCloud();
+        if (!remote) {
+          await pushProgressToCloud();
+          return false;
+        }
+        if ((remote.updatedAt || 0) > (progress.updatedAt || 0)) {
+          progress = remote.progress;
+          progress.updatedAt = remote.updatedAt;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+          return true;
+        }
+        if ((progress.updatedAt || 0) > (remote.updatedAt || 0)) {
+          await pushProgressToCloud();
+        }
+      } catch (e) { /* 离线时忽略 */ }
+      return false;
+    }
 
     /* ========== 换机备份 / 恢复（家长操作，无账号） ========== */
     function encodeProgressPayload(data) {
@@ -652,19 +792,10 @@
       return data.p;
     }
     function applyImportedProgress(data) {
-      progress = {
-        correctCount: data.correctCount || 0,
-        energy: data.energy || 0,
-        questions: data.questions || {},
-        wrongList: Array.isArray(data.wrongList) ? data.wrongList : [],
-        clearedTopics: Array.isArray(data.clearedTopics) ? data.clearedTopics : [],
-        clearedDays: Array.isArray(data.clearedDays) ? data.clearedDays.filter((d) => typeof d === "number") : [],
-        promotedAnnounced: Array.isArray(data.promotedAnnounced) ? data.promotedAnnounced : [],
-        lastWelcomeDay: data.lastWelcomeDay || "",
-        scoutedDays: Array.isArray(data.scoutedDays) ? data.scoutedDays : [],
-        enlistedSpoken: !!data.enlistedSpoken
-      };
-      saveProgress();
+      progress = normalizeProgressData(data);
+      progress.updatedAt = Date.now();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+      scheduleCloudPush();
     }
     function buildRestoreUrl() {
       const payload = encodeProgressPayload(progress);
@@ -2059,6 +2190,70 @@
       }
     });
 
+    document.getElementById("familyOpenBtn").addEventListener("click", () => {
+      document.getElementById("familyDbUrl").value = getCloudDbUrl();
+      document.getElementById("familyCodeInput").value = getFamilyCode();
+      refreshFamilyStatus();
+      document.getElementById("familyOverlay").classList.add("show");
+    });
+    document.getElementById("familyCloseBtn").addEventListener("click", () => {
+      document.getElementById("familyOverlay").classList.remove("show");
+    });
+    document.getElementById("familyOverlay").addEventListener("click", (e) => {
+      if (e.target.id === "familyOverlay") document.getElementById("familyOverlay").classList.remove("show");
+    });
+    document.getElementById("familySaveBtn").addEventListener("click", async () => {
+      const db = document.getElementById("familyDbUrl").value.trim().replace(/\/$/, "");
+      const code = document.getElementById("familyCodeInput").value.trim();
+      if (!db || !/^https:\/\//i.test(db) || (!/firebaseio\.com$/i.test(db) && !/firebasedatabase\.app$/i.test(db))) {
+        alert("请填写正确的 Firebase Realtime Database 地址（以 firebaseio.com 或 firebasedatabase.app 结尾）");
+        return;
+      }
+      if (code.length < 6) {
+        alert("通行码至少 6 位");
+        return;
+      }
+      localStorage.setItem(FAMILY_DB_KEY, db);
+      localStorage.setItem(FAMILY_CODE_KEY, code);
+      refreshFamilyStatus();
+      try {
+        await pushProgressToCloud();
+        showToast("✅ 已保存，进度已同步到云端");
+        document.getElementById("familyOverlay").classList.remove("show");
+      } catch (e) {
+        alert("上传失败。请检查数据库地址和规则是否已发布为允许 families 读写。");
+      }
+    });
+    document.getElementById("familyPullBtn").addEventListener("click", async () => {
+      const db = document.getElementById("familyDbUrl").value.trim().replace(/\/$/, "");
+      const code = document.getElementById("familyCodeInput").value.trim();
+      if (db) localStorage.setItem(FAMILY_DB_KEY, db);
+      if (code.length >= 6) localStorage.setItem(FAMILY_CODE_KEY, code);
+      refreshFamilyStatus();
+      try {
+        const remote = await pullProgressFromCloud(code);
+        if (!remote) {
+          alert("云端还没有这个通行码的进度。请先在旧手机点「保存并同步到云端」。");
+          return;
+        }
+        progress = remote.progress;
+        progress.updatedAt = remote.updatedAt || Date.now();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+        showToast("✅ 已从云端拉取进度");
+        document.getElementById("familyOverlay").classList.remove("show");
+        location.reload();
+      } catch (e) {
+        alert(e.message || "拉取失败，请检查网络和配置");
+      }
+    });
+    document.getElementById("familyClearBtn").addEventListener("click", () => {
+      if (!confirm("清除本机记住的通行码？云端进度不会删除。")) return;
+      localStorage.removeItem(FAMILY_CODE_KEY);
+      document.getElementById("familyCodeInput").value = "";
+      refreshFamilyStatus();
+      showToast("已清除本机通行码");
+    });
+
     document.getElementById("historyOpenBtn").addEventListener("click", openHistory);
     document.getElementById("historyCloseBtn").addEventListener("click", () => {
       document.getElementById("historyOverlay").classList.remove("show");
@@ -2173,12 +2368,17 @@
       });
     })();
 
-    // boot：先尝试从换机链接恢复，再进入今日任务
-    const restored = tryRestoreFromUrl();
-    mount(true);
-    if (restored) {
-      setTimeout(() => showToast("✅ 进度已从链接恢复到本机"), 600);
-    }
+    // boot：URL恢复 → 云同步 → 今日任务
+    (async function boot() {
+      const restored = tryRestoreFromUrl();
+      let cloudPulled = false;
+      try {
+        cloudPulled = await bootCloudSync();
+      } catch (e) { /* ignore */ }
+      mount(true);
+      if (restored) setTimeout(() => showToast("✅ 进度已从链接恢复到本机"), 600);
+      else if (cloudPulled) setTimeout(() => showToast("☁️ 已从云端同步最新进度"), 600);
+    })();
 
   </script>
 </body>
