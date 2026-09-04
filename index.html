@@ -327,7 +327,7 @@
 
   <script>
 
-    const STORAGE_KEY = "redAlert_progress_v4";
+    const STORAGE_KEY = "redAlert_progress";
     const GUIDE_KEY = "redAlert_guide_done_v1";
     const MAX_RANK_SCORE = 74;
     const QUESTIONS_PER_DAY = 3;
@@ -561,9 +561,17 @@
       try {
         let raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) {
-          // migrate older local keys if present
-          raw = localStorage.getItem("redAlert_progress_v2")
-            || localStorage.getItem("redAlert_progress_v3_guest");
+          // 一次性迁移旧版本地 key，之后只读写 redAlert_progress
+          const legacyKeys = [
+            "redAlert_progress_v4",
+            "redAlert_progress_v3_guest",
+            "redAlert_progress_v2",
+            "redAlert_progress_v3"
+          ];
+          for (const k of legacyKeys) {
+            raw = localStorage.getItem(k);
+            if (raw) break;
+          }
         }
         if (!raw) return defaultProgress();
         const data = JSON.parse(raw);
@@ -589,7 +597,7 @@
     }
 
     let progress = loadProgress();
-    saveProgress(); // ensure key exists on first visit
+    saveProgress(); // 首次访问自动初始化；若刚迁移则写入正式 key
 
     function getQState(id) {
       return progress.questions[id] || { status: "unanswered", firstCorrect: false };
@@ -1965,6 +1973,9 @@
       progress = defaultProgress();
       saveProgress();
       localStorage.removeItem(GUIDE_KEY);
+      ["redAlert_progress_v4", "redAlert_progress_v3_guest", "redAlert_progress_v2", "redAlert_progress_v3", "redAlert_session_v3"].forEach((k) => {
+        localStorage.removeItem(k);
+      });
       selectedDayNum = null;
       historyReadonly = false;
       location.reload();
