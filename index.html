@@ -450,12 +450,12 @@
       "🌈 你不是在解题，你是在征服领地。"
     ];
 
-    /* 按「第01天…」顺序：每个主题两天（打基础 + 提升），每天固定3题 */
+    /* 按「第01天…」顺序：奇数为新主题入门，偶数为同一主题难度升级；视频与题目配套 */
     const courses = [
       {
         dayNum: 1, phase: "foundation", topic: "和差问题",
         name: { redAlert: "🏗️ 基地资源分配", original: "和差入门" },
-        videoSource: "gauss", videoLabel: "零食短片 · 高斯", videoTitle: "3205 和差问题", videoDuration: "1:58",
+        videoSource: "gauss", videoLabel: "零食短片 · 高斯", videoTitle: "3205 和差问题（入门）", videoDuration: "1:58",
         videoUrl: "https://www.bilibili.com/video/BV1Es4y177LY?p=25", videoType: "short",
         questions: [
           { q: "基地有动员兵和工程师共20人，动员兵比工程师多4人。动员兵有多少人？", answer: 12, hint: "总人数减去多出的人数，再平分，就是工程师的数量。动员兵就是工程师加4。", ex: { t: "sd", A: "动员兵", B: "工程师", S: 20, D: 4, want: "A" } },
@@ -465,19 +465,19 @@
       },
       {
         dayNum: 2, phase: "advancement", topic: "和差问题",
-        name: { redAlert: "🔬 科技研发投入", original: "和差提升" },
-        videoSource: "super", videoLabel: "故事主线 · 超级课堂", videoTitle: "02 未公布的分数—和差问题二", videoDuration: "6:43",
+        name: { redAlert: "🔬 科技研发投入", original: "和差升级" },
+        videoSource: "super", videoLabel: "故事主线 · 超级课堂", videoTitle: "02 和差问题二（升级）", videoDuration: "6:43",
         videoUrl: "https://www.bilibili.com/video/BV1ScwnzFEkR?p=2", videoType: "long",
         questions: [
-          { q: "研发激光武器和磁能武器共投入18亿，激光武器比磁能武器多4亿。磁能武器投入多少亿？", answer: 7, hint: "总投入减差，平分得小数。", ex: { t: "sd", A: "激光武器", B: "磁能武器", S: 18, D: 4, want: "B" } },
-          { q: "两个科技实验室共存铀矿100吨，甲实验室比乙实验室多20吨。甲实验室存铀多少吨？", answer: 60, hint: "（100+20）÷2=60，甲是多的那一个。", ex: { t: "sd", A: "甲实验室", B: "乙实验室", S: 100, D: 20, want: "A" } },
-          { q: "A级芯片库存15万片，B级库存7万片，A级给B级多少万片后两者一样多？", answer: 4, hint: "先算差：15-7=8，给出一半：8÷2=4。", ex: { t: "give", A: "A级", B: "B级", Xa: 15, Xb: 7 } }
+          { q: "两个油井共产油80桶，第一口井比第二口井多产8桶。两口井各产多少桶？（多的在前，用逗号隔开）", answer: "44,36", hint: "先求第二口井：（80-8）÷2=36，第一口：36+8=44。", ex: { t: "sd", A: "第一口井", B: "第二口井", S: 80, D: 8, want: "both" } },
+          { q: "A级芯片库存15万片，B级库存7万片，A级给B级多少万片后两者一样多？", answer: 4, hint: "先算差：15-7=8，给出一半：8÷2=4。", ex: { t: "give", A: "A级", B: "B级", Xa: 15, Xb: 7 } },
+          { q: "一个两位数密码，十位与个位数字之和为13，十位比个位大3。这个密码是多少？", answer: 85, hint: "十位=（13+3）÷2=8，个位=8-3=5。", ex: { t: "digit", S: 13, D: 3 } }
         ]
       },
       {
         dayNum: 3, phase: "foundation", topic: "差倍问题",
         name: { redAlert: "🪖 部队规模对比", original: "差倍入门" },
-        videoSource: "gauss", videoLabel: "零食短片 · 高斯", videoTitle: "4101 差倍差不变", videoDuration: "2:02",
+        videoSource: "gauss", videoLabel: "零食短片 · 高斯", videoTitle: "4101 差倍差不变（入门）", videoDuration: "2:02",
         videoUrl: "https://www.bilibili.com/video/BV1Ys4y1S7ZB?p=1", videoType: "short",
         questions: [
           { q: "基地有12辆犀牛坦克，4辆防空履带车。犀牛坦克是防空履带车的几倍？", answer: 3, hint: "12÷4=3。", ex: { t: "mul", A: "犀牛坦克", B: "防空车", Xa: 12, Xb: 4 } },
@@ -487,19 +487,19 @@
       },
       {
         dayNum: 4, phase: "advancement", topic: "差倍问题",
-        name: { redAlert: "🪖 部队规模对比", original: "差倍提升" },
-        videoSource: "gauss", videoLabel: "零食短片 · 高斯", videoTitle: "4101 差倍和不变", videoDuration: "2:11",
+        name: { redAlert: "🪖 部队规模突击", original: "差倍升级" },
+        videoSource: "gauss", videoLabel: "零食短片 · 高斯", videoTitle: "4101 差倍和不变（升级）", videoDuration: "2:11",
         videoUrl: "https://www.bilibili.com/video/BV1Ys4y1S7ZB?p=2", videoType: "short",
         questions: [
-          { q: "基地有18架入侵者战机，6架黑鹰战机。入侵者是黑鹰的几倍？", answer: 3, hint: "18÷6=3。", ex: { t: "mul", A: "入侵者", B: "黑鹰", Xa: 18, Xb: 6 } },
           { q: "光棱坦克数量是磁能坦克的4倍，光棱比磁能多27辆。磁能坦克多少辆？", answer: 9, hint: "27÷（4-1）=9。", ex: { t: "cd", A: "光棱", B: "磁能", K: 4, D: 27, want: "B" } },
-          { q: "航空兵比伞兵多30人，航空兵是伞兵的4倍。伞兵多少人？", answer: 10, hint: "30÷（4-1）=10。", ex: { t: "cd", A: "航空兵", B: "伞兵", K: 4, D: 30, want: "B" } }
+          { q: "航空兵比伞兵多30人，航空兵是伞兵的4倍。伞兵多少人？", answer: 10, hint: "30÷（4-1）=10。", ex: { t: "cd", A: "航空兵", B: "伞兵", K: 4, D: 30, want: "B" } },
+          { q: "指挥官年龄是副官年龄的3倍，指挥官比副官大24岁。指挥官几岁？", answer: 36, hint: "副官=24÷（3-1）=12，指挥官=12×3=36。", ex: { t: "cd", A: "指挥官", B: "副官", K: 3, D: 24, want: "A" } }
         ]
       },
       {
         dayNum: 5, phase: "foundation", topic: "和倍问题",
         name: { redAlert: "⚔️ 联合作战力量", original: "和倍入门" },
-        videoSource: "super", videoLabel: "故事主线 · 超级课堂", videoTitle: "35 采蜜实习生—和倍问题一", videoDuration: "9:53",
+        videoSource: "super", videoLabel: "故事主线 · 超级课堂", videoTitle: "35 和倍问题一（入门）", videoDuration: "9:53",
         videoUrl: "https://www.bilibili.com/video/BV1ScwnzFEkR?p=34", videoType: "long",
         questions: [
           { q: "步兵和坦克共36个单位，步兵数量是坦克的3倍。坦克有多少个单位？", answer: 9, hint: "总数÷（倍数+1）=36÷4=9。", ex: { t: "hb", A: "步兵", B: "坦克", S: 36, K: 3, want: "B" } },
@@ -509,19 +509,19 @@
       },
       {
         dayNum: 6, phase: "advancement", topic: "和倍问题",
-        name: { redAlert: "⚔️ 联合作战力量", original: "和倍提升" },
-        videoSource: "super", videoLabel: "故事主线 · 超级课堂", videoTitle: "36 仓库管理员—和倍问题二", videoDuration: "6:59",
+        name: { redAlert: "⚔️ 联合作战升级", original: "和倍升级" },
+        videoSource: "super", videoLabel: "故事主线 · 超级课堂", videoTitle: "36 和倍问题二（升级）", videoDuration: "6:59",
         videoUrl: "https://www.bilibili.com/video/BV1ScwnzFEkR?p=35", videoType: "long",
         questions: [
-          { q: "科技中心和战车工厂共54座，科技中心是战车工厂的2倍。战车工厂多少座？", answer: 18, hint: "54÷（2+1）=18。", ex: { t: "hb", A: "科技中心", B: "战车工厂", S: 54, K: 2, want: "B" } },
-          { q: "两座雷达站共探测到96个目标，A站是B站的3倍。B站探测到多少个？", answer: 24, hint: "96÷（3+1）=24。", ex: { t: "hb", A: "A站", B: "B站", S: 96, K: 3, want: "B" } },
-          { q: "军官和士兵共60人，军官是士兵的4倍。士兵有多少人？", answer: 12, hint: "60÷（4+1）=12。", ex: { t: "hb", A: "军官", B: "士兵", S: 60, K: 4, want: "B" } }
+          { q: "科技中心和战车工厂共54座，科技中心是战车工厂的2倍。科技中心多少座？", answer: 36, hint: "战车工厂=54÷（2+1）=18，科技中心=18×2=36。", ex: { t: "hb", A: "科技中心", B: "战车工厂", S: 54, K: 2, want: "A" } },
+          { q: "军官和士兵共60人，军官是士兵的4倍。军官有多少人？", answer: 48, hint: "士兵=60÷（4+1）=12，军官=12×4=48。", ex: { t: "hb", A: "军官", B: "士兵", S: 60, K: 4, want: "A" } },
+          { q: "陆海空三军共有48个单位，陆军是海军的2倍，空军与海军一样多。海军有多少？", answer: 12, hint: "设海军为x，则2x+x+x=48，x=12。", ex: { t: "hbm", S: 48, parts: [2, 1, 1], exact: 12 } }
         ]
       },
       {
         dayNum: 7, phase: "foundation", topic: "植树问题",
         name: { redAlert: "🛡️ 防御工事部署", original: "植树入门" },
-        videoSource: "gauss", videoLabel: "零食短片 · 高斯", videoTitle: "直线上两端植树问题", videoDuration: "2:34",
+        videoSource: "gauss", videoLabel: "零食短片 · 高斯", videoTitle: "直线两端都植树（入门）", videoDuration: "2:34",
         videoUrl: "https://www.bilibili.com/video/BV1VCWSz6ERs?p=47", videoType: "short",
         questions: [
           { q: "基地围墙长20米，每隔5米建一座机枪碉堡，两端都建，一共建几座？", answer: 5, hint: "段数=20÷5=4，两端都建：4+1=5。", ex: { t: "tree", L: 20, G: 5, mode: "both" } },
@@ -531,13 +531,13 @@
       },
       {
         dayNum: 8, phase: "advancement", topic: "植树问题",
-        name: { redAlert: "🛡️ 防御工事部署", original: "植树提升" },
-        videoSource: "gauss", videoLabel: "零食短片 · 高斯", videoTitle: "直线上两端不植树问题", videoDuration: "2:45",
+        name: { redAlert: "🛡️ 防御工事升级", original: "植树升级" },
+        videoSource: "gauss", videoLabel: "零食短片 · 高斯", videoTitle: "直线两端不植树（升级）", videoDuration: "2:45",
         videoUrl: "https://www.bilibili.com/video/BV1VCWSz6ERs?p=48", videoType: "short",
         questions: [
-          { q: "基地围栏长50米，每隔5米插一面旗帜，两端都插，一共几面？", answer: 11, hint: "50÷5=10段，10+1=11。", ex: { t: "tree", L: 50, G: 5, mode: "both" } },
-          { q: "阅兵路线长60米，每隔10米站一名仪仗兵，两端都站，一共几名？", answer: 7, hint: "60÷10=6段，6+1=7。", ex: { t: "tree", L: 60, G: 10, mode: "both" } },
-          { q: "地雷阵长120米，每隔12米埋一颗雷，两端都不埋，一共几颗？", answer: 9, hint: "120÷12=10段，两端不埋：10-1=9。", ex: { t: "tree", L: 120, G: 12, mode: "none" } }
+          { q: "战略公路长45米，每隔9米设一个检查站，两端都设，一共几个？", answer: 6, hint: "45÷9=5段，两端都设：5+1=6。", ex: { t: "tree", L: 45, G: 9, mode: "both" } },
+          { q: "地雷阵长120米，每隔12米埋一颗雷，两端都不埋，一共几颗？", answer: 9, hint: "120÷12=10段，两端不埋：10-1=9。", ex: { t: "tree", L: 120, G: 12, mode: "none" } },
+          { q: "围栏长50米，每隔5米插一面旗，两端都不插，一共几面？", answer: 9, hint: "50÷5=10段，两端不插：10-1=9。", ex: { t: "tree", L: 50, G: 5, mode: "none" } }
         ]
       },
       { dayNum: 9, type: "review" }
@@ -546,7 +546,7 @@
 
     function padDay(n) { return String(n).padStart(2, "0"); }
     function phaseLabel(phase) {
-      return phase === "foundation" ? "打基础" : phase === "advancement" ? "提升" : "";
+      return phase === "foundation" ? "打基础 · 入门" : phase === "advancement" ? "难度升级" : "";
     }
     function findCourseByDay(dayNum) {
       return courses.find((c) => c.dayNum === dayNum) || null;
@@ -1653,7 +1653,8 @@
       days.forEach((c) => {
         const cleared = progress.clearedDays.includes(c.dayNum);
         const cls = c.dayNum === activeDay ? "current" : cleared ? "cleared" : "";
-        html += `<button type="button" class="day-chip ${cls}" data-day="${c.dayNum}">第${padDay(c.dayNum)}天</button>`;
+        const tag = c.phase === "foundation" ? "入门" : "升级";
+        html += `<button type="button" class="day-chip ${cls}" data-day="${c.dayNum}">第${padDay(c.dayNum)}天·${escapeHtml(c.topic)}·${tag}</button>`;
       });
       html += `</div>`;
       return html;
@@ -1709,9 +1710,10 @@
         html: `
           ${historyReadonly ? "" : renderDayPicker(dayNum)}
           <h1 class="mission-title">${escapeHtml(course.name.redAlert)}</h1>
-          <p class="mission-sub">第${padDay(dayNum)}天 · ${escapeHtml(course.topic || course.name.original)}</p>
+          <p class="mission-sub">第${padDay(dayNum)}天 · 主题「${escapeHtml(course.topic || course.name.original)}」· ${phaseText}${course.phase === "advancement" ? "（承接前一天）" : "（新主题）"}</p>
           <span class="phase-tag ${phaseCls}">${phaseText}</span>
           <span class="source-tag">${escapeHtml(label)}</span>
+          <p class="video-meta" style="margin:0 0 12px;">今日视频与练习配套：${escapeHtml(course.videoTitle || "")}</p>
           <div class="day-progress-wrap">
             <div class="day-progress-label" id="dayProgressLabel"><span>今日战果</span><span>${done}/${QUESTIONS_PER_DAY}</span></div>
             <div class="day-progress-bar"><div class="day-progress-fill" id="dayProgressFill" style="width:${(done / QUESTIONS_PER_DAY) * 100}%"></div></div>
