@@ -267,7 +267,7 @@
       <span class="energy-chip" id="userChip" hidden>👤 </span>
       <span class="energy-chip" id="energyChip">⚡ 能源 0</span>
       <div style="margin-top:8px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
-        <span class="timer-display" id="timerDisplay">30:00</span>
+        <span class="timer-display" id="timerDisplay">20:00</span>
       </div>
       <div class="timer-alert" id="timerAlert">⏰ 三题全部攻克！任务结束，撤退休整！</div>
       <div class="parent-debug">
@@ -284,6 +284,7 @@
       <button type="button" class="btn btn-ghost reset-btn" id="accountOpenBtn">👤 账号</button>
       <button type="button" class="btn btn-ghost reset-btn" id="transferOpenBtn">📱 换机带走进度</button>
       <button type="button" class="btn btn-ghost reset-btn" id="muteBtn">🔊 音效开</button>
+      <button type="button" class="btn btn-ghost reset-btn" id="voiceGenderBtn">👨 男长官</button>
       <button type="button" class="btn btn-ghost reset-btn" id="resetProgressBtn">🔄 重置进度</button>
     </div>
   </header>
@@ -426,8 +427,8 @@
     const GUIDE_KEY = "redAlert_guide_done_v1";
     const MAX_RANK_SCORE = 74;
     const QUESTIONS_PER_DAY = 3;
-    const TIMER_TOTAL_SEC = 30 * 60;
-    const BONUS_TIME_SEC = 20 * 60;
+    const TIMER_TOTAL_SEC = 20 * 60;
+    const BONUS_TIME_SEC = 15 * 60;
     const BONUS_ENERGY = 10;
 
     let selectedDayNum = null;
@@ -1085,14 +1086,25 @@
 
     const bgmEl = document.getElementById("bgmAudio");
     let soundMuted = localStorage.getItem("redAlert_mute") === "1";
+    let commanderGender = localStorage.getItem("redAlert_commander_voice") === "female" ? "female" : "male";
     let bgmStopTimer = null;
     let voicePlayer = null;
-    let cachedMaleVoice = null;
+    let cachedCommanderVoice = null;
     let voiceChain = Promise.resolve();
 
     function updateMuteBtn() {
       const btn = document.getElementById("muteBtn");
       if (btn) btn.textContent = soundMuted ? "🔇 音效关" : "🔊 音效开";
+    }
+    function updateVoiceGenderBtn() {
+      const btn = document.getElementById("voiceGenderBtn");
+      if (btn) btn.textContent = commanderGender === "female" ? "👩 女长官" : "👨 男长官";
+    }
+    function setCommanderGender(g) {
+      commanderGender = g === "female" ? "female" : "male";
+      localStorage.setItem("redAlert_commander_voice", commanderGender);
+      cachedCommanderVoice = null;
+      updateVoiceGenderBtn();
     }
     function setMuted(muted) {
       soundMuted = muted;
@@ -1193,27 +1205,31 @@
         if (p && p.then) p.catch(() => resolve(false));
       });
     }
-    function scoreMaleVoice(v) {
+    function scoreCommanderVoice(v) {
       const n = (v.name + " " + v.lang).toLowerCase();
       if (!/zh|chinese|中文/.test(n)) return -100;
       let s = 10;
-      if (/natural|neural|online|云|neural/.test(n)) s += 40;
-      if (/yunyang|yunjian|yunfeng|yunze|kangkang|yunhao|yunjie|男/.test(n)) s += 50;
-      if (/male/.test(n)) s += 30;
-      if (/huihui|xiaoxiao|xiaoyi|xiaoxuan|xiaohan|female|女|yaoyao|hui/.test(n)) s -= 60;
+      if (/natural|neural|online|云|microsoft|edge/.test(n)) s += 45;
+      if (commanderGender === "female") {
+        if (/xiaoyi|xiaoxiao|xiaoxuan|xiaohan|xiaoyan|xiaomo|xiaorui|女|female|huihui|yaoyao/.test(n)) s += 55;
+        if (/yunyang|yunjian|yunfeng|yunze|kangkang|yunhao|男|male/.test(n)) s -= 50;
+      } else {
+        if (/yunyang|yunjian|yunfeng|yunze|kangkang|yunhao|yunjie|男|male/.test(n)) s += 55;
+        if (/xiaoyi|xiaoxiao|xiaoxuan|xiaohan|女|female|huihui|yaoyao/.test(n)) s -= 50;
+      }
       return s;
     }
     function pickCommanderVoice() {
-      if (cachedMaleVoice) return cachedMaleVoice;
+      if (cachedCommanderVoice) return cachedCommanderVoice;
       const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
       if (!voices.length) return null;
-      const ranked = voices.map((v) => ({ v, s: scoreMaleVoice(v) })).filter((x) => x.s > 0).sort((a, b) => b.s - a.s);
-      cachedMaleVoice = ranked.length ? ranked[0].v : null;
-      return cachedMaleVoice;
+      const ranked = voices.map((v) => ({ v, s: scoreCommanderVoice(v) })).filter((x) => x.s > 0).sort((a, b) => b.s - a.s);
+      cachedCommanderVoice = ranked.length ? ranked[0].v : null;
+      return cachedCommanderVoice;
     }
     if (window.speechSynthesis) {
       window.speechSynthesis.onvoiceschanged = function () {
-        cachedMaleVoice = null;
+        cachedCommanderVoice = null;
         pickCommanderVoice();
       };
       pickCommanderVoice();
@@ -1221,31 +1237,49 @@
     function speakSynth(text, opts) {
       if (!window.speechSynthesis || !text) return Promise.resolve();
       const voice = pickCommanderVoice();
-      if (!voice || scoreMaleVoice(voice) < 40) return Promise.resolve();
       return new Promise((resolve) => {
         try {
           window.speechSynthesis.cancel();
           duckBgmForSpeech();
           const u = new SpeechSynthesisUtterance(text);
           u.lang = "zh-CN";
-          u.rate = (opts && opts.rate) != null ? opts.rate : 0.78;
-          u.pitch = (opts && opts.pitch) != null ? opts.pitch : 0.72;
+          if (voice) u.voice = voice;
+          if (commanderGender === "female") {
+            u.rate = (opts && opts.rate) != null ? opts.rate : 0.88;
+            u.pitch = (opts && opts.pitch) != null ? opts.pitch : 1.05;
+          } else {
+            u.rate = (opts && opts.rate) != null ? opts.rate : 0.82;
+            u.pitch = (opts && opts.pitch) != null ? opts.pitch : 0.78;
+          }
           u.volume = 1;
-          u.voice = voice;
           u.onend = () => resolve();
           u.onerror = () => resolve();
           window.speechSynthesis.speak(u);
         } catch (e) { resolve(); }
       });
     }
+    function voiceAsset(relPath) {
+      if (!relPath) return relPath;
+      if (commanderGender !== "female") return relPath;
+      if (relPath.startsWith("voice/brief/")) return relPath.replace("voice/brief/", "voice/brief-f/");
+      if (relPath.startsWith("voice/") && !relPath.startsWith("voice/brief") && !relPath.startsWith("voice/f-") && !relPath.startsWith("voice/brief-f/")) {
+        return relPath.replace("voice/", "voice/f-");
+      }
+      return relPath;
+    }
     function speak(text, opts) {
       if (soundMuted || !text) return Promise.resolve();
-      if (opts && opts.file) {
-        return playVoiceFile(opts.file).then((ok) => {
-          if (ok) return;
-          return speakSynth(text, opts);
-        });
+      const files = [];
+      if (opts && Array.isArray(opts.files)) files.push(...opts.files);
+      else if (opts && opts.file) {
+        files.push(voiceAsset(opts.file));
+        if (commanderGender === "female" && opts.file) files.push(opts.file);
       }
+      const tryNext = (i) => {
+        if (i >= files.length) return speakSynth(text, opts);
+        return playVoiceFile(files[i]).then((ok) => (ok ? undefined : tryNext(i + 1)));
+      };
+      if (files.length) return tryNext(0);
       return speakSynth(text, opts);
     }
     function enqueueVoice(fn) {
@@ -1675,7 +1709,9 @@
       overlay.classList.add("show");
       formulas.innerHTML = steps.map((s) => `<li>${escapeHtml(s.formula)}</li>`).join("");
       stage.innerHTML = "";
-      caption.textContent = "长官频道已接通（云扬男声）……";
+      caption.textContent = commanderGender === "female"
+        ? "女长官频道已接通（晓伊）……"
+        : "长官频道已接通（云扬男声）……";
 
       const idBase =
         frozenMeta && frozenMeta.dayNum != null
@@ -1694,16 +1730,20 @@
         if (step.paint) step.paint(stage);
         await sleep(800);
         if (token !== briefToken) return;
-        const stepFile = idBase ? `voice/brief/${idBase}-s${i}.mp3` : null;
-        await speak(step.say, { file: stepFile, rate: 0.76, pitch: 0.7 });
+        const preferred = idBase
+          ? (commanderGender === "female"
+              ? [`voice/brief-f/${idBase}-s${i}.mp3`, `voice/brief/${idBase}-s${i}.mp3`]
+              : [`voice/brief/${idBase}-s${i}.mp3`, `voice/brief-f/${idBase}-s${i}.mp3`])
+          : [];
+        await speak(step.say, { files: preferred, rate: commanderGender === "female" ? 0.88 : 0.8, pitch: commanderGender === "female" ? 1.05 : 0.78 });
         if (token !== briefToken) return;
         await sleep(500);
       }
       caption.textContent = "讲解完毕。听懂了就去瞄准目标！";
       await speak("讲解完毕。听懂了就去瞄准目标！", {
         file: "voice/brief-end.mp3",
-        rate: 0.78,
-        pitch: 0.7
+        rate: commanderGender === "female" ? 0.88 : 0.8,
+        pitch: commanderGender === "female" ? 1.05 : 0.78
       });
     }
 
@@ -2249,7 +2289,7 @@
         ? `<ol class="briefing-tips">
             <li>📺 先完成侦察：观看今日配套视频</li>
             <li>🎯 再攻克 ${QUESTIONS_PER_DAY} 道题（一道一道来）</li>
-            <li>⏱️ 接受任务后开始 <strong>30 分钟</strong>作战计时</li>
+            <li>⏱️ 接受任务后开始 <strong>20 分钟</strong>作战计时</li>
           </ol>`
         : `<ol class="briefing-tips">
             <li>📢 听长官鼓励，明确今日目标</li>
@@ -2670,6 +2710,11 @@
     });
 
     document.getElementById("muteBtn").addEventListener("click", () => setMuted(!soundMuted));
+    document.getElementById("voiceGenderBtn").addEventListener("click", () => {
+      setCommanderGender(commanderGender === "female" ? "male" : "female");
+      showToast(commanderGender === "female" ? "👩 已切换女长官语音" : "👨 已切换男长官语音（云扬）");
+    });
+    updateVoiceGenderBtn();
     document.getElementById("resetProgressBtn").addEventListener("click", () => {
       if (!confirm("确定清空全部进度？将从列兵、第01天重新开始。")) return;
       progress = defaultProgress();

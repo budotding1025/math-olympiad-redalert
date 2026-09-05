@@ -1,6 +1,11 @@
 /**
- * Edge TTS 预生成长官男声（Yunyang）
- * 用法：node generate_voices.js
+ * Edge TTS 预生成长官语音
+ * 男声默认：zh-CN-YunyangNeural
+ * 女声：zh-CN-XiaoyiNeural（女长官）
+ * 用法：
+ *   node generate_voices.js
+ *   node generate_voices.js --female
+ *   node generate_voices.js --force
  */
 const fs = require("fs");
 const path = require("path");
@@ -8,7 +13,11 @@ const { spawn } = require("child_process");
 
 const ROOT = __dirname;
 const OUT = path.join(ROOT, "voice");
-const VOICE = "zh-CN-YunyangNeural";
+const args = process.argv.slice(2);
+const FORCE = args.includes("--force");
+const FEMALE = args.includes("--female");
+const VOICE = FEMALE ? "zh-CN-XiaoyiNeural" : "zh-CN-YunyangNeural";
+const BRIEF_DIR = FEMALE ? "brief-f" : "brief";
 
 function ensureDir(d) {
   if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
@@ -16,18 +25,18 @@ function ensureDir(d) {
 
 function tts(text, outfile) {
   return new Promise((resolve, reject) => {
-    const args = [
+    const pyArgs = [
       "-m",
       "edge_tts",
       "--voice",
       VOICE,
-      "--rate=-10%",
+      "--rate=-8%",
       "--text",
       text,
       "--write-media",
       outfile,
     ];
-    const p = spawn("python", args, { stdio: ["ignore", "ignore", "pipe"] });
+    const p = spawn("python", pyArgs, { stdio: ["ignore", "ignore", "pipe"] });
     let err = "";
     p.stderr.on("data", (c) => (err += c.toString()));
     p.on("close", (code) => {
@@ -40,7 +49,7 @@ function tts(text, outfile) {
 async function gen(text, rel) {
   const file = path.join(OUT, rel);
   ensureDir(path.dirname(file));
-  if (fs.existsSync(file) && fs.statSync(file).size > 200) {
+  if (!FORCE && fs.existsSync(file) && fs.statSync(file).size > 200) {
     console.log("skip", rel);
     return;
   }
@@ -114,31 +123,34 @@ function briefingLines(ex, hint) {
   return lines;
 }
 
+/** 从当前 dayNum 课程结构提取带 ex 的题目 */
 function extractQuestions(html) {
   const items = [];
-  const courseRe =
-    /\{\s*week:\s*(\d+),\s*day:\s*(\d+),\s*name:[\s\S]*?questions:\s*\[([\s\S]*?)\]\s*\}/g;
+  const courseRe = /\{\s*dayNum:\s*(\d+),([\s\S]*?)questions:\s*\[([\s\S]*?)\]\s*\}/g;
   let cm;
   while ((cm = courseRe.exec(html))) {
-    const week = +cm[1];
-    const day = +cm[2];
+    const dayNum = +cm[1];
+    const head = cm[2];
+    if (/type:\s*"review"/.test(head)) continue;
     const body = cm[3];
-    const qRe = /\{[^{}]*ex:\s*(\{[^{}]+\})[^{}]*\}/g;
-    let qm;
-    let index = 0;
-    // better: split by "ex:"
     const parts = body.split(/\{\s*q:/).slice(1);
     parts.forEach((part, i) => {
-      const exMatch = part.match(/ex:\s*(\{[\s\S]*?\})\s*\}/);
+      const hintMatch = part.match(/hint:\s*"((?:\\.|[^"\\])*)"/);
+      const exMatch = part.match(/ex:\s*(\{[\s\S]*?\})\s*(?:,|\})/);
       if (!exMatch) return;
       let ex;
       try {
         ex = eval("(" + exMatch[1] + ")");
       } catch (e) {
-        console.warn("ex parse fail", week, day, i, e.message);
+        console.warn("ex parse fail", dayNum, i, e.message);
         return;
       }
-      items.push({ week, day, index: i, ex });
+      items.push({
+        dayNum,
+        index: i,
+        ex,
+        hint: hintMatch ? hintMatch[1].replace(/\\"/g, '"') : ""
+      });
     });
   }
   return items;
@@ -146,25 +158,26 @@ function extractQuestions(html) {
 
 async function main() {
   ensureDir(OUT);
-  console.log("voice:", VOICE);
+  console.log("voice:", VOICE, "briefDir:", BRIEF_DIR, FORCE ? "(force)" : "");
 
+  const fixedPrefix = FEMALE ? "f-" : "";
   const fixed = {
-    "clear.mp3": "完美！今日任务全部完成，你证明了自己！",
-    "review-done.mp3": "恭喜你，士兵！本周战场已全部清扫干净。",
-    "timer.mp3": "时间到！今日任务完成，撤退休整！",
-    "miss-0.mp3": "目标丢失，别灰心，重新瞄准！",
-    "miss-1.mp3": "记住，真正的战士不是不失败，而是失败后依然冲锋。",
-    "miss-2.mp3": "一次失手不算什么，站起来，再给敌人一炮！",
-    "miss-3.mp3": "冷静，士兵。看清题意，我们还能赢。",
-    "hit-0.mp3": "干得漂亮，士兵！继续保持。",
-    "hit-1.mp3": "命中目标！你是个好苗子。",
-    "hit-2.mp3": "漂亮！我已经看到你身上的将军潜质了。",
-    "hit-3.mp3": "完美！这一仗打得漂亮，我为你骄傲。",
-    "welcome-0.mp3": "士兵，欢迎归队！今天的目标是拿下这个据点。",
-    "welcome-1.mp3": "看到你来了，我就放心了。开始行动吧。",
-    "welcome-2.mp3": "战场已经准备好，就差你了，指挥官。",
-    "welcome-3.mp3": "别让敌人觉得你好欺负，让他们见识你的厉害！",
-    "brief-end.mp3": "讲解完毕。听懂了就去瞄准目标！",
+    [fixedPrefix + "clear.mp3"]: "完美！今日任务全部完成，你证明了自己！",
+    [fixedPrefix + "review-done.mp3"]: "恭喜你，士兵！本周战场已全部清扫干净。",
+    [fixedPrefix + "timer.mp3"]: "时间到！今日任务完成，撤退休整！",
+    [fixedPrefix + "miss-0.mp3"]: "目标丢失，别灰心，重新瞄准！",
+    [fixedPrefix + "miss-1.mp3"]: "记住，真正的战士不是不失败，而是失败后依然冲锋。",
+    [fixedPrefix + "miss-2.mp3"]: "一次失手不算什么，站起来，再给敌人一炮！",
+    [fixedPrefix + "miss-3.mp3"]: "冷静，士兵。看清题意，我们还能赢。",
+    [fixedPrefix + "hit-0.mp3"]: "干得漂亮，士兵！继续保持。",
+    [fixedPrefix + "hit-1.mp3"]: "命中目标！你是个好苗子。",
+    [fixedPrefix + "hit-2.mp3"]: "漂亮！我已经看到你身上的将军潜质了。",
+    [fixedPrefix + "hit-3.mp3"]: "完美！这一仗打得漂亮，我为你骄傲。",
+    [fixedPrefix + "welcome-0.mp3"]: "士兵，欢迎归队！今天的目标是拿下这个据点。",
+    [fixedPrefix + "welcome-1.mp3"]: "看到你来了，我就放心了。开始行动吧。",
+    [fixedPrefix + "welcome-2.mp3"]: "战场已经准备好，就差你了，指挥官。",
+    [fixedPrefix + "welcome-3.mp3"]: "别让敌人觉得你好欺负，让他们见识你的厉害！",
+    [fixedPrefix + "brief-end.mp3"]: "讲解完毕。听懂了就去瞄准目标！",
   };
 
   for (const [f, t] of Object.entries(fixed)) {
@@ -176,20 +189,20 @@ async function main() {
   console.log("questions with ex:", qs.length);
 
   for (const q of qs) {
-    const lines = briefingLines(q.ex);
+    const lines = briefingLines(q.ex, q.hint);
     for (let s = 0; s < lines.length; s++) {
-      const rel = `brief/w${q.week}-d${q.day}-q${q.index}-s${s}.mp3`;
+      const rel = `${BRIEF_DIR}/d${q.dayNum}-q${q.index}-s${s}.mp3`;
       await gen(lines[s], rel);
     }
   }
 
-  // manifest for runtime
-  const manifest = { voice: VOICE, fixed: Object.keys(fixed), briefs: {} };
+  const manifestPath = path.join(OUT, FEMALE ? "manifest-f.json" : "manifest.json");
+  const manifest = { voice: VOICE, briefDir: BRIEF_DIR, fixed: Object.keys(fixed), briefs: {} };
   for (const q of qs) {
-    const key = `w${q.week}-d${q.day}-q${q.index}`;
-    manifest.briefs[key] = briefingLines(q.ex).length;
+    const key = `d${q.dayNum}-q${q.index}`;
+    manifest.briefs[key] = briefingLines(q.ex, q.hint).length;
   }
-  fs.writeFileSync(path.join(OUT, "manifest.json"), JSON.stringify(manifest, null, 2));
+  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
   console.log("done. files in voice/");
 }
 
