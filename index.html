@@ -366,18 +366,23 @@
       <button type="button" class="btn btn-orange" id="accountLoginBtn" style="width:100%;margin-bottom:12px;min-height:48px;">▶ 进入指挥部</button>
 
       <details id="accountSetupDetails" style="margin-bottom:12px;color:var(--muted);font-size:0.88rem;line-height:1.6;">
-        <summary style="cursor:pointer;color:#ffd08a;font-weight:700;">家长首次开通云同步（只需一次，国内可开）</summary>
+        <summary style="cursor:pointer;color:#ffd08a;font-weight:700;">家长首次开通云同步（阿里云 · 支付宝实名，不绑微信）</summary>
         <ol style="padding-left:1.2em;margin:8px 0;">
-          <li>打开 <a href="https://console.leancloud.cn/" target="_blank" rel="noopener" style="color:var(--accent);">console.leancloud.cn</a>，手机号注册</li>
-          <li>创建应用 → 设置 → 应用凭证，复制 AppID、AppKey、API 域名</li>
-          <li>填到下面，再登录账号。也可点「复制配置链接」发到其他设备</li>
+          <li>打开 <a href="https://www.aliyun.com/" target="_blank" rel="noopener" style="color:var(--accent);">阿里云</a> → 手机号注册</li>
+          <li>账号中心 → 实名认证 → 选<strong>个人支付宝</strong>扫码（不要用微信）</li>
+          <li>开通 <a href="https://oss.console.aliyun.com/" target="_blank" rel="noopener" style="color:var(--accent);">对象存储 OSS</a> → 创建 Bucket（读写权限选<strong>私有</strong>），记住地域（如华东1杭州 = <code style="color:#ffd08a;">oss-cn-hangzhou</code>）</li>
+          <li>Bucket → 数据安全 → 跨域设置 CORS：来源填 <code style="color:#ffd08a;">https://budotding1025.github.io</code>，Methods 勾选 GET/PUT/HEAD/POST，允许 Headers 填 <code style="color:#ffd08a;">*</code>，暴露 Headers 填 <code style="color:#ffd08a;">ETag</code></li>
+          <li>访问控制 → 用户 → 创建 RAM 用户 → 开通 AccessKey，并给该用户加上该 Bucket 的权限（家庭自用；密钥不要外传）</li>
+          <li>把下面四项填好，再设孩子账号密码登录。也可「复制配置链接」发到平板</li>
         </ol>
-        <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">AppID</label>
-        <input id="familyAppId" type="text" placeholder="LeanCloud AppID" style="width:100%;padding:10px;margin-bottom:8px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;" />
-        <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">AppKey</label>
-        <input id="familyAppKey" type="text" placeholder="LeanCloud AppKey" style="width:100%;padding:10px;margin-bottom:8px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;" />
-        <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">API 服务器地址</label>
-        <input id="familyServerUrl" type="url" placeholder="https://xxx.lc-cn-n1-shared.com" style="width:100%;padding:10px;margin-bottom:10px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;" />
+        <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">地域 Region</label>
+        <input id="familyOssRegion" type="text" placeholder="oss-cn-hangzhou" style="width:100%;padding:10px;margin-bottom:8px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;" />
+        <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">Bucket 名称</label>
+        <input id="familyOssBucket" type="text" placeholder="例如 math-olympiad-home" style="width:100%;padding:10px;margin-bottom:8px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;" />
+        <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">AccessKey ID</label>
+        <input id="familyOssAk" type="text" autocomplete="off" placeholder="RAM 用户的 AccessKey ID" style="width:100%;padding:10px;margin-bottom:8px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;" />
+        <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">AccessKey Secret</label>
+        <input id="familyOssSk" type="password" autocomplete="off" placeholder="AccessKey Secret" style="width:100%;padding:10px;margin-bottom:10px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;" />
         <button type="button" class="btn btn-ghost" id="familyConfigLinkBtn" style="width:100%;">📋 复制全家配置链接</button>
       </details>
 
@@ -393,6 +398,7 @@
     </div>
   </div>
 
+  <script src="https://gosspublic.alicdn.com/aliyun-oss-sdk-6.20.0.min.js"></script>
   <script src="cloud-config.js"></script>
   <script>
 
@@ -664,24 +670,36 @@
 
     const ACCOUNT_USER_KEY = "redAlert_account_user";
     const ACCOUNT_PASS_KEY = "redAlert_account_pass";
-    const FAMILY_APPID_KEY = "redAlert_lc_appId";
-    const FAMILY_APPKEY_KEY = "redAlert_lc_appKey";
-    const FAMILY_SERVER_KEY = "redAlert_lc_server";
+    const FAMILY_OSS_REGION_KEY = "redAlert_oss_region";
+    const FAMILY_OSS_BUCKET_KEY = "redAlert_oss_bucket";
+    const FAMILY_OSS_AK_KEY = "redAlert_oss_ak";
+    const FAMILY_OSS_SK_KEY = "redAlert_oss_sk";
     const FAMILY_SALT = "redAlert_family_salt_2026";
     let cloudPushTimer = null;
     let accountReady = false;
+    let _ossClient = null;
+    let _ossSig = "";
 
-    function getLeanCloudCfg() {
-      const cfg = (window.RED_ALERT_CLOUD && window.RED_ALERT_CLOUD.leancloud) || {};
+    function getOssCfg() {
+      const cfg = (window.RED_ALERT_CLOUD && window.RED_ALERT_CLOUD.oss) || {};
       return {
-        appId: (localStorage.getItem(FAMILY_APPID_KEY) || cfg.appId || "").trim(),
-        appKey: (localStorage.getItem(FAMILY_APPKEY_KEY) || cfg.appKey || "").trim(),
-        serverURL: (localStorage.getItem(FAMILY_SERVER_KEY) || cfg.serverURL || "").trim().replace(/\/$/, "")
+        region: (localStorage.getItem(FAMILY_OSS_REGION_KEY) || cfg.region || "").trim(),
+        bucket: (localStorage.getItem(FAMILY_OSS_BUCKET_KEY) || cfg.bucket || "").trim(),
+        accessKeyId: (localStorage.getItem(FAMILY_OSS_AK_KEY) || cfg.accessKeyId || "").trim(),
+        accessKeySecret: (localStorage.getItem(FAMILY_OSS_SK_KEY) || cfg.accessKeySecret || "").trim()
       };
     }
     function cloudReady() {
-      const c = getLeanCloudCfg();
-      return !!(c.appId && c.appKey && c.serverURL);
+      const c = getOssCfg();
+      return !!(c.region && c.bucket && c.accessKeyId && c.accessKeySecret);
+    }
+    function persistOssCfg(c) {
+      if (c.region) localStorage.setItem(FAMILY_OSS_REGION_KEY, c.region);
+      if (c.bucket) localStorage.setItem(FAMILY_OSS_BUCKET_KEY, c.bucket);
+      if (c.accessKeyId) localStorage.setItem(FAMILY_OSS_AK_KEY, c.accessKeyId);
+      if (c.accessKeySecret) localStorage.setItem(FAMILY_OSS_SK_KEY, c.accessKeySecret);
+      _ossClient = null;
+      _ossSig = "";
     }
     function getAccountUser() {
       return (localStorage.getItem(ACCOUNT_USER_KEY) || "").trim();
@@ -705,6 +723,9 @@
         new TextEncoder().encode(String(secret).trim() + ":" + FAMILY_SALT)
       );
       return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+    }
+    function progressObjectKey(familyId) {
+      return "redalert/progress/" + familyId + ".json";
     }
     function normalizeProgressData(data) {
       return {
@@ -750,12 +771,13 @@
       }
     }
     function encodeFamilyConfigPayload() {
-      const c = getLeanCloudCfg();
+      const c = getOssCfg();
       const json = JSON.stringify({
-        v: 2,
-        appId: c.appId,
-        appKey: c.appKey,
-        serverURL: c.serverURL,
+        v: 4,
+        region: c.region,
+        bucket: c.bucket,
+        accessKeyId: c.accessKeyId,
+        accessKeySecret: c.accessKeySecret,
         user: getAccountUser(),
         pass: getAccountPass()
       });
@@ -766,19 +788,19 @@
       s = s.replace(/-/g, "+").replace(/_/g, "/");
       while (s.length % 4) s += "=";
       const data = JSON.parse(decodeURIComponent(escape(atob(s))));
-      if (!data || !data.appId || !data.appKey || !data.serverURL) throw new Error("配置无效");
+      if (!data || !data.region || !data.bucket || !data.accessKeyId || !data.accessKeySecret) {
+        throw new Error("请使用新的阿里云配置链接");
+      }
       return data;
     }
     function applyFamilyConfig(data) {
-      localStorage.setItem(FAMILY_APPID_KEY, data.appId);
-      localStorage.setItem(FAMILY_APPKEY_KEY, data.appKey);
-      localStorage.setItem(FAMILY_SERVER_KEY, String(data.serverURL).replace(/\/$/, ""));
+      persistOssCfg(data);
       if (data.user) localStorage.setItem(ACCOUNT_USER_KEY, String(data.user).trim());
       if (data.pass && String(data.pass).length >= 6) localStorage.setItem(ACCOUNT_PASS_KEY, String(data.pass));
       if (data.code && !data.user) localStorage.setItem("redAlert_family_code", String(data.code).trim());
     }
     function buildFamilyConfigUrl() {
-      if (!cloudReady()) throw new Error("请先填写 LeanCloud 信息");
+      if (!cloudReady()) throw new Error("请先填写阿里云 OSS 信息");
       const base = location.href.split(/[?#]/)[0];
       return base + "?cfg=" + encodeFamilyConfigPayload();
     }
@@ -794,63 +816,70 @@
         return false;
       }
     }
-    function leanHeaders() {
-      const c = getLeanCloudCfg();
-      return {
-        "X-LC-Id": c.appId,
-        "X-LC-Key": c.appKey,
-        "Content-Type": "application/json"
-      };
+    function getOssClient() {
+      if (!window.OSS) throw new Error("OSS SDK 未加载，请用网页打开（不要双击本地文件）");
+      const c = getOssCfg();
+      if (!cloudReady()) throw new Error("请先填写阿里云 OSS 信息");
+      const sig = [c.region, c.bucket, c.accessKeyId, c.accessKeySecret].join("|");
+      if (!_ossClient || _ossSig !== sig) {
+        _ossClient = new OSS({
+          region: c.region,
+          accessKeyId: c.accessKeyId,
+          accessKeySecret: c.accessKeySecret,
+          bucket: c.bucket,
+          secure: true
+        });
+        _ossSig = sig;
+      }
+      return _ossClient;
     }
-    async function findCloudRecord(familyId) {
-      const c = getLeanCloudCfg();
-      const where = encodeURIComponent(JSON.stringify({ familyId }));
-      const url = c.serverURL + "/1.1/classes/FamilyProgress?where=" + where + "&limit=1";
-      const res = await fetch(url, { headers: leanHeaders() });
-      if (!res.ok) throw new Error("云同步查询失败");
-      const data = await res.json();
-      const list = (data && data.results) || [];
-      return list[0] || null;
+    function parseOssBody(content) {
+      if (content == null) return null;
+      if (typeof content === "string") return JSON.parse(content);
+      if (typeof TextDecoder !== "undefined" && content instanceof ArrayBuffer) {
+        return JSON.parse(new TextDecoder().decode(content));
+      }
+      if (content.buffer && typeof TextDecoder !== "undefined") {
+        return JSON.parse(new TextDecoder().decode(content));
+      }
+      return JSON.parse(String(content));
     }
     async function pushProgressToCloud() {
       const secret = getAccountSecret();
       if (!cloudReady() || !secret) return false;
       const familyId = await familyHash(secret);
-      const c = getLeanCloudCfg();
-      const existing = await findCloudRecord(familyId);
       const body = {
         familyId,
         accountName: getAccountUser() || "",
         syncAt: progress.updatedAt || Date.now(),
         progress
       };
-      let res;
-      if (existing && existing.objectId) {
-        res = await fetch(c.serverURL + "/1.1/classes/FamilyProgress/" + existing.objectId, {
-          method: "PUT",
-          headers: leanHeaders(),
-          body: JSON.stringify(body)
-        });
-      } else {
-        res = await fetch(c.serverURL + "/1.1/classes/FamilyProgress", {
-          method: "POST",
-          headers: leanHeaders(),
-          body: JSON.stringify(body)
-        });
-      }
-      if (!res.ok) throw new Error("云同步上传失败");
+      const client = getOssClient();
+      const blob = new Blob([JSON.stringify(body)], { type: "application/json" });
+      await client.put(progressObjectKey(familyId), blob);
       return true;
     }
     async function pullProgressFromCloud(secretOverride) {
       const secret = (secretOverride || getAccountSecret()).trim();
       if (!cloudReady() || !secret) throw new Error("请先开通云同步并登录账号");
       const familyId = await familyHash(secret);
-      const existing = await findCloudRecord(familyId);
-      if (!existing || !existing.progress) return null;
-      return {
-        updatedAt: existing.syncAt || existing.progress.updatedAt || 0,
-        progress: normalizeProgressData(existing.progress)
-      };
+      const client = getOssClient();
+      try {
+        const res = await client.get(progressObjectKey(familyId));
+        const existing = parseOssBody(res.content);
+        if (!existing || !existing.progress) return null;
+        return {
+          updatedAt: existing.syncAt || existing.progress.updatedAt || 0,
+          progress: normalizeProgressData(existing.progress)
+        };
+      } catch (e) {
+        const code = (e && (e.code || e.name || e.status)) || "";
+        const msg = String((e && e.message) || e || "");
+        if (code === "NoSuchKey" || code === 404 || /NoSuchKey|404|not exist|不存在/i.test(msg)) {
+          return null;
+        }
+        throw e;
+      }
     }
     function scheduleCloudPush() {
       if (!accountReady || !isLoggedIn()) return;
@@ -894,10 +923,11 @@
     function showAccountGate(force) {
       const overlay = document.getElementById("accountOverlay");
       if (!overlay) return;
-      const c = getLeanCloudCfg();
-      document.getElementById("familyAppId").value = c.appId;
-      document.getElementById("familyAppKey").value = c.appKey;
-      document.getElementById("familyServerUrl").value = c.serverURL;
+      const c = getOssCfg();
+      document.getElementById("familyOssRegion").value = c.region;
+      document.getElementById("familyOssBucket").value = c.bucket;
+      document.getElementById("familyOssAk").value = c.accessKeyId;
+      document.getElementById("familyOssSk").value = c.accessKeySecret;
       document.getElementById("accountUserInput").value = getAccountUser();
       document.getElementById("accountPassInput").value = getAccountPass();
       refreshAccountUI();
@@ -2338,16 +2368,15 @@
       if (e.target.id === "accountOverlay" && isLoggedIn() && accountReady) hideAccountGate();
     });
     document.getElementById("familyConfigLinkBtn").addEventListener("click", async () => {
-      const appId = document.getElementById("familyAppId").value.trim();
-      const appKey = document.getElementById("familyAppKey").value.trim();
-      const serverURL = document.getElementById("familyServerUrl").value.trim().replace(/\/$/, "");
+      const draft = {
+        region: document.getElementById("familyOssRegion").value.trim(),
+        bucket: document.getElementById("familyOssBucket").value.trim(),
+        accessKeyId: document.getElementById("familyOssAk").value.trim(),
+        accessKeySecret: document.getElementById("familyOssSk").value.trim()
+      };
       const user = document.getElementById("accountUserInput").value.trim();
       const pass = document.getElementById("accountPassInput").value;
-      if (appId && appKey && serverURL) {
-        localStorage.setItem(FAMILY_APPID_KEY, appId);
-        localStorage.setItem(FAMILY_APPKEY_KEY, appKey);
-        localStorage.setItem(FAMILY_SERVER_KEY, serverURL);
-      }
+      if (draft.region && draft.bucket && draft.accessKeyId && draft.accessKeySecret) persistOssCfg(draft);
       if (user) localStorage.setItem(ACCOUNT_USER_KEY, user);
       if (pass.length >= 6) localStorage.setItem(ACCOUNT_PASS_KEY, pass);
       try {
@@ -2356,28 +2385,27 @@
         showToast("📋 配置链接已复制，发到其他设备打开即可");
       } catch (e) {
         try { prompt("请复制此配置链接：", buildFamilyConfigUrl()); }
-        catch (err) { alert("请先填好云同步信息和账号密码"); }
+        catch (err) { alert("请先填好阿里云四项和账号密码"); }
       }
     });
     async function doAccountLogin() {
-      const appId = document.getElementById("familyAppId").value.trim();
-      const appKey = document.getElementById("familyAppKey").value.trim();
-      const serverURL = document.getElementById("familyServerUrl").value.trim().replace(/\/$/, "");
+      const draft = {
+        region: document.getElementById("familyOssRegion").value.trim(),
+        bucket: document.getElementById("familyOssBucket").value.trim(),
+        accessKeyId: document.getElementById("familyOssAk").value.trim(),
+        accessKeySecret: document.getElementById("familyOssSk").value.trim()
+      };
       const user = document.getElementById("accountUserInput").value.trim();
       const pass = document.getElementById("accountPassInput").value;
       if (!cloudReady()) {
-        if (!appId || !appKey || !/^https:\/\//i.test(serverURL)) {
+        if (!draft.region || !draft.bucket || !draft.accessKeyId || !draft.accessKeySecret) {
           document.getElementById("accountSetupDetails").open = true;
-          alert("第一次使用：请先展开「家长首次开通云同步」，填好三项（国内可开）");
+          alert("第一次使用：请先展开「家长首次开通云同步」，填好阿里云四项（支付宝实名即可，不用微信）");
           return;
         }
-        localStorage.setItem(FAMILY_APPID_KEY, appId);
-        localStorage.setItem(FAMILY_APPKEY_KEY, appKey);
-        localStorage.setItem(FAMILY_SERVER_KEY, serverURL);
-      } else if (appId && appKey && serverURL) {
-        localStorage.setItem(FAMILY_APPID_KEY, appId);
-        localStorage.setItem(FAMILY_APPKEY_KEY, appKey);
-        localStorage.setItem(FAMILY_SERVER_KEY, serverURL);
+        persistOssCfg(draft);
+      } else if (draft.region && draft.bucket && draft.accessKeyId && draft.accessKeySecret) {
+        persistOssCfg(draft);
       }
       if (!user) {
         alert("请输入账号");
@@ -2405,7 +2433,15 @@
         hideAccountGate();
         mount(true);
       } catch (e) {
-        alert("登录同步失败。请检查云同步三项是否正确，或网络是否正常。");
+        const tip = (e && e.message) ? String(e.message) : "";
+        alert(
+          "登录同步失败。请检查：\n" +
+          "1）Region / Bucket / AccessKey 是否正确\n" +
+          "2）Bucket 是否已配置 CORS（来源含 github.io）\n" +
+          "3）RAM 用户是否有该 Bucket 读写权限\n" +
+          "4）请用网站打开，不要双击本地 html\n" +
+          (tip ? ("\n详情：" + tip) : "")
+        );
       }
     }
     document.getElementById("accountLoginBtn").addEventListener("click", doAccountLogin);

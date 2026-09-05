@@ -1,10 +1,10 @@
-// 家庭云同步（LeanCloud，国内一般可直接打开，不需要 VPN）
-// 在 https://console.leancloud.cn/ 创建应用后，把凭证填到这里
-// 填好并推送到网站后，各设备只需输入家庭通行码
+// 家庭云同步（阿里云 OSS：手机号注册 + 支付宝实名，不绑微信）
+// 开通步骤见登录页「家长首次开通」；填好后各设备只需孩子账号密码
 window.RED_ALERT_CLOUD = {
-  leancloud: {
-    appId: "",
-    appKey: "",
-    serverURL: "" // 例如 https://xxx.lc-cn-n1-shared.com
+  oss: {
+    region: "",          // 例如 oss-cn-hangzhou
+    bucket: "",          // Bucket 名称
+    accessKeyId: "",
+    accessKeySecret: ""
   }
 };

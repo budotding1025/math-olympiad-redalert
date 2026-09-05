@@ -13,5 +13,7 @@ node_modules/
 .vscode/
 .idea/
 .gh-token
+accesskey.txt
+*accesskey*
 login-github.ps1
 一键登录GitHub.bat
