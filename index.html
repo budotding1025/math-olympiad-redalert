@@ -147,8 +147,19 @@
       padding: 8px 12px; min-height: 44px; border: 2px solid #555; background: #1a1a1a;
       color: var(--muted); cursor: pointer; font-family: inherit; font-size: 0.85rem;
     }
-    .day-chip.current { border-color: var(--accent); color: #ffd08a; }
-    .day-chip.cleared { border-color: var(--ok); color: #7dffa0; }
+    .day-chip.locked { border-color: #555; color: #888; opacity: 0.75; }
+    .roadmap-list { list-style: none; margin: 0; padding: 0; max-height: 60vh; overflow: auto; }
+    .roadmap-list li {
+      display: flex; justify-content: space-between; gap: 10px; align-items: center;
+      padding: 10px 12px; border: 1px solid var(--border); margin-bottom: 8px; background: rgba(0,0,0,0.25);
+    }
+    .roadmap-list li.locked { opacity: 0.7; }
+    .roadmap-list li.current { border-color: var(--accent); }
+    .roadmap-list li.cleared { border-color: var(--ok); }
+    .roadmap-term {
+      display: block; margin: 14px 0 8px; color: var(--accent); font-weight: 700; font-size: 0.95rem;
+    }
+    .lock-box { text-align: center; padding: 36px 16px; line-height: 1.75; font-size: 1.1rem; color: #ffd08a; }
     .parent-debug { margin-top: 8px; opacity: 0.45; font-size: 0.75rem; }
     .parent-debug select, .parent-debug button {
       font-size: 0.8rem; padding: 4px 8px; background: #1a1a1a; color: var(--text);
@@ -280,6 +291,7 @@
       <div class="rank-line"><span class="rank-badge" id="rankBadge"></span><span id="rankName">🪖 列兵</span></div>
       <div class="score-line" id="scoreLabel">战果：0/3</div>
       <div class="rank-bar"><div class="rank-bar-fill" id="rankBarFill"></div></div>
+      <button type="button" class="btn btn-ghost reset-btn" id="mapOpenBtn">🗺️ 战略地图</button>
       <button type="button" class="btn btn-ghost reset-btn" id="historyOpenBtn">📅 历史任务</button>
       <button type="button" class="btn btn-ghost reset-btn" id="accountOpenBtn">👤 账号</button>
       <button type="button" class="btn btn-ghost reset-btn" id="transferOpenBtn">📱 换机带走进度</button>
@@ -339,6 +351,17 @@
       <h2 style="color:var(--accent);margin:0 0 12px;">📅 历史任务</h2>
       <ul class="history-list" id="historyList"></ul>
       <button type="button" class="btn btn-ghost" id="historyCloseBtn" style="width:100%;margin-top:8px;">关闭</button>
+    </div>
+  </div>
+
+  <div class="history-overlay" id="mapOverlay" role="dialog" aria-modal="true">
+    <div class="history-panel">
+      <h2 style="color:var(--accent);margin:0 0 8px;">🗺️ 汇文主线 · 战略地图</h2>
+      <p style="margin:0 0 12px;color:var(--muted);font-size:0.9rem;line-height:1.55;">
+        按东城汇文南校区实验班分班考优先级排布。灰色为「🔒 即将解锁」占位，补齐视频与题目后开放。
+      </p>
+      <div id="roadmapRoot"></div>
+      <button type="button" class="btn btn-ghost" id="mapCloseBtn" style="width:100%;margin-top:8px;">关闭</button>
     </div>
   </div>
 
@@ -609,13 +632,125 @@
           { q: "围栏长50米，每隔5米插一面旗，两端都不插，一共几面？", answer: 9, hint: "50÷5=10段，两端不插：10-1=9。", ex: { t: "tree", L: 50, G: 5, mode: "none" } }
         ]
       },
-      { dayNum: 9, type: "review" }
+      {
+        dayNum: 9, type: "review",
+        term: "四年级上 · 基础武器",
+        topic: "错题复盘",
+        name: { redAlert: "📋 基础武器复盘湖", original: "错题复盘" }
+      }
     ];
 
+    /* 汇文南校区实验班分班考主线（四年级下起）。占位节点：此处需补充B站视频链接和题目 */
+    (function appendHuiwenRoadmap() {
+      let d = 10;
+      function ph(term, topic, phase, redAlert, original) {
+        courses.push({
+          dayNum: d++,
+          phase,
+          topic,
+          term,
+          name: { redAlert, original },
+          videoUrl: "",
+          videoType: phase === "foundation" ? "short" : "long",
+          videoTitle: "",
+          videoLabel: "🔒 即将解锁",
+          placeholder: true,
+          // 此处需补充B站视频链接和题目
+          questions: []
+        });
+      }
+      function lake(term, topic, redAlert) {
+        courses.push({
+          dayNum: d++,
+          type: "lake",
+          phase: "lake",
+          topic,
+          term,
+          name: { redAlert, original: topic + "复盘" },
+          videoUrl: "",
+          videoLabel: "🔒 即将解锁",
+          placeholder: true,
+          // 此处需补充B站视频链接和题目（湖：变式+错题混合）
+          questions: []
+        });
+      }
+      function trio(term, topic, raBase, origBase) {
+        ph(term, topic, "foundation", raBase + "·入门", origBase + "入门");
+        ph(term, topic, "advancement", raBase + "·升级", origBase + "升级");
+        ph(term, topic, "consolidate", raBase + "·巩固", origBase + "巩固");
+      }
+
+      // —— 四年级下：行程 → 年龄 → 鸡兔 → 几何面积基础 ——
+      trio("四年级下", "行程·相遇", "🚗 两军会师", "行程相遇");
+      trio("四年级下", "行程·追及", "🏃 追击战", "行程追及");
+      trio("四年级下", "行程·火车过桥", "🚂 装甲列过桥", "火车过桥");
+      lake("四年级下", "行程专题", "🌊 行程战术湖");
+      trio("四年级下", "年龄问题", "⏳ 时间差侦察", "年龄");
+      trio("四年级下", "鸡兔同笼", "🐔 鸡兔情报站", "鸡兔同笼");
+      trio("四年级下", "几何·面积基础", "📐 领地测绘基础", "几何面积基础");
+      lake("四年级下", "四年级下结训", "🌊 四年级下结训湖");
+
+      // —— 五年级上：数论 → 一半模型 → 复杂行程 ——
+      trio("五年级上", "数论·整除特征", "🔢 整除口令", "整除特征");
+      trio("五年级上", "数论·质数合数", "⚛️ 质合判定站", "质数合数");
+      trio("五年级上", "数论·约数倍数", "🧩 约倍补给线", "约数倍数");
+      lake("五年级上", "数论专题", "🌊 数论战术湖");
+      trio("五年级上", "一半模型", "✂️ 等积一半", "一半模型");
+      trio("五年级上", "复杂行程", "🛰️ 复合机动", "复杂行程");
+      lake("五年级上", "五年级上结训", "🌊 五年级上结训湖");
+
+      // —— 五年级下：裂项/等差 → 几何进阶 → 方程初步 ——
+      trio("五年级下", "计算·裂项", "💥 裂项爆破", "裂项");
+      trio("五年级下", "计算·等差数列", "📶 等差阵列", "等差数列");
+      lake("五年级下", "速算巧算", "🌊 计算战术湖");
+      trio("五年级下", "几何模型进阶", "🏗️ 等积变形要塞", "几何模型进阶");
+      trio("五年级下", "方程初步", "⚖️ 方程指挥所", "方程初步");
+      lake("五年级下", "五年级下结训", "🌊 五年级下结训湖");
+
+      // —— 六年级上：绝对值/整式 → 汇文真题模拟 ——
+      trio("六年级上", "绝对值", "📏 绝对值雷达", "绝对值");
+      trio("六年级上", "整式", "📦 整式补给箱", "整式");
+      lake("六年级上", "初中衔接", "🌊 衔接战术湖");
+      ph("六年级上", "汇文真题模拟", "foundation", "🎖️ 汇文模拟A", "汇文真题模拟A");
+      ph("六年级上", "汇文真题模拟", "advancement", "🎖️ 汇文模拟B", "汇文真题模拟B");
+      lake("六年级上", "汇文结业检阅", "🏁 汇文结业湖");
+    })();
 
     function padDay(n) { return String(n).padStart(2, "0"); }
     function phaseLabel(phase) {
-      return phase === "foundation" ? "打基础 · 入门" : phase === "advancement" ? "难度升级" : "";
+      if (phase === "foundation") return "打基础 · 入门";
+      if (phase === "advancement") return "难度升级";
+      if (phase === "consolidate") return "巩固变式";
+      if (phase === "lake") return "战术湖";
+      return "";
+    }
+    function isPlaceholderCourse(c) { return !!(c && c.placeholder); }
+    function isPlayableCourse(c) {
+      return !!(c && !c.type && !c.placeholder && Array.isArray(c.questions) && c.questions.length);
+    }
+    function courseTerm(c) {
+      if (!c) return "";
+      if (c.term) return c.term;
+      return "四年级上 · 基础武器";
+    }
+    function phaseChipTag(c) {
+      if (!c) return "";
+      if (c.type === "review" || c.type === "lake") return "湖";
+      if (c.phase === "foundation") return "入门";
+      if (c.phase === "advancement") return "升级";
+      if (c.phase === "consolidate") return "巩固";
+      return "";
+    }
+    function canStudyDay(dayNum) {
+      const c = findCourseByDay(dayNum);
+      if (!c) return false;
+      if (isPlaceholderCourse(c) || c.type === "lake") return false;
+      if (c.type === "review") {
+        const prev = courses.filter((x) => isPlayableCourse(x) && x.dayNum < dayNum);
+        return prev.every((x) => progress.clearedDays.includes(x.dayNum));
+      }
+      if (progress.clearedDays.includes(dayNum)) return true;
+      return dayNum === getDefaultDayNum();
     }
     function findCourseByDay(dayNum) {
       return courses.find((c) => c.dayNum === dayNum) || null;
@@ -1040,10 +1175,12 @@
     }
 
     function getDefaultDayNum() {
-      const missionDays = courses.filter((c) => !c.type).map((c) => c.dayNum);
+      const missionDays = courses.filter((c) => isPlayableCourse(c)).map((c) => c.dayNum);
       for (const d of missionDays) {
         if (!progress.clearedDays.includes(d)) return d;
       }
+      const review = courses.find((c) => c.type === "review");
+      if (review) return review.dayNum;
       return missionDays[missionDays.length - 1] || 1;
     }
     function getActiveDayNum() {
@@ -1894,7 +2031,7 @@
       return Math.floor(((timerStoppedAt || Date.now()) - timerStartedAt) / 1000);
     }
     function checkDailyClear(dayNum, course) {
-      if (!course || course.type || historyReadonly) return;
+      if (!course || course.type || course.placeholder || historyReadonly) return;
       if (progress.clearedDays.includes(dayNum)) return;
       const entries = activeQuestionEntries(course);
       const allOk = entries.every(({ index }) => getQState(qid(dayNum, index)).status === "correct");
@@ -2050,16 +2187,37 @@
     }
 
     function renderDayPicker(activeDay) {
-      const days = courses.filter((c) => !c.type);
+      const days = courses.filter((c) => isPlayableCourse(c) || (c.type === "review" && canStudyDay(c.dayNum)));
       let html = `<div class="day-picker">`;
       days.forEach((c) => {
         const cleared = progress.clearedDays.includes(c.dayNum);
-        const cls = c.dayNum === activeDay ? "current" : cleared ? "cleared" : "";
-        const tag = c.phase === "foundation" ? "入门" : "升级";
-        html += `<button type="button" class="day-chip ${cls}" data-day="${c.dayNum}">第${padDay(c.dayNum)}天·${escapeHtml(c.topic)}·${tag}</button>`;
+        const locked = !canStudyDay(c.dayNum);
+        const cls = locked ? "locked" : (c.dayNum === activeDay ? "current" : cleared ? "cleared" : "");
+        const tag = phaseChipTag(c);
+        html += `<button type="button" class="day-chip ${cls}" data-day="${c.dayNum}" ${locked ? "disabled" : ""}>第${padDay(c.dayNum)}天·${escapeHtml(c.topic || c.name.original)}·${tag}</button>`;
       });
       html += `</div>`;
       return html;
+    }
+
+    function renderLockedMission(dayNum, course) {
+      const title = course && course.name ? course.name.redAlert : "未开放战区";
+      const topic = course ? (course.topic || (course.name && course.name.original) || "") : "";
+      return {
+        html: `
+          ${renderDayPicker(dayNum)}
+          <h1 class="mission-title">${escapeHtml(title)}</h1>
+          <p class="mission-sub">第${padDay(dayNum)}天 · ${escapeHtml(courseTerm(course))} · ${escapeHtml(topic)}</p>
+          <div class="lock-box">
+            🔒 即将解锁<br />
+            汇文主线已标在战略地图上，视频与题目到位后即可开战。<br />
+            <span style="color:var(--muted);font-size:0.92rem;">（此处需补充B站视频链接和题目）</span><br />
+            <button type="button" class="btn btn-orange" id="openMapFromLockBtn" style="margin-top:16px;">🗺️ 查看完整路线</button>
+          </div>`,
+        dayNum,
+        course,
+        locked: true
+      };
     }
 
     function renderMission(dayNum, course) {
@@ -2200,11 +2358,18 @@
 
       document.querySelectorAll(".day-chip").forEach((btn) => {
         btn.addEventListener("click", () => {
+          const d = Number(btn.dataset.day);
+          if (!canStudyDay(d)) {
+            showToast("🔒 该战区尚未解锁");
+            return;
+          }
           historyReadonly = false;
-          selectedDayNum = Number(btn.dataset.day);
+          selectedDayNum = d;
           mount(false);
         });
       });
+      const openMapFromLock = document.getElementById("openMapFromLockBtn");
+      if (openMapFromLock) openMapFromLock.addEventListener("click", () => openRoadmap());
 
       // review bind
       const root = document.getElementById("missionRoot");
@@ -2275,37 +2440,60 @@
     }
 
     function renderBriefingGateHtml(dayNum, course, helloLine) {
-      const title = course && !course.type
-        ? escapeHtml(course.name.redAlert)
-        : course && course.type === "review"
-          ? "战术复盘室"
-          : "今日作战命令";
-      const sub = course && !course.type
-        ? `第${padDay(dayNum)}天 · ${escapeHtml(course.name.original)} · ${course.phase === "advancement" ? "难度升级" : "基础入门"}`
-        : course && course.type === "review"
-          ? "复习本周错题，巩固阵地"
-          : "";
-      const tips = course && !course.type
+      const locked = !!(course && (isPlaceholderCourse(course) || course.type === "lake" || !canStudyDay(dayNum)));
+      const title = locked
+        ? "🔒 即将解锁"
+        : course && !course.type
+          ? escapeHtml(course.name.redAlert)
+          : course && course.type === "review"
+            ? "战术复盘室"
+            : "今日作战命令";
+      const sub = locked
+        ? `第${padDay(dayNum)}天 · ${escapeHtml(courseTerm(course))} · ${escapeHtml((course && (course.topic || (course.name && course.name.original))) || "")}（占位）`
+        : course && !course.type
+          ? `第${padDay(dayNum)}天 · ${escapeHtml(course.name.original)} · ${phaseLabel(course.phase)}`
+          : course && course.type === "review"
+            ? "复习本周错题，巩固阵地"
+            : "";
+      const tips = locked
         ? `<ol class="briefing-tips">
+            <li>🗺️ 完整汇文主线已在战略地图标出</li>
+            <li>🔒 当前节点待补充 B 站视频与题目</li>
+            <li>✅ 请先完成「基础武器」已开放关卡</li>
+          </ol>`
+        : course && !course.type
+          ? `<ol class="briefing-tips">
             <li>📺 先完成侦察：观看今日配套视频</li>
             <li>🎯 再攻克 ${QUESTIONS_PER_DAY} 道题（一道一道来）</li>
             <li>⏱️ 接受任务后开始 <strong>20 分钟</strong>作战计时</li>
           </ol>`
-        : `<ol class="briefing-tips">
+          : `<ol class="briefing-tips">
             <li>📢 听长官鼓励，明确今日目标</li>
             <li>⏱️ 点「接受任务」后再开始计时</li>
           </ol>`;
+      const action = locked
+        ? `<button type="button" class="btn btn-orange" id="briefOpenMapBtn">🗺️ 打开战略地图</button>
+           <button type="button" class="btn btn-ghost" id="acceptMissionBtn" style="margin-top:10px;">返回当前可学任务</button>`
+        : `<button type="button" class="btn btn-orange" id="acceptMissionBtn">🎯 接受任务 · 开始计时</button>`;
       return `<div class="briefing-gate">
         <p class="briefing-hello">🎙️ ${escapeHtml(helloLine)}</p>
         <h2 class="briefing-title">${title}</h2>
         <p class="briefing-sub">${sub}</p>
         ${tips}
-        <button type="button" class="btn btn-orange" id="acceptMissionBtn">🎯 接受任务 · 开始计时</button>
+        ${action}
       </div>`;
     }
 
     async function acceptMissionAndStart() {
       if (missionAccepted) return;
+      const gateDay = getActiveDayNum();
+      const gateCourse = findCourseByDay(gateDay);
+      if (gateCourse && (isPlaceholderCourse(gateCourse) || gateCourse.type === "lake" || !canStudyDay(gateDay))) {
+        selectedDayNum = null;
+        mount(false);
+        showToast("🔒 请先学习当前已开放任务");
+        return;
+      }
       unlockAudioFromUserGesture();
       missionAccepted = true;
       welcomeGateDone = true;
@@ -2372,8 +2560,19 @@
       const course = findCourseByDay(dayNum);
       root.dataset.mode = "briefing";
       root.innerHTML = renderBriefingGateHtml(dayNum, course, line);
+      const mapBtn = document.getElementById("briefOpenMapBtn");
+      if (mapBtn) mapBtn.addEventListener("click", () => openRoadmap());
       const acceptBtn = document.getElementById("acceptMissionBtn");
-      if (acceptBtn) acceptBtn.addEventListener("click", () => { acceptMissionAndStart(); });
+      if (acceptBtn) {
+        acceptBtn.addEventListener("click", () => {
+          if (course && (isPlaceholderCourse(course) || course.type === "lake" || !canStudyDay(dayNum))) {
+            selectedDayNum = null;
+            mount(false);
+            return;
+          }
+          acceptMissionAndStart();
+        });
+      }
     }
 
     function mount(runWelcome) {
@@ -2393,6 +2592,13 @@
       const course = findCourseByDay(dayNum);
       if (!course) {
         root.innerHTML = `<div class="empty-box">作战档案尚未送达。</div>`;
+        return;
+      }
+      if (isPlaceholderCourse(course) || course.type === "lake" || !canStudyDay(dayNum)) {
+        root.dataset.mode = "locked";
+        const packed = renderLockedMission(dayNum, course);
+        root.innerHTML = packed.html;
+        bindMissionEvents(packed);
         return;
       }
       if (course.type === "review") {
@@ -2472,7 +2678,7 @@
     function openHistory() {
       const list = document.getElementById("historyList");
       list.innerHTML = "";
-      courses.filter((c) => !c.type).forEach((c) => {
+      courses.filter((c) => isPlayableCourse(c)).forEach((c) => {
         const done = dayQuestionDoneCount(c.dayNum);
         const cleared = progress.clearedDays.includes(c.dayNum);
         const status = cleared ? "✅ 已通关" : done > 0 ? `进行中 ${done}/${QUESTIONS_PER_DAY}` : "未开始";
@@ -2481,8 +2687,10 @@
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "btn btn-ghost";
-        btn.textContent = "回看";
+        btn.textContent = cleared || canStudyDay(c.dayNum) ? "回看" : "🔒";
+        btn.disabled = !(cleared || canStudyDay(c.dayNum));
         btn.addEventListener("click", () => {
+          if (!(cleared || canStudyDay(c.dayNum))) return;
           historyReadonly = true;
           selectedDayNum = c.dayNum;
           currentQIndex = 0;
@@ -2493,6 +2701,75 @@
         list.appendChild(li);
       });
       document.getElementById("historyOverlay").classList.add("show");
+    }
+
+    function openRoadmap() {
+      const root = document.getElementById("roadmapRoot");
+      if (!root) return;
+      const active = getActiveDayNum();
+      let html = "";
+      let lastTerm = "";
+      let openUl = false;
+      const closeUl = () => { if (openUl) { html += "</ul>"; openUl = false; } };
+      courses.forEach((c) => {
+        const term = courseTerm(c);
+        if (term !== lastTerm) {
+          closeUl();
+          html += `<span class="roadmap-term">${escapeHtml(term)}</span><ul class="roadmap-list">`;
+          openUl = true;
+          lastTerm = term;
+        } else if (!openUl) {
+          html += `<ul class="roadmap-list">`;
+          openUl = true;
+        }
+        const cleared = progress.clearedDays.includes(c.dayNum);
+        const locked = isPlaceholderCourse(c) || c.type === "lake" || !canStudyDay(c.dayNum);
+        const current = c.dayNum === active;
+        let cls = locked ? "locked" : cleared ? "cleared" : "";
+        if (current) cls += (cls ? " " : "") + "current";
+        const status = isPlaceholderCourse(c) || c.type === "lake"
+          ? "🔒 即将解锁"
+          : cleared
+            ? "✅ 已通关"
+            : canStudyDay(c.dayNum)
+              ? "▶ 可学习"
+              : "🔒 未到阶段";
+        const title = c.name && c.name.redAlert
+          ? c.name.redAlert
+          : (c.topic || "任务");
+        const tag = phaseChipTag(c);
+        html += `<li class="${cls}">
+          <div>
+            <strong>第${padDay(c.dayNum)}天</strong> · ${escapeHtml(title)}
+            <br/><span style="color:var(--muted);font-size:0.85rem;">${escapeHtml(c.topic || "")}${tag ? " · " + tag : ""}</span>
+            <br/><span style="color:#ffd08a;font-size:0.85rem;">${status}</span>
+          </div>
+          <button type="button" class="btn btn-ghost roadmap-go" data-day="${c.dayNum}" ${locked && !cleared ? "disabled" : ""}>${locked && !cleared ? "锁定" : (cleared ? "回看" : "进入")}</button>
+        </li>`;
+      });
+      closeUl();
+      root.innerHTML = html;
+      root.innerHTML = html;
+      root.querySelectorAll(".roadmap-go").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const d = Number(btn.dataset.day);
+          const c = findCourseByDay(d);
+          if (!c) return;
+          if (isPlaceholderCourse(c) || c.type === "lake") {
+            showToast("🔒 即将解锁：需补充视频与题目");
+            return;
+          }
+          if (!canStudyDay(d) && !progress.clearedDays.includes(d)) {
+            showToast("🔒 请先完成前面的关卡");
+            return;
+          }
+          historyReadonly = progress.clearedDays.includes(d) && d !== getDefaultDayNum();
+          selectedDayNum = d;
+          document.getElementById("mapOverlay").classList.remove("show");
+          mount(false);
+        });
+      });
+      document.getElementById("mapOverlay").classList.add("show");
     }
 
     /* ========== Timer ========== */
@@ -2638,6 +2915,13 @@
       showAccountGate(true);
     });
 
+    document.getElementById("mapOpenBtn").addEventListener("click", openRoadmap);
+    document.getElementById("mapCloseBtn").addEventListener("click", () => {
+      document.getElementById("mapOverlay").classList.remove("show");
+    });
+    document.getElementById("mapOverlay").addEventListener("click", (e) => {
+      if (e.target.id === "mapOverlay") document.getElementById("mapOverlay").classList.remove("show");
+    });
     document.getElementById("historyOpenBtn").addEventListener("click", openHistory);
     document.getElementById("historyCloseBtn").addEventListener("click", () => {
       document.getElementById("historyOverlay").classList.remove("show");
@@ -2744,10 +3028,11 @@
     (function initDebugDay() {
       const sel = document.getElementById("debugDaySelect");
       if (!sel) return;
-      courses.filter((c) => !c.type).forEach((c) => {
+      courses.forEach((c) => {
         const opt = document.createElement("option");
         opt.value = c.dayNum;
-        opt.textContent = `第${padDay(c.dayNum)}天`;
+        const lock = isPlaceholderCourse(c) || c.type === "lake" ? "🔒" : "";
+        opt.textContent = `第${padDay(c.dayNum)}天 ${lock}${(c.topic || (c.name && c.name.original) || c.type || "").slice(0, 12)}`;
         sel.appendChild(opt);
       });
       document.getElementById("debugDayApply").addEventListener("click", () => {
