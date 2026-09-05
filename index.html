@@ -1118,6 +1118,45 @@
         voicePlayer = null;
       }
     }
+    /** 浏览器要求：音效必须在用户点击后解锁，否则登录后欢迎语音会被静默拦截 */
+    function unlockAudioFromUserGesture() {
+      try {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (Ctx) {
+          if (!window.__redAlertAudioCtx) window.__redAlertAudioCtx = new Ctx();
+          const ctx = window.__redAlertAudioCtx;
+          if (ctx.state === "suspended") ctx.resume().catch(() => {});
+          const buf = ctx.createBuffer(1, 1, 22050);
+          const src = ctx.createBufferSource();
+          src.buffer = buf;
+          src.connect(ctx.destination);
+          src.start(0);
+        }
+      } catch (e) { /* ignore */ }
+      try {
+        if (bgmEl) {
+          const wasMuted = bgmEl.muted;
+          bgmEl.muted = true;
+          const p = bgmEl.play();
+          if (p && p.then) p.then(() => { try { bgmEl.pause(); bgmEl.currentTime = 0; bgmEl.muted = wasMuted; } catch (e2) {} }).catch(() => { try { bgmEl.muted = wasMuted; } catch (e3) {} });
+        }
+      } catch (e) { /* ignore */ }
+      window.__redAlertAudioUnlocked = true;
+    }
+    function waitForAudioUnlock() {
+      if (window.__redAlertAudioUnlocked) {
+        unlockAudioFromUserGesture();
+        return Promise.resolve();
+      }
+      return new Promise((resolve) => {
+        const done = () => {
+          unlockAudioFromUserGesture();
+          resolve();
+        };
+        document.addEventListener("pointerdown", done, { once: true, capture: true });
+        document.addEventListener("keydown", done, { once: true, capture: true });
+      });
+    }
     function playVoiceFile(relPath) {
       if (soundMuted) return Promise.resolve(false);
       return new Promise((resolve) => {
@@ -2151,14 +2190,20 @@
       const banner = document.getElementById("welcomeBanner");
       const dayNum = getActiveDayNum();
       const welcomeKey = String(dayNum);
+      const sessionKey = "redAlert_welcome_session";
+      const alreadyThisSession = sessionStorage.getItem(sessionKey) === "1";
       updateMuteBtn();
       refreshRankUI();
       refreshEnergyUI();
 
-      if (progress.lastWelcomeDay === welcomeKey) {
+      // 每次打开网页会话播一次欢迎；同一会话内刷新不再重复播，但仍保证顶部有鼓励文字
+      if (alreadyThisSession) {
         welcomeGateDone = true;
         banner.hidden = true;
         root.classList.remove("waiting-welcome");
+        if (!document.getElementById("encourageText").textContent) {
+          document.getElementById("encourageText").textContent = pickRandom(ENCOURAGE_LINES);
+        }
         mount(false);
         maybeStartGuide();
         return;
@@ -2167,17 +2212,23 @@
       const line = pickRandom(WELCOME_SPEECH);
       document.getElementById("encourageText").textContent = line;
       banner.hidden = false;
-      document.getElementById("welcomeText").textContent = "🎙️ " + line;
+      const needTap = !window.__redAlertAudioUnlocked;
+      document.getElementById("welcomeText").textContent =
+        "🎙️ " + line + (needTap ? "（请点一下屏幕听语音）" : "");
       root.classList.add("waiting-welcome");
       mount(false); // prepare content behind dimmed card
 
-      await playWelcomeComm(line);
+      await waitForAudioUnlock();
+      document.getElementById("welcomeText").textContent = "🎙️ " + line;
+      const minShow = new Promise((r) => setTimeout(r, 2200));
+      await Promise.all([playWelcomeComm(line), minShow]);
       if (!progress.enlistedSpoken && progress.correctCount === 0) {
         progress.enlistedSpoken = true;
         saveProgress();
         await enqueueVoice(() => speak(PROMOTE_SPEECH[0], { file: "voice/promote-0.mp3" }));
       }
       progress.lastWelcomeDay = welcomeKey;
+      try { sessionStorage.setItem(sessionKey, "1"); } catch (e) {}
       saveProgress();
       welcomeGateDone = true;
       banner.hidden = true;
@@ -2389,6 +2440,7 @@
       }
     });
     async function doAccountLogin() {
+      unlockAudioFromUserGesture();
       const draft = {
         region: document.getElementById("familyOssRegion").value.trim(),
         bucket: document.getElementById("familyOssBucket").value.trim(),
@@ -2430,6 +2482,7 @@
           showToast("✅ 账号已创建，进度将自动保存到云端");
         }
         accountReady = true;
+        try { sessionStorage.removeItem("redAlert_welcome_session"); } catch (e) {}
         hideAccountGate();
         mount(true);
       } catch (e) {
