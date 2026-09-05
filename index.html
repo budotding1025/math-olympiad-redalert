@@ -76,12 +76,32 @@
       border-left: 4px solid var(--accent); color: #ffd08a; font-size: 1.05rem;
     }
     .welcome-banner[hidden] { display: none !important; }
+    .briefing-gate {
+      text-align: center; padding: 28px 18px 32px; line-height: 1.7;
+    }
+    .briefing-gate .briefing-hello {
+      margin: 0 0 18px; color: #ffd08a; font-size: 1.15rem; font-weight: 700;
+    }
+    .briefing-gate .briefing-title {
+      margin: 0 0 8px; color: var(--accent); font-size: 1.45rem;
+    }
+    .briefing-gate .briefing-sub {
+      margin: 0 0 16px; color: var(--muted); font-size: 1rem;
+    }
+    .briefing-gate .briefing-tips {
+      margin: 0 auto 22px; max-width: 420px; text-align: left;
+      padding: 14px 16px; background: rgba(0,0,0,0.28); border: 1px solid var(--border);
+      color: var(--text); font-size: 0.98rem;
+    }
+    .briefing-gate .briefing-tips li { margin: 6px 0; }
+    .briefing-gate .btn { min-width: 220px; min-height: 52px; font-size: 1.15rem; }
     .mission-card {
       background: var(--card); border: 2px solid var(--border);
       padding: 18px 18px 22px; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
       transition: opacity 0.8s ease;
     }
-    .mission-card.waiting-welcome { opacity: 0.25; pointer-events: none; }
+    .mission-card.waiting-welcome { opacity: 0.35; }
+    .mission-card.gate-locked .command-only { pointer-events: none; }
     .mission-title { margin: 0 0 4px; font-size: 1.4rem; color: var(--accent); }
     .mission-sub { margin: 0 0 12px; color: var(--muted); }
     .phase-tag {
@@ -279,7 +299,7 @@
 
   <nav class="command-bar" id="commandBar" aria-label="作战命令栏">
     <div class="command-bar-inner">
-      <button type="button" class="btn btn-orange" id="timerBtn">⏱️ 开始行动</button>
+      <button type="button" class="btn btn-orange" id="timerBtn">🎯 接受任务</button>
       <a class="btn btn-ghost" id="cmdVideoBtn" href="#" target="_blank" rel="noopener noreferrer">🎬 前往B站观看</a>
       <button type="button" class="btn btn-ghost" id="cmdPrevBtn">⏪ 上一题</button>
       <button type="button" class="btn btn-ghost" id="cmdNextBtn">⏩ 下一题</button>
@@ -417,6 +437,8 @@
     let timerStoppedAt = null;
     let historyReadonly = false;
     let welcomeGateDone = false;
+    let missionAccepted = false;
+    let pendingWelcomeLine = "";
     let advanceTimer = null;
     let activeCourse = null;
     let activeDayNum = 1;
@@ -2185,19 +2207,110 @@
       updateCommandBar(dayNum, course);
     }
 
-    async function playHomeWelcomeThenMount() {
+    function startMissionTimer() {
+      if (timerRunning) return;
+      timerRunning = true;
+      timerRemain = TIMER_TOTAL_SEC;
+      timerStartedAt = Date.now();
+      timerStoppedAt = null;
+      updateTimerUI();
+      const btn = document.getElementById("timerBtn");
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "⏱️ 计时中…";
+      }
+      document.getElementById("timerAlert").classList.remove("show");
+      if (timerId) clearInterval(timerId);
+      timerId = setInterval(() => {
+        timerRemain -= 1;
+        updateTimerUI();
+        if (timerRemain <= 0) {
+          stopMissionTimer();
+          document.getElementById("timerAlert").classList.add("show");
+          const line = "时间到！任务结束，撤退休整！";
+          document.getElementById("timerAlert").textContent = "⏰ " + line;
+          speak(line, { file: "voice/timer.mp3" });
+        }
+      }, 1000);
+    }
+
+    function renderBriefingGateHtml(dayNum, course, helloLine) {
+      const title = course && !course.type
+        ? escapeHtml(course.name.redAlert)
+        : course && course.type === "review"
+          ? "战术复盘室"
+          : "今日作战命令";
+      const sub = course && !course.type
+        ? `第${padDay(dayNum)}天 · ${escapeHtml(course.name.original)} · ${course.phase === "advancement" ? "难度升级" : "基础入门"}`
+        : course && course.type === "review"
+          ? "复习本周错题，巩固阵地"
+          : "";
+      const tips = course && !course.type
+        ? `<ol class="briefing-tips">
+            <li>📺 先完成侦察：观看今日配套视频</li>
+            <li>🎯 再攻克 ${QUESTIONS_PER_DAY} 道题（一道一道来）</li>
+            <li>⏱️ 接受任务后开始 <strong>30 分钟</strong>作战计时</li>
+          </ol>`
+        : `<ol class="briefing-tips">
+            <li>📢 听长官鼓励，明确今日目标</li>
+            <li>⏱️ 点「接受任务」后再开始计时</li>
+          </ol>`;
+      return `<div class="briefing-gate">
+        <p class="briefing-hello">🎙️ ${escapeHtml(helloLine)}</p>
+        <h2 class="briefing-title">${title}</h2>
+        <p class="briefing-sub">${sub}</p>
+        ${tips}
+        <button type="button" class="btn btn-orange" id="acceptMissionBtn">🎯 接受任务 · 开始计时</button>
+      </div>`;
+    }
+
+    async function acceptMissionAndStart() {
+      if (missionAccepted) return;
+      unlockAudioFromUserGesture();
+      missionAccepted = true;
+      welcomeGateDone = true;
+      const dayNum = getActiveDayNum();
+      const welcomeKey = String(dayNum);
+      const line = pendingWelcomeLine || pickRandom(WELCOME_SPEECH);
+      document.getElementById("encourageText").textContent = line;
+      document.getElementById("welcomeBanner").hidden = true;
+      const root = document.getElementById("missionRoot");
+      root.classList.remove("waiting-welcome");
+
+      startMissionTimer();
+      mount(false);
+
+      const minShow = new Promise((r) => setTimeout(r, 1800));
+      await Promise.all([playWelcomeComm(line), minShow]);
+      if (!progress.enlistedSpoken && progress.correctCount === 0) {
+        progress.enlistedSpoken = true;
+        saveProgress();
+        await enqueueVoice(() => speak(PROMOTE_SPEECH[0], { file: "voice/promote-0.mp3" }));
+      }
+      progress.lastWelcomeDay = welcomeKey;
+      try { sessionStorage.setItem("redAlert_welcome_session", "1"); } catch (e) {}
+      saveProgress();
+      maybeStartGuide();
+    }
+
+    function playHomeWelcomeThenMount() {
       const root = document.getElementById("missionRoot");
       const banner = document.getElementById("welcomeBanner");
       const dayNum = getActiveDayNum();
-      const welcomeKey = String(dayNum);
       const sessionKey = "redAlert_welcome_session";
       const alreadyThisSession = sessionStorage.getItem(sessionKey) === "1";
       updateMuteBtn();
       refreshRankUI();
       refreshEnergyUI();
 
-      // 每次打开网页会话播一次欢迎；同一会话内刷新不再重复播，但仍保证顶部有鼓励文字
-      if (alreadyThisSession) {
+      const timerBtn = document.getElementById("timerBtn");
+      if (timerBtn && !timerRunning) {
+        timerBtn.disabled = false;
+        timerBtn.textContent = "🎯 接受任务";
+      }
+
+      // 同一会话已接受过：直接进入任务（计时若已停过则不自动再开）
+      if (alreadyThisSession && missionAccepted) {
         welcomeGateDone = true;
         banner.hidden = true;
         root.classList.remove("waiting-welcome");
@@ -2209,31 +2322,18 @@
         return;
       }
 
+      missionAccepted = false;
       const line = pickRandom(WELCOME_SPEECH);
+      pendingWelcomeLine = line;
       document.getElementById("encourageText").textContent = line;
-      banner.hidden = false;
-      const needTap = !window.__redAlertAudioUnlocked;
-      document.getElementById("welcomeText").textContent =
-        "🎙️ " + line + (needTap ? "（请点一下屏幕听语音）" : "");
-      root.classList.add("waiting-welcome");
-      mount(false); // prepare content behind dimmed card
-
-      await waitForAudioUnlock();
-      document.getElementById("welcomeText").textContent = "🎙️ " + line;
-      const minShow = new Promise((r) => setTimeout(r, 2200));
-      await Promise.all([playWelcomeComm(line), minShow]);
-      if (!progress.enlistedSpoken && progress.correctCount === 0) {
-        progress.enlistedSpoken = true;
-        saveProgress();
-        await enqueueVoice(() => speak(PROMOTE_SPEECH[0], { file: "voice/promote-0.mp3" }));
-      }
-      progress.lastWelcomeDay = welcomeKey;
-      try { sessionStorage.setItem(sessionKey, "1"); } catch (e) {}
-      saveProgress();
-      welcomeGateDone = true;
       banner.hidden = true;
       root.classList.remove("waiting-welcome");
-      maybeStartGuide();
+
+      const course = findCourseByDay(dayNum);
+      root.dataset.mode = "briefing";
+      root.innerHTML = renderBriefingGateHtml(dayNum, course, line);
+      const acceptBtn = document.getElementById("acceptMissionBtn");
+      if (acceptBtn) acceptBtn.addEventListener("click", () => { acceptMissionAndStart(); });
     }
 
     function mount(runWelcome) {
@@ -2269,8 +2369,7 @@
 
     /* ========== Guide ========== */
     const guideSteps = [
-      { el: "#timerBtn", text: "先点击这里开始今日任务！" },
-      { el: "#cmdVideoBtn", text: "看完视频回来做题！" },
+      { el: "#cmdVideoBtn", text: "先去看今日视频侦察！" },
       { el: "#activeAnswer", text: "在这里输入你的答案" },
       { el: "#cmdCheckBtn", text: "点击这里检查对不对！" }
     ];
@@ -2371,25 +2470,11 @@
 
     document.getElementById("timerBtn").addEventListener("click", () => {
       if (timerRunning) return;
-      timerRunning = true;
-      timerRemain = TIMER_TOTAL_SEC;
-      timerStartedAt = Date.now();
-      timerStoppedAt = null;
-      updateTimerUI();
-      document.getElementById("timerBtn").disabled = true;
-      document.getElementById("timerBtn").textContent = "⏱️ 计时中…";
-      document.getElementById("timerAlert").classList.remove("show");
-      timerId = setInterval(() => {
-        timerRemain -= 1;
-        updateTimerUI();
-        if (timerRemain <= 0) {
-          stopMissionTimer();
-          document.getElementById("timerAlert").classList.add("show");
-          const line = "时间到！任务结束，撤退休整！";
-          document.getElementById("timerAlert").textContent = "⏰ " + line;
-          speak(line, { file: "voice/timer.mp3" });
-        }
-      }, 1000);
+      if (!missionAccepted) {
+        acceptMissionAndStart();
+        return;
+      }
+      startMissionTimer();
     });
 
     document.getElementById("cmdPrevBtn").addEventListener("click", () => {
@@ -2482,7 +2567,10 @@
           showToast("✅ 账号已创建，进度将自动保存到云端");
         }
         accountReady = true;
-        try { sessionStorage.removeItem("redAlert_welcome_session"); } catch (e) {}
+        try {
+          sessionStorage.removeItem("redAlert_welcome_session");
+          missionAccepted = false;
+        } catch (e) {}
         hideAccountGate();
         mount(true);
       } catch (e) {
