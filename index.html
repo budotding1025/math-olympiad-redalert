@@ -174,66 +174,78 @@
     .strat-map-scroll {
       flex: 1; min-height: 52vh; max-height: calc(94vh - 140px);
       overflow: auto; border: 2px solid #5a4a2a;
-      background: #1a2818;
+      background: #0e160c;
       position: relative;
       -webkit-overflow-scrolling: touch;
     }
     .strat-map-board {
       position: relative;
       min-width: 720px;
+      background: #152214;
+    }
+    .strat-map-board.iso-board {
       background:
-        repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(0,0,0,0.06) 32px),
-        repeating-linear-gradient(90deg, transparent, transparent 31px, rgba(0,0,0,0.06) 32px),
-        linear-gradient(160deg, #3a5a28 0%, #2f4a22 35%, #355528 70%, #2a421c 100%);
+        radial-gradient(ellipse at 50% 20%, rgba(70,100,40,0.25), transparent 55%),
+        #152214;
     }
     .strat-unit {
-      position: absolute; z-index: 5; pointer-events: none;
-      font-size: 1.6rem; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.7));
-      animation: unitBob 1.2s ease-in-out infinite;
-      transform: translate(-50%, -110%);
+      position: absolute; z-index: 6; pointer-events: none;
+      width: 48px; height: 56px;
+      filter: drop-shadow(0 3px 2px rgba(0,0,0,0.65));
+      animation: unitBob 1.15s ease-in-out infinite;
+      transform: translate(-50%, -100%);
+    }
+    .strat-unit svg { width: 100%; height: 100%; display: block; overflow: visible; }
+    .strat-unit .unit-label {
+      position: absolute; left: 50%; bottom: -14px; transform: translateX(-50%);
+      font-size: 0.58rem; font-weight: 800; color: #ffd08a; white-space: nowrap;
+      text-shadow: 0 1px 2px #000;
     }
     @keyframes unitBob {
-      0%, 100% { transform: translate(-50%, -110%); }
-      50% { transform: translate(-50%, -125%); }
+      0%, 100% { transform: translate(-50%, -100%); }
+      50% { transform: translate(-50%, -112%); }
     }
     .strat-map-board svg.strat-roads {
       position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;
     }
     .strat-term-banner {
-      position: absolute; z-index: 1;
+      position: absolute; z-index: 3;
       font-size: 0.72rem; font-weight: 800; letter-spacing: 0.04em;
-      color: #ffd08a; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,106,0,0.45);
+      color: #ffd08a; background: rgba(0,0,0,0.55); border: 1px solid rgba(255,106,0,0.45);
       padding: 4px 10px; white-space: nowrap; pointer-events: none;
     }
     .strat-node {
-      position: absolute; z-index: 2; width: 86px; min-height: 78px;
-      padding: 6px 4px 5px; border: 2px solid #666; background: rgba(30,40,28,0.92);
+      position: absolute; z-index: 4; width: 78px; min-height: 54px;
+      padding: 5px 3px 4px; border: 2px solid #5a6a4a; background: rgba(22,34,20,0.88);
       color: var(--text); font-family: inherit; cursor: pointer;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      text-align: center; line-height: 1.2; box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      text-align: center; line-height: 1.15;
+      box-shadow: 2px 3px 0 rgba(0,0,0,0.45);
       transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+      clip-path: polygon(8% 0, 92% 0, 100% 50%, 92% 100%, 8% 100%, 0 50%);
     }
     .strat-node:hover:not(:disabled) { transform: translateY(-2px); border-color: #ffd08a; }
     .strat-node:disabled { cursor: not-allowed; }
-    .strat-node .sn-day { font-size: 0.68rem; color: #ffd08a; font-weight: 700; }
+    .strat-node .sn-day { font-size: 0.64rem; color: #ffd08a; font-weight: 700; }
     .strat-node .sn-title {
-      font-size: 0.72rem; font-weight: 700; margin-top: 2px;
-      max-width: 78px; overflow: hidden; display: -webkit-box;
+      font-size: 0.68rem; font-weight: 700; margin-top: 1px;
+      max-width: 70px; overflow: hidden; display: -webkit-box;
       -webkit-line-clamp: 2; -webkit-box-orient: vertical;
     }
-    .strat-node .sn-tag { font-size: 0.62rem; color: var(--muted); margin-top: 2px; }
-    .strat-node.cleared { border-color: var(--ok); background: rgba(40,70,40,0.95); }
+    .strat-node .sn-tag { font-size: 0.58rem; color: var(--muted); margin-top: 1px; }
+    .strat-node.cleared { border-color: #5c9a5c; background: rgba(36,72,36,0.92); }
     .strat-node.current {
-      border-color: var(--accent); background: rgba(80,40,10,0.95);
-      box-shadow: 0 0 0 2px rgba(255,106,0,0.35), 0 0 16px rgba(255,106,0,0.45);
+      border-color: var(--accent); background: rgba(90,42,8,0.95);
+      box-shadow: 0 0 0 2px rgba(255,106,0,0.4), 0 0 14px rgba(255,106,0,0.5);
       animation: mapPulse 1.6s ease-in-out infinite;
+      z-index: 5;
     }
     .strat-node.locked {
-      opacity: 0.55; filter: grayscale(0.55); border-color: #444; background: rgba(20,22,20,0.9);
+      opacity: 0.5; filter: grayscale(0.6); border-color: #3a3a3a; background: rgba(16,18,16,0.9);
     }
     .strat-node.lake {
-      border-radius: 50%; width: 78px; min-height: 78px; border-color: #5a9fd4;
-      background: rgba(28,50,70,0.92);
+      clip-path: none; border-radius: 50%; width: 72px; min-height: 72px; border-color: #5a9fd4;
+      background: rgba(24,48,68,0.9);
     }
     .strat-node.lake.locked { border-color: #3a5568; }
     @keyframes mapPulse {
@@ -446,7 +458,7 @@
         <span><i class="cleared"></i>已攻克</span>
         <span><i class="locked"></i>迷雾锁定</span>
         <span><i class="lake"></i>战术湖</span>
-        <span>🪖/🚛 指挥官单位</span>
+        <span>动员兵（中国大兵）</span>
       </div>
       <div class="strat-map-scroll" id="roadmapRoot"></div>
       <p class="map-hint">左右/上下滑动展开整张作战图。点亮节点可进入；灰色迷雾为「即将解锁」占位（需补视频与题目）。</p>
@@ -2854,18 +2866,51 @@
       document.getElementById("historyOverlay").classList.add("show");
     }
 
+    function conscriptSvgHtml(rankIdx) {
+      // 自绘「动员兵/中国大兵」剪影：褐大衣、防毒面罩头盔、步枪（非游戏原素材）
+      const vet = rankIdx >= 3;
+      const star = vet
+        ? `<polygon points="20,5 21.2,8.2 24.5,8.2 21.8,10.1 22.9,13.2 20,11.2 17.1,13.2 18.2,10.1 15.5,8.2 18.8,8.2" fill="#e8c84a"/>`
+        : `<circle cx="20" cy="8" r="2.2" fill="#c0392b"/>`;
+      const rifle = `<g transform="rotate(-18 30 28)">
+          <rect x="28" y="16" width="2.2" height="22" rx="0.6" fill="#2b2418"/>
+          <rect x="27.2" y="14" width="3.8" height="3" fill="#1a1a1a"/>
+        </g>`;
+      return `<svg viewBox="0 0 40 48" aria-hidden="true">
+        <ellipse cx="20" cy="45" rx="11" ry="2.8" fill="#000" opacity="0.4"/>
+        <rect x="13" y="37" width="5.5" height="6" rx="1" fill="#1a1410"/>
+        <rect x="21.5" y="37" width="5.5" height="6" rx="1" fill="#1a1410"/>
+        <path d="M13 19 L27 19 L29 37 L11 37 Z" fill="#6e422c"/>
+        <path d="M13 19 L27 19 L26 24 L14 24 Z" fill="#8a5538"/>
+        <rect x="9.5" y="18" width="6" height="5" rx="1" fill="#4a4a4a"/>
+        <rect x="24.5" y="18" width="6" height="5" rx="1" fill="#4a4a4a"/>
+        <ellipse cx="20" cy="12" rx="9.2" ry="8" fill="#5c5c5c"/>
+        <ellipse cx="20" cy="13.5" rx="7" ry="5.2" fill="#2a2a2a"/>
+        <ellipse cx="17" cy="13" rx="1.6" ry="1.2" fill="#6a8a6a" opacity="0.7"/>
+        <ellipse cx="23" cy="13" rx="1.6" ry="1.2" fill="#6a8a6a" opacity="0.7"/>
+        <rect x="16.5" y="16.5" width="7" height="2.2" rx="0.6" fill="#1a1a1a"/>
+        ${star}
+        ${rifle}
+        ${vet ? `<rect x="15" y="26" width="10" height="2" fill="#c9a227" opacity="0.85"/>` : ""}
+      </svg><span class="unit-label">${vet ? "老兵·动员兵" : "动员兵"}</span>`;
+    }
+
+    function isoXY(col, row, tw, th, ox, oy) {
+      return {
+        x: ox + (col - row) * (tw / 2),
+        y: oy + (col + row) * (th / 2)
+      };
+    }
+
     function openRoadmap() {
       const root = document.getElementById("roadmapRoot");
       if (!root) return;
       const active = getActiveDayNum();
       const COLS = 6;
-      const NODE_W = 86;
-      const NODE_H = 78;
-      const GAP_X = 36;
-      const GAP_Y = 52;
-      const PAD_X = 36;
-      const PAD_Y = 48;
-      const TERM_H = 28;
+      const TILE_W = 96;
+      const TILE_H = 48;
+      const NODE_W = 78;
+      const NODE_H = 54;
 
       const positions = [];
       let lastTerm = "";
@@ -2873,88 +2918,109 @@
       let row = 0;
       let col = 0;
       let termStartRow = 0;
+      let maxRow = 0;
 
       courses.forEach((c, i) => {
         const term = courseTerm(c);
         if (term !== lastTerm) {
-          if (lastTerm) {
-            termBlocks.push({ term: lastTerm, startRow: termStartRow, endRow: row });
-          }
-          if (i > 0) {
-            row += 1;
-            col = 0;
-          }
+          if (lastTerm) termBlocks.push({ term: lastTerm, startRow: termStartRow, endRow: row });
+          if (i > 0) { row += 1; col = 0; }
           termStartRow = row;
           lastTerm = term;
         }
         const snaking = row % 2 === 1;
         const visualCol = snaking ? (COLS - 1 - col) : col;
-        const x = PAD_X + visualCol * (NODE_W + GAP_X);
-        const y = PAD_Y + row * (NODE_H + GAP_Y) + TERM_H;
-        positions.push({ c, x, y, cx: x + NODE_W / 2, cy: y + NODE_H / 2, term });
+        positions.push({ c, gridCol: visualCol, gridRow: row, term });
+        maxRow = Math.max(maxRow, row);
         col += 1;
-        if (col >= COLS) {
-          col = 0;
-          row += 1;
-        }
+        if (col >= COLS) { col = 0; row += 1; }
       });
       if (lastTerm) termBlocks.push({ term: lastTerm, startRow: termStartRow, endRow: Math.max(termStartRow, row - (col === 0 ? 1 : 0)) });
 
-      const boardW = PAD_X * 2 + COLS * NODE_W + (COLS - 1) * GAP_X;
-      const boardH = PAD_Y + (row + 1) * (NODE_H + GAP_Y) + TERM_H + 40;
+      const pad = 80;
+      const ox = pad + (maxRow + COLS) * (TILE_W / 4);
+      const oy = 56;
+      const boardW = Math.ceil(pad * 2 + (COLS + maxRow) * (TILE_W / 2) + TILE_W);
+      const boardH = Math.ceil(pad + (COLS + maxRow) * (TILE_H / 2) + 160);
 
-      // 红警温带地形层：草地格已在 CSS；此处画山/湖/树林/土路
+      positions.forEach((p) => {
+        const pt = isoXY(p.gridCol, p.gridRow, TILE_W, TILE_H, ox, oy);
+        p.cx = pt.x;
+        p.cy = pt.y;
+        p.x = pt.x - NODE_W / 2;
+        p.y = pt.y - NODE_H / 2;
+      });
+
       let terrain = `<defs>
-        <linearGradient id="mtn" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#5a4a32"/><stop offset="100%" stop-color="#8a7a55"/></linearGradient>
-        <radialGradient id="water" cx="50%" cy="45%"><stop offset="0%" stop-color="#6eb8e0"/><stop offset="70%" stop-color="#2a6a9a"/><stop offset="100%" stop-color="#1a3a55"/></radialGradient>
-        <pattern id="dirt" width="8" height="8" patternUnits="userSpaceOnUse">
-          <rect width="8" height="8" fill="#6b5a3a"/><circle cx="2" cy="3" r="0.8" fill="#5a4a2e"/><circle cx="6" cy="6" r="0.7" fill="#7a6844"/>
+        <linearGradient id="grassA" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4a7a32"/><stop offset="100%" stop-color="#355a24"/></linearGradient>
+        <linearGradient id="grassB" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3f6a2a"/><stop offset="100%" stop-color="#2e4e1e"/></linearGradient>
+        <linearGradient id="cliff" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8a7a55"/><stop offset="55%" stop-color="#5a4a32"/><stop offset="100%" stop-color="#3a3020"/></linearGradient>
+        <radialGradient id="water" cx="45%" cy="40%"><stop offset="0%" stop-color="#7ec8e8"/><stop offset="55%" stop-color="#2a6a9a"/><stop offset="100%" stop-color="#163848"/></radialGradient>
+        <pattern id="dirt" width="6" height="6" patternUnits="userSpaceOnUse">
+          <rect width="6" height="6" fill="#6e5a38"/><circle cx="1.5" cy="2" r="0.6" fill="#5a482c"/><circle cx="4.5" cy="4.5" r="0.55" fill="#7a6644"/>
         </pattern>
       </defs>`;
-      // 山（角落/边缘高原）
-      [[40,80],[boardW-90,60],[60,boardH*0.45],[boardW-70,boardH*0.55],[boardW*0.45,boardH-50]].forEach(([mx,my],i) => {
-        const s = 38 + (i % 3) * 10;
-        terrain += `<polygon points="${mx},${my} ${mx+s*0.55},${my-s} ${mx+s},${my}" fill="url(#mtn)" opacity="0.85"/>`;
-        terrain += `<polygon points="${mx+s*0.2},${my} ${mx+s*0.55},${my-s*0.7} ${mx+s*0.85},${my}" fill="#3d3220" opacity="0.35"/>`;
-      });
-      // 湖（靠近 lake/review 节点，或固定装饰湖）
-      positions.filter((p) => p.c.type === "lake" || p.c.type === "review").forEach((p) => {
-        terrain += `<ellipse cx="${p.cx}" cy="${p.cy + 8}" rx="48" ry="28" fill="url(#water)" opacity="0.75"/>`;
-        terrain += `<ellipse cx="${p.cx - 10}" cy="${p.cy}" rx="18" ry="8" fill="#9ad0f0" opacity="0.25"/>`;
-      });
-      // 装饰湖
-      terrain += `<ellipse cx="${boardW * 0.22}" cy="${boardH * 0.72}" rx="70" ry="36" fill="url(#water)" opacity="0.55"/>`;
-      terrain += `<ellipse cx="${boardW * 0.78}" cy="${boardH * 0.28}" rx="55" ry="30" fill="url(#water)" opacity="0.5"/>`;
-      // 树林簇
-      for (let t = 0; t < 28; t++) {
-        const tx = 24 + ((t * 97) % (boardW - 48));
-        const ty = 40 + ((t * 53) % (boardH - 80));
-        const nearRoad = positions.some((p) => Math.hypot(p.cx - tx, p.cy - ty) < 70);
-        if (nearRoad && t % 3 !== 0) continue;
-        terrain += `<circle cx="${tx}" cy="${ty}" r="7" fill="#1e4a18"/><circle cx="${tx + 5}" cy="${ty - 4}" r="6" fill="#2d6a24"/><circle cx="${tx - 4}" cy="${ty - 3}" r="5" fill="#245a1e"/>`;
-      }
 
-      // 土路（粗描边折线）
-      let roadPts = positions.map((p) => `${p.cx},${p.cy}`).join(" ");
-      let roads = `<polyline points="${roadPts}" fill="none" stroke="#3a3020" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"/>`;
-      roads += `<polyline points="${roadPts}" fill="none" stroke="url(#dirt)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>`;
-      roads += `<polyline points="${roadPts}" fill="none" stroke="#c4a86a" stroke-width="2" stroke-dasharray="10 14" opacity="0.35"/>`;
-      for (let i = 0; i < positions.length - 1; i++) {
-        const a = positions[i];
-        const b = positions[i + 1];
-        if (isPlaceholderCourse(a.c) || isPlaceholderCourse(b.c)) {
-          roads += `<line x1="${a.cx}" y1="${a.cy}" x2="${b.cx}" y2="${b.cy}" stroke="#2a3228" stroke-width="14" stroke-dasharray="8 10" opacity="0.5"/>`;
+      // 等距草地菱形底图
+      for (let r = 0; r <= maxRow + 1; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const pt = isoXY(c, r, TILE_W, TILE_H, ox, oy);
+          const fill = (c + r) % 2 === 0 ? "url(#grassA)" : "url(#grassB)";
+          terrain += `<polygon points="${pt.x},${pt.y - TILE_H / 2} ${pt.x + TILE_W / 2},${pt.y} ${pt.x},${pt.y + TILE_H / 2} ${pt.x - TILE_W / 2},${pt.y}" fill="${fill}" stroke="#2a4018" stroke-width="1" opacity="0.95"/>`;
         }
       }
 
+      // 山崖块（等距台地）
+      const cliffs = [
+        { c: -1, r: 1 }, { c: COLS, r: 2 }, { c: -1, r: Math.floor(maxRow * 0.45) },
+        { c: COLS, r: Math.floor(maxRow * 0.55) }, { c: 2, r: maxRow + 1 }
+      ];
+      cliffs.forEach(({ c, r }) => {
+        const pt = isoXY(c, r, TILE_W, TILE_H, ox, oy);
+        const tw = TILE_W * 1.15, th = TILE_H * 1.15, h = 22;
+        terrain += `<polygon points="${pt.x - tw / 2},${pt.y} ${pt.x},${pt.y + th / 2} ${pt.x},${pt.y + th / 2 + h} ${pt.x - tw / 2},${pt.y + h}" fill="#3d3220"/>`;
+        terrain += `<polygon points="${pt.x + tw / 2},${pt.y} ${pt.x},${pt.y + th / 2} ${pt.x},${pt.y + th / 2 + h} ${pt.x + tw / 2},${pt.y + h}" fill="#2a2418"/>`;
+        terrain += `<polygon points="${pt.x},${pt.y - th / 2 - h} ${pt.x + tw / 2},${pt.y - h} ${pt.x},${pt.y + th / 2 - h} ${pt.x - tw / 2},${pt.y - h}" fill="url(#cliff)"/>`;
+      });
+
+      // 湖（等距椭圆 + 岸线）
+      const drawLake = (cx, cy, rx, ry) => {
+        terrain += `<ellipse cx="${cx}" cy="${cy + 4}" rx="${rx + 6}" ry="${ry + 4}" fill="#2a4a28" opacity="0.55"/>`;
+        terrain += `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#water)"/>`;
+        terrain += `<ellipse cx="${cx - rx * 0.25}" cy="${cy - ry * 0.25}" rx="${rx * 0.35}" ry="${ry * 0.22}" fill="#b8e4f8" opacity="0.28"/>`;
+      };
+      positions.filter((p) => p.c.type === "lake" || p.c.type === "review").forEach((p) => {
+        drawLake(p.cx, p.cy + 6, 42, 22);
+      });
+      drawLake(ox - TILE_W * 1.2, oy + TILE_H * 3, 58, 28);
+      drawLake(ox + TILE_W * 2.2, oy + TILE_H * (maxRow * 0.35), 48, 24);
+
+      // 树林（等距小树：竖干+菱形冠）
+      for (let t = 0; t < 36; t++) {
+        const tc = (t * 3) % (COLS + 2) - 1;
+        const tr = Math.floor((t * 5) % (maxRow + 3));
+        const pt = isoXY(tc, tr, TILE_W, TILE_H, ox, oy);
+        const near = positions.some((p) => Math.hypot(p.cx - pt.x, p.cy - pt.y) < 55);
+        if (near && t % 4 !== 0) continue;
+        terrain += `<rect x="${pt.x - 2}" y="${pt.y - 4}" width="4" height="10" fill="#3a2818"/>`;
+        terrain += `<polygon points="${pt.x},${pt.y - 22} ${pt.x + 10},${pt.y - 6} ${pt.x},${pt.y - 2} ${pt.x - 10},${pt.y - 6}" fill="#1e4a18"/>`;
+        terrain += `<polygon points="${pt.x},${pt.y - 18} ${pt.x + 7},${pt.y - 7} ${pt.x - 7},${pt.y - 7}" fill="#2d6a24"/>`;
+      }
+
+      // 土路（沿主线折线，略加阴影）
+      const roadPts = positions.map((p) => `${p.cx},${p.cy + 6}`).join(" ");
+      let roads = `<polyline points="${roadPts}" fill="none" stroke="#2a2210" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"/>`;
+      roads += `<polyline points="${roadPts}" fill="none" stroke="url(#dirt)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>`;
+      roads += `<polyline points="${roadPts}" fill="none" stroke="#c4a86a" stroke-width="1.5" stroke-dasharray="8 12" opacity="0.4"/>`;
+
       let banners = "";
       termBlocks.forEach((tb) => {
-        const y = PAD_Y + tb.startRow * (NODE_H + GAP_Y) - 6;
-        banners += `<div class="strat-term-banner" style="left:${PAD_X}px;top:${y}px;">⚔ ${escapeHtml(tb.term)}</div>`;
+        const midCol = Math.floor(COLS / 2);
+        const pt = isoXY(midCol, tb.startRow, TILE_W, TILE_H, ox, oy);
+        banners += `<div class="strat-term-banner" style="left:${Math.max(8, pt.x - 70)}px;top:${Math.max(4, pt.y - 40)}px;">⚔ ${escapeHtml(tb.term)}</div>`;
       });
 
       const rankIdx = getRankIndex(progress.correctCount || 0);
-      const unitIcon = rankIdx >= 6 ? "🚛" : rankIdx >= 3 ? "🪖🚗" : "🪖";
       let unitHtml = "";
       let nodes = "";
       positions.forEach(({ c, x, y, cx, cy }) => {
@@ -2979,11 +3045,11 @@
           <span class="sn-tag">${tag}</span>
         </button>`;
         if (current) {
-          unitHtml = `<div class="strat-unit" style="left:${cx}px;top:${y}px;" title="指挥官单位">${unitIcon}</div>`;
+          unitHtml = `<div class="strat-unit" style="left:${cx}px;top:${y - 2}px;" title="苏联动员兵（中国大兵）">${conscriptSvgHtml(rankIdx)}</div>`;
         }
       });
 
-      root.innerHTML = `<div class="strat-map-board" style="width:${boardW}px;height:${boardH}px;">
+      root.innerHTML = `<div class="strat-map-board iso-board" style="width:${boardW}px;height:${boardH}px;">
         <svg class="strat-roads" viewBox="0 0 ${boardW} ${boardH}" preserveAspectRatio="none">${terrain}${roads}</svg>
         ${banners}
         ${nodes}
@@ -3012,12 +3078,9 @@
       });
 
       document.getElementById("mapOverlay").classList.add("show");
-      // 滚到当前战区
       const curBtn = root.querySelector(`.strat-node[data-day="${active}"]`);
       if (curBtn) {
-        try {
-          curBtn.scrollIntoView({ block: "center", inline: "center", behavior: "smooth" });
-        } catch (e) {}
+        try { curBtn.scrollIntoView({ block: "center", inline: "center", behavior: "smooth" }); } catch (e) {}
       }
     }
 
