@@ -148,18 +148,88 @@
       color: var(--muted); cursor: pointer; font-family: inherit; font-size: 0.85rem;
     }
     .day-chip.locked { border-color: #555; color: #888; opacity: 0.75; }
-    .roadmap-list { list-style: none; margin: 0; padding: 0; max-height: 60vh; overflow: auto; }
-    .roadmap-list li {
-      display: flex; justify-content: space-between; gap: 10px; align-items: center;
-      padding: 10px 12px; border: 1px solid var(--border); margin-bottom: 8px; background: rgba(0,0,0,0.25);
-    }
-    .roadmap-list li.locked { opacity: 0.7; }
-    .roadmap-list li.current { border-color: var(--accent); }
-    .roadmap-list li.cleared { border-color: var(--ok); }
-    .roadmap-term {
-      display: block; margin: 14px 0 8px; color: var(--accent); font-weight: 700; font-size: 0.95rem;
-    }
     .lock-box { text-align: center; padding: 36px 16px; line-height: 1.75; font-size: 1.1rem; color: #ffd08a; }
+
+    /* 战略地图 · 展开作战图 */
+    #mapOverlay .history-panel.map-panel {
+      max-width: min(980px, 96vw);
+      width: 100%;
+      max-height: 94vh;
+      padding: 14px 14px 16px;
+      display: flex;
+      flex-direction: column;
+    }
+    .map-legend {
+      display: flex; flex-wrap: wrap; gap: 10px 14px; margin: 0 0 10px;
+      font-size: 0.78rem; color: var(--muted);
+    }
+    .map-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .map-legend i {
+      width: 14px; height: 14px; border: 2px solid #666; display: inline-block; flex-shrink: 0;
+    }
+    .map-legend i.cleared { border-color: var(--ok); background: rgba(74,122,74,0.55); }
+    .map-legend i.current { border-color: var(--accent); background: rgba(255,106,0,0.45); box-shadow: 0 0 8px rgba(255,106,0,0.6); }
+    .map-legend i.locked { border-color: #555; background: #2a2a2a; opacity: 0.7; }
+    .map-legend i.lake { border-color: #5a9fd4; background: rgba(60,120,180,0.45); border-radius: 50%; }
+    .strat-map-scroll {
+      flex: 1; min-height: 52vh; max-height: calc(94vh - 140px);
+      overflow: auto; border: 2px solid #5a4a2a;
+      background:
+        radial-gradient(ellipse at 20% 30%, rgba(60,90,40,0.35), transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(40,70,90,0.3), transparent 45%),
+        linear-gradient(160deg, #1c2a18 0%, #243520 40%, #1a281c 70%, #152018 100%);
+      position: relative;
+      -webkit-overflow-scrolling: touch;
+    }
+    .strat-map-board {
+      position: relative;
+      min-width: 720px;
+    }
+    .strat-map-board svg.strat-roads {
+      position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;
+    }
+    .strat-term-banner {
+      position: absolute; z-index: 1;
+      font-size: 0.72rem; font-weight: 800; letter-spacing: 0.04em;
+      color: #ffd08a; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,106,0,0.45);
+      padding: 4px 10px; white-space: nowrap; pointer-events: none;
+    }
+    .strat-node {
+      position: absolute; z-index: 2; width: 86px; min-height: 78px;
+      padding: 6px 4px 5px; border: 2px solid #666; background: rgba(30,40,28,0.92);
+      color: var(--text); font-family: inherit; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; line-height: 1.2; box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    }
+    .strat-node:hover:not(:disabled) { transform: translateY(-2px); border-color: #ffd08a; }
+    .strat-node:disabled { cursor: not-allowed; }
+    .strat-node .sn-day { font-size: 0.68rem; color: #ffd08a; font-weight: 700; }
+    .strat-node .sn-title {
+      font-size: 0.72rem; font-weight: 700; margin-top: 2px;
+      max-width: 78px; overflow: hidden; display: -webkit-box;
+      -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    }
+    .strat-node .sn-tag { font-size: 0.62rem; color: var(--muted); margin-top: 2px; }
+    .strat-node.cleared { border-color: var(--ok); background: rgba(40,70,40,0.95); }
+    .strat-node.current {
+      border-color: var(--accent); background: rgba(80,40,10,0.95);
+      box-shadow: 0 0 0 2px rgba(255,106,0,0.35), 0 0 16px rgba(255,106,0,0.45);
+      animation: mapPulse 1.6s ease-in-out infinite;
+    }
+    .strat-node.locked {
+      opacity: 0.55; filter: grayscale(0.55); border-color: #444; background: rgba(20,22,20,0.9);
+    }
+    .strat-node.lake {
+      border-radius: 50%; width: 78px; min-height: 78px; border-color: #5a9fd4;
+      background: rgba(28,50,70,0.92);
+    }
+    .strat-node.lake.locked { border-color: #3a5568; }
+    @keyframes mapPulse {
+      0%, 100% { box-shadow: 0 0 0 2px rgba(255,106,0,0.35), 0 0 12px rgba(255,106,0,0.35); }
+      50% { box-shadow: 0 0 0 3px rgba(255,106,0,0.55), 0 0 22px rgba(255,106,0,0.65); }
+    }
+    .map-hint { margin: 8px 0 0; font-size: 0.8rem; color: var(--muted); line-height: 1.45; }
     .parent-debug { margin-top: 8px; opacity: 0.45; font-size: 0.75rem; }
     .parent-debug select, .parent-debug button {
       font-size: 0.8rem; padding: 4px 8px; background: #1a1a1a; color: var(--text);
@@ -355,13 +425,17 @@
   </div>
 
   <div class="history-overlay" id="mapOverlay" role="dialog" aria-modal="true">
-    <div class="history-panel">
-      <h2 style="color:var(--accent);margin:0 0 8px;">🗺️ 汇文主线 · 战略地图</h2>
-      <p style="margin:0 0 12px;color:var(--muted);font-size:0.9rem;line-height:1.55;">
-        按东城汇文南校区实验班分班考优先级排布。灰色为「🔒 即将解锁」占位，补齐视频与题目后开放。
-      </p>
-      <div id="roadmapRoot"></div>
-      <button type="button" class="btn btn-ghost" id="mapCloseBtn" style="width:100%;margin-top:8px;">关闭</button>
+    <div class="history-panel map-panel">
+      <h2 style="color:var(--accent);margin:0 0 6px;">🗺️ 汇文主线 · 战略地图</h2>
+      <div class="map-legend">
+        <span><i class="current"></i>当前战区</span>
+        <span><i class="cleared"></i>已攻克</span>
+        <span><i class="locked"></i>迷雾锁定</span>
+        <span><i class="lake"></i>战术湖</span>
+      </div>
+      <div class="strat-map-scroll" id="roadmapRoot"></div>
+      <p class="map-hint">左右/上下滑动展开整张作战图。点亮节点可进入；灰色迷雾为「即将解锁」占位（需补视频与题目）。</p>
+      <button type="button" class="btn btn-ghost" id="mapCloseBtn" style="width:100%;margin-top:10px;">关闭</button>
     </div>
   </div>
 
@@ -2707,69 +2781,124 @@
       const root = document.getElementById("roadmapRoot");
       if (!root) return;
       const active = getActiveDayNum();
-      let html = "";
+      const COLS = 6;
+      const NODE_W = 86;
+      const NODE_H = 78;
+      const GAP_X = 36;
+      const GAP_Y = 52;
+      const PAD_X = 36;
+      const PAD_Y = 48;
+      const TERM_H = 28;
+
+      const positions = [];
       let lastTerm = "";
-      let openUl = false;
-      const closeUl = () => { if (openUl) { html += "</ul>"; openUl = false; } };
-      courses.forEach((c) => {
+      let termBlocks = [];
+      let row = 0;
+      let col = 0;
+      let termStartRow = 0;
+
+      courses.forEach((c, i) => {
         const term = courseTerm(c);
         if (term !== lastTerm) {
-          closeUl();
-          html += `<span class="roadmap-term">${escapeHtml(term)}</span><ul class="roadmap-list">`;
-          openUl = true;
+          if (lastTerm) {
+            termBlocks.push({ term: lastTerm, startRow: termStartRow, endRow: row });
+          }
+          if (i > 0) {
+            row += 1;
+            col = 0;
+          }
+          termStartRow = row;
           lastTerm = term;
-        } else if (!openUl) {
-          html += `<ul class="roadmap-list">`;
-          openUl = true;
         }
+        const snaking = row % 2 === 1;
+        const visualCol = snaking ? (COLS - 1 - col) : col;
+        const x = PAD_X + visualCol * (NODE_W + GAP_X);
+        const y = PAD_Y + row * (NODE_H + GAP_Y) + TERM_H;
+        positions.push({ c, x, y, cx: x + NODE_W / 2, cy: y + NODE_H / 2, term });
+        col += 1;
+        if (col >= COLS) {
+          col = 0;
+          row += 1;
+        }
+      });
+      if (lastTerm) termBlocks.push({ term: lastTerm, startRow: termStartRow, endRow: Math.max(termStartRow, row - (col === 0 ? 1 : 0)) });
+
+      const boardW = PAD_X * 2 + COLS * NODE_W + (COLS - 1) * GAP_X;
+      const boardH = PAD_Y + (row + 1) * (NODE_H + GAP_Y) + TERM_H + 40;
+
+      let roads = "";
+      for (let i = 0; i < positions.length - 1; i++) {
+        const a = positions[i];
+        const b = positions[i + 1];
+        const lockedSeg = isPlaceholderCourse(a.c) || isPlaceholderCourse(b.c);
+        roads += `<line x1="${a.cx}" y1="${a.cy}" x2="${b.cx}" y2="${b.cy}" stroke="${lockedSeg ? "#3a4538" : "#8B7355"}" stroke-width="3" stroke-dasharray="${lockedSeg ? "6 6" : "0"}" opacity="${lockedSeg ? 0.45 : 0.85}"/>`;
+      }
+
+      let banners = "";
+      termBlocks.forEach((tb) => {
+        const y = PAD_Y + tb.startRow * (NODE_H + GAP_Y) - 6;
+        banners += `<div class="strat-term-banner" style="left:${PAD_X}px;top:${y}px;">⚔ ${escapeHtml(tb.term)}</div>`;
+      });
+
+      let nodes = "";
+      positions.forEach(({ c, x, y }) => {
         const cleared = progress.clearedDays.includes(c.dayNum);
+        const isLake = c.type === "lake" || c.type === "review";
         const locked = isPlaceholderCourse(c) || c.type === "lake" || !canStudyDay(c.dayNum);
         const current = c.dayNum === active;
-        let cls = locked ? "locked" : cleared ? "cleared" : "";
-        if (current) cls += (cls ? " " : "") + "current";
-        const status = isPlaceholderCourse(c) || c.type === "lake"
-          ? "🔒 即将解锁"
-          : cleared
-            ? "✅ 已通关"
-            : canStudyDay(c.dayNum)
-              ? "▶ 可学习"
-              : "🔒 未到阶段";
-        const title = c.name && c.name.redAlert
-          ? c.name.redAlert
-          : (c.topic || "任务");
-        const tag = phaseChipTag(c);
-        html += `<li class="${cls}">
-          <div>
-            <strong>第${padDay(c.dayNum)}天</strong> · ${escapeHtml(title)}
-            <br/><span style="color:var(--muted);font-size:0.85rem;">${escapeHtml(c.topic || "")}${tag ? " · " + tag : ""}</span>
-            <br/><span style="color:#ffd08a;font-size:0.85rem;">${status}</span>
-          </div>
-          <button type="button" class="btn btn-ghost roadmap-go" data-day="${c.dayNum}" ${locked && !cleared ? "disabled" : ""}>${locked && !cleared ? "锁定" : (cleared ? "回看" : "进入")}</button>
-        </li>`;
+        let cls = "strat-node";
+        if (isLake) cls += " lake";
+        if (locked && !cleared) cls += " locked";
+        else if (cleared) cls += " cleared";
+        if (current) cls += " current";
+        const title = c.topic || (c.name && c.name.original) || "任务";
+        const shortTitle = title.length > 8 ? title.slice(0, 7) + "…" : title;
+        const tag = isPlaceholderCourse(c) || (c.type === "lake" && c.placeholder)
+          ? "🔒"
+          : (phaseChipTag(c) || (cleared ? "✅" : "▶"));
+        const disabled = locked && !cleared ? "disabled" : "";
+        nodes += `<button type="button" class="${cls}" style="left:${x}px;top:${y}px;" data-day="${c.dayNum}" ${disabled} title="${escapeHtml((c.name && c.name.redAlert) || c.topic || "")}">
+          <span class="sn-day">D${padDay(c.dayNum)}</span>
+          <span class="sn-title">${escapeHtml(shortTitle)}</span>
+          <span class="sn-tag">${tag}</span>
+        </button>`;
       });
-      closeUl();
-      root.innerHTML = html;
-      root.innerHTML = html;
-      root.querySelectorAll(".roadmap-go").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const d = Number(btn.dataset.day);
-          const c = findCourseByDay(d);
-          if (!c) return;
-          if (isPlaceholderCourse(c) || c.type === "lake") {
-            showToast("🔒 即将解锁：需补充视频与题目");
-            return;
-          }
-          if (!canStudyDay(d) && !progress.clearedDays.includes(d)) {
-            showToast("🔒 请先完成前面的关卡");
-            return;
-          }
-          historyReadonly = progress.clearedDays.includes(d) && d !== getDefaultDayNum();
-          selectedDayNum = d;
-          document.getElementById("mapOverlay").classList.remove("show");
-          mount(false);
-        });
+
+      root.innerHTML = `<div class="strat-map-board" style="width:${boardW}px;height:${boardH}px;">
+        <svg class="strat-roads" viewBox="0 0 ${boardW} ${boardH}" preserveAspectRatio="none">${roads}</svg>
+        ${banners}
+        ${nodes}
+      </div>`;
+
+      const goDay = (d) => {
+        const c = findCourseByDay(d);
+        if (!c) return;
+        if (isPlaceholderCourse(c) || c.type === "lake") {
+          showToast("🔒 即将解锁：需补充视频与题目");
+          return;
+        }
+        if (!canStudyDay(d) && !progress.clearedDays.includes(d)) {
+          showToast("🔒 请先完成前面的关卡");
+          return;
+        }
+        historyReadonly = progress.clearedDays.includes(d) && d !== getDefaultDayNum();
+        selectedDayNum = d;
+        document.getElementById("mapOverlay").classList.remove("show");
+        mount(false);
+      };
+
+      root.querySelectorAll(".strat-node").forEach((btn) => {
+        btn.addEventListener("click", () => goDay(Number(btn.dataset.day)));
       });
+
       document.getElementById("mapOverlay").classList.add("show");
+      // 滚到当前战区
+      const curBtn = root.querySelector(`.strat-node[data-day="${active}"]`);
+      if (curBtn) {
+        try {
+          curBtn.scrollIntoView({ block: "center", inline: "center", behavior: "smooth" });
+        } catch (e) {}
+      }
     }
 
     /* ========== Timer ========== */
