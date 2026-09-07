@@ -172,85 +172,80 @@
     .map-legend i.locked { border-color: #555; background: #2a2a2a; opacity: 0.7; }
     .map-legend i.lake { border-color: #5a9fd4; background: rgba(60,120,180,0.45); border-radius: 50%; }
     .strat-map-scroll {
-      flex: 1; min-height: 52vh; max-height: calc(94vh - 140px);
+      flex: 1; min-height: 52vh; max-height: calc(94vh - 160px);
       overflow: auto; border: 2px solid #5a4a2a;
-      background: #0e160c;
+      background: #1a2818;
       position: relative;
       -webkit-overflow-scrolling: touch;
+      touch-action: pan-x pan-y;
     }
+    .map-zoom-bar {
+      display: flex; align-items: center; gap: 8px; margin: 0 0 8px; flex-wrap: wrap;
+    }
+    .map-zoom-bar .btn { min-height: 36px; padding: 6px 12px; font-size: 0.85rem; }
+    .map-zoom-label { color: #ffd08a; font-size: 0.82rem; font-weight: 700; min-width: 3.5em; }
     .strat-map-board {
       position: relative;
-      min-width: 720px;
-      background: #152214;
-    }
-    .strat-map-board.iso-board {
+      transform-origin: 0 0;
       background:
-        radial-gradient(ellipse at 50% 20%, rgba(70,100,40,0.25), transparent 55%),
-        #152214;
+        repeating-linear-gradient(0deg, #3a5c28 0 32px, #345424 32px 64px),
+        repeating-linear-gradient(90deg, transparent 0 32px, rgba(0,0,0,0.06) 32px 33px);
+      background-blend-mode: normal;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.25);
     }
     .strat-unit {
-      position: absolute; z-index: 6; pointer-events: none;
-      width: 48px; height: 56px;
-      filter: drop-shadow(0 3px 2px rgba(0,0,0,0.65));
-      animation: unitBob 1.15s ease-in-out infinite;
-      transform: translate(-50%, -100%);
+      position: absolute; z-index: 5; pointer-events: none;
+      width: 44px; height: 52px;
+      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.55));
     }
     .strat-unit svg { width: 100%; height: 100%; display: block; overflow: visible; }
     .strat-unit .unit-label {
-      position: absolute; left: 50%; bottom: -14px; transform: translateX(-50%);
-      font-size: 0.58rem; font-weight: 800; color: #ffd08a; white-space: nowrap;
+      position: absolute; left: 50%; bottom: -12px; transform: translateX(-50%);
+      font-size: 0.55rem; font-weight: 800; color: #ffd08a; white-space: nowrap;
       text-shadow: 0 1px 2px #000;
     }
-    @keyframes unitBob {
-      0%, 100% { transform: translate(-50%, -100%); }
-      50% { transform: translate(-50%, -112%); }
-    }
     .strat-map-board svg.strat-roads {
-      position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;
+      position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;
     }
     .strat-term-banner {
-      position: absolute; z-index: 3;
+      position: absolute; z-index: 2;
       font-size: 0.72rem; font-weight: 800; letter-spacing: 0.04em;
       color: #ffd08a; background: rgba(0,0,0,0.55); border: 1px solid rgba(255,106,0,0.45);
       padding: 4px 10px; white-space: nowrap; pointer-events: none;
     }
     .strat-node {
-      position: absolute; z-index: 4; width: 78px; min-height: 54px;
-      padding: 5px 3px 4px; border: 2px solid #5a6a4a; background: rgba(22,34,20,0.88);
+      position: absolute; z-index: 3; width: 92px; height: 64px; box-sizing: border-box;
+      padding: 4px 4px; border: 2px solid #5a6a4a; background: rgba(22,34,20,0.95);
       color: var(--text); font-family: inherit; cursor: pointer;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       text-align: center; line-height: 1.15;
-      box-shadow: 2px 3px 0 rgba(0,0,0,0.45);
-      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
-      clip-path: polygon(8% 0, 92% 0, 100% 50%, 92% 100%, 8% 100%, 0 50%);
+      border-radius: 4px;
     }
-    .strat-node:hover:not(:disabled) { transform: translateY(-2px); border-color: #ffd08a; }
+    .strat-node:hover:not(:disabled) { border-color: #ffd08a; }
     .strat-node:disabled { cursor: not-allowed; }
     .strat-node .sn-day { font-size: 0.64rem; color: #ffd08a; font-weight: 700; }
     .strat-node .sn-title {
       font-size: 0.68rem; font-weight: 700; margin-top: 1px;
-      max-width: 70px; overflow: hidden; display: -webkit-box;
+      max-width: 84px; overflow: hidden; display: -webkit-box;
       -webkit-line-clamp: 2; -webkit-box-orient: vertical;
     }
     .strat-node .sn-tag { font-size: 0.58rem; color: var(--muted); margin-top: 1px; }
-    .strat-node.cleared { border-color: #5c9a5c; background: rgba(36,72,36,0.92); }
+    .strat-node.cleared { border-color: #5c9a5c; background: rgba(36,72,36,0.95); }
     .strat-node.current {
       border-color: var(--accent); background: rgba(90,42,8,0.95);
-      box-shadow: 0 0 0 2px rgba(255,106,0,0.4), 0 0 14px rgba(255,106,0,0.5);
-      animation: mapPulse 1.6s ease-in-out infinite;
-      z-index: 5;
+      box-shadow: 0 0 0 2px rgba(255,106,0,0.35);
     }
     .strat-node.locked {
-      opacity: 0.5; filter: grayscale(0.6); border-color: #3a3a3a; background: rgba(16,18,16,0.9);
+      opacity: 0.55; filter: grayscale(0.55); border-color: #444; background: rgba(20,22,20,0.95);
     }
     .strat-node.lake {
-      clip-path: none; border-radius: 50%; width: 72px; min-height: 72px; border-color: #5a9fd4;
-      background: rgba(24,48,68,0.9);
+      border-radius: 50%; width: 72px; height: 72px; border-color: #5a9fd4;
+      background: rgba(24,48,68,0.95);
     }
     .strat-node.lake.locked { border-color: #3a5568; }
     @keyframes mapPulse {
-      0%, 100% { box-shadow: 0 0 0 2px rgba(255,106,0,0.35), 0 0 12px rgba(255,106,0,0.35); }
-      50% { box-shadow: 0 0 0 3px rgba(255,106,0,0.55), 0 0 22px rgba(255,106,0,0.65); }
+      0%, 100% { box-shadow: 0 0 0 2px rgba(255,106,0,0.35); }
+      50% { box-shadow: 0 0 0 3px rgba(255,106,0,0.55); }
     }
     .map-hint { margin: 8px 0 0; font-size: 0.8rem; color: var(--muted); line-height: 1.45; }
     .parent-debug { margin-top: 8px; opacity: 0.45; font-size: 0.75rem; }
@@ -460,8 +455,14 @@
         <span><i class="lake"></i>战术湖</span>
         <span>动员兵（中国大兵）</span>
       </div>
+      <div class="map-zoom-bar">
+        <button type="button" class="btn btn-ghost" id="mapZoomOutBtn" title="缩小">➖</button>
+        <span class="map-zoom-label" id="mapZoomLabel">100%</span>
+        <button type="button" class="btn btn-ghost" id="mapZoomInBtn" title="放大">➕</button>
+        <button type="button" class="btn btn-ghost" id="mapZoomResetBtn" title="复位">100%</button>
+      </div>
       <div class="strat-map-scroll" id="roadmapRoot"></div>
-      <p class="map-hint">左右/上下滑动展开整张作战图。点亮节点可进入；灰色迷雾为「即将解锁」占位（需补视频与题目）。</p>
+      <p class="map-hint">纯平面俯视图。用 ➕➖ 或 Ctrl+滚轮缩放；拖动滚动条浏览。灰色为「即将解锁」占位。</p>
       <button type="button" class="btn btn-ghost" id="mapCloseBtn" style="width:100%;margin-top:10px;">关闭</button>
     </div>
   </div>
@@ -2866,8 +2867,10 @@
       document.getElementById("historyOverlay").classList.add("show");
     }
 
+    let mapZoom = 1;
+
     function conscriptSvgHtml(rankIdx) {
-      // 自绘「动员兵/中国大兵」剪影：褐大衣、防毒面罩头盔、步枪（非游戏原素材）
+      // 自绘「动员兵/中国大兵」剪影（非游戏原素材）
       const vet = rankIdx >= 3;
       const star = vet
         ? `<polygon points="20,5 21.2,8.2 24.5,8.2 21.8,10.1 22.9,13.2 20,11.2 17.1,13.2 18.2,10.1 15.5,8.2 18.8,8.2" fill="#e8c84a"/>`
@@ -2895,22 +2898,45 @@
       </svg><span class="unit-label">${vet ? "老兵·动员兵" : "动员兵"}</span>`;
     }
 
-    function isoXY(col, row, tw, th, ox, oy) {
-      return {
-        x: ox + (col - row) * (tw / 2),
-        y: oy + (col + row) * (th / 2)
-      };
+    function applyMapZoom() {
+      const board = document.getElementById("stratMapBoard");
+      const label = document.getElementById("mapZoomLabel");
+      if (board) {
+        board.style.transform = `scale(${mapZoom})`;
+        // 放大后撑开滚动区域，避免裁切
+        const baseW = Number(board.dataset.baseW || board.offsetWidth);
+        const baseH = Number(board.dataset.baseH || board.offsetHeight);
+        board.style.width = baseW + "px";
+        board.style.height = baseH + "px";
+        const wrap = board.parentElement;
+        if (wrap && wrap.classList.contains("strat-map-zoom-inner")) {
+          wrap.style.width = Math.ceil(baseW * mapZoom) + "px";
+          wrap.style.height = Math.ceil(baseH * mapZoom) + "px";
+        }
+      }
+      if (label) label.textContent = Math.round(mapZoom * 100) + "%";
+    }
+
+    function setMapZoom(z) {
+      mapZoom = Math.min(2.2, Math.max(0.55, Math.round(z * 100) / 100));
+      applyMapZoom();
     }
 
     function openRoadmap() {
       const root = document.getElementById("roadmapRoot");
       if (!root) return;
       const active = getActiveDayNum();
-      const COLS = 6;
-      const TILE_W = 96;
-      const TILE_H = 48;
-      const NODE_W = 78;
-      const NODE_H = 54;
+      const COLS = 5;
+      const NODE_W = 92;
+      const NODE_H = 64;
+      const GAP_X = 28;
+      const GAP_Y = 36;
+      const MARGIN_L = 150; // 学期条带区，避免与节点重叠
+      const MARGIN_T = 24;
+      const MARGIN_R = 70; // 动员兵站位
+      const MARGIN_B = 40;
+      const CELL_W = NODE_W + GAP_X;
+      const CELL_H = NODE_H + GAP_Y;
 
       const positions = [];
       let lastTerm = "";
@@ -2918,112 +2944,100 @@
       let row = 0;
       let col = 0;
       let termStartRow = 0;
-      let maxRow = 0;
 
       courses.forEach((c, i) => {
         const term = courseTerm(c);
         if (term !== lastTerm) {
           if (lastTerm) termBlocks.push({ term: lastTerm, startRow: termStartRow, endRow: row });
-          if (i > 0) { row += 1; col = 0; }
+          if (i > 0) {
+            // 学期之间空一行，放横幅，避免重叠
+            row += 1;
+            col = 0;
+            row += 1;
+          }
           termStartRow = row;
           lastTerm = term;
         }
         const snaking = row % 2 === 1;
         const visualCol = snaking ? (COLS - 1 - col) : col;
-        positions.push({ c, gridCol: visualCol, gridRow: row, term });
-        maxRow = Math.max(maxRow, row);
+        const x = MARGIN_L + visualCol * CELL_W;
+        const y = MARGIN_T + row * CELL_H;
+        const isLake = c.type === "lake" || c.type === "review";
+        const nw = isLake ? 72 : NODE_W;
+        const nh = isLake ? 72 : NODE_H;
+        positions.push({
+          c, x, y,
+          cx: x + nw / 2,
+          cy: y + nh / 2,
+          nw, nh,
+          gridCol: visualCol, gridRow: row, term
+        });
         col += 1;
         if (col >= COLS) { col = 0; row += 1; }
       });
-      if (lastTerm) termBlocks.push({ term: lastTerm, startRow: termStartRow, endRow: Math.max(termStartRow, row - (col === 0 ? 1 : 0)) });
+      if (lastTerm) {
+        termBlocks.push({ term: lastTerm, startRow: termStartRow, endRow: Math.max(termStartRow, row - (col === 0 ? 1 : 0)) });
+      }
 
-      const pad = 80;
-      const ox = pad + (maxRow + COLS) * (TILE_W / 4);
-      const oy = 56;
-      const boardW = Math.ceil(pad * 2 + (COLS + maxRow) * (TILE_W / 2) + TILE_W);
-      const boardH = Math.ceil(pad + (COLS + maxRow) * (TILE_H / 2) + 160);
+      const maxRow = positions.reduce((m, p) => Math.max(m, p.gridRow), 0);
+      const boardW = MARGIN_L + COLS * CELL_W + MARGIN_R;
+      const boardH = MARGIN_T + (maxRow + 1) * CELL_H + MARGIN_B;
 
-      positions.forEach((p) => {
-        const pt = isoXY(p.gridCol, p.gridRow, TILE_W, TILE_H, ox, oy);
-        p.cx = pt.x;
-        p.cy = pt.y;
-        p.x = pt.x - NODE_W / 2;
-        p.y = pt.y - NODE_H / 2;
-      });
+      const hitsNode = (px, py, pad) => positions.some((p) =>
+        px >= p.x - pad && px <= p.x + p.nw + pad && py >= p.y - pad && py <= p.y + p.nh + pad
+      );
 
       let terrain = `<defs>
-        <linearGradient id="grassA" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4a7a32"/><stop offset="100%" stop-color="#355a24"/></linearGradient>
-        <linearGradient id="grassB" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3f6a2a"/><stop offset="100%" stop-color="#2e4e1e"/></linearGradient>
-        <linearGradient id="cliff" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8a7a55"/><stop offset="55%" stop-color="#5a4a32"/><stop offset="100%" stop-color="#3a3020"/></linearGradient>
-        <radialGradient id="water" cx="45%" cy="40%"><stop offset="0%" stop-color="#7ec8e8"/><stop offset="55%" stop-color="#2a6a9a"/><stop offset="100%" stop-color="#163848"/></radialGradient>
+        <radialGradient id="water" cx="45%" cy="40%"><stop offset="0%" stop-color="#7ec8e8"/><stop offset="60%" stop-color="#2a6a9a"/><stop offset="100%" stop-color="#163848"/></radialGradient>
         <pattern id="dirt" width="6" height="6" patternUnits="userSpaceOnUse">
-          <rect width="6" height="6" fill="#6e5a38"/><circle cx="1.5" cy="2" r="0.6" fill="#5a482c"/><circle cx="4.5" cy="4.5" r="0.55" fill="#7a6644"/>
+          <rect width="6" height="6" fill="#6e5a38"/><circle cx="1.5" cy="2" r="0.6" fill="#5a482c"/>
         </pattern>
       </defs>`;
 
-      // 等距草地菱形底图
-      for (let r = 0; r <= maxRow + 1; r++) {
-        for (let c = 0; c < COLS; c++) {
-          const pt = isoXY(c, r, TILE_W, TILE_H, ox, oy);
-          const fill = (c + r) % 2 === 0 ? "url(#grassA)" : "url(#grassB)";
-          terrain += `<polygon points="${pt.x},${pt.y - TILE_H / 2} ${pt.x + TILE_W / 2},${pt.y} ${pt.x},${pt.y + TILE_H / 2} ${pt.x - TILE_W / 2},${pt.y}" fill="${fill}" stroke="#2a4018" stroke-width="1" opacity="0.95"/>`;
-        }
-      }
-
-      // 山崖块（等距台地）
-      const cliffs = [
-        { c: -1, r: 1 }, { c: COLS, r: 2 }, { c: -1, r: Math.floor(maxRow * 0.45) },
-        { c: COLS, r: Math.floor(maxRow * 0.55) }, { c: 2, r: maxRow + 1 }
+      // 山：只放左右边距空白区
+      const mountains = [
+        [28, 80], [28, boardH * 0.4], [28, boardH * 0.7],
+        [boardW - 40, 100], [boardW - 36, boardH * 0.55]
       ];
-      cliffs.forEach(({ c, r }) => {
-        const pt = isoXY(c, r, TILE_W, TILE_H, ox, oy);
-        const tw = TILE_W * 1.15, th = TILE_H * 1.15, h = 22;
-        terrain += `<polygon points="${pt.x - tw / 2},${pt.y} ${pt.x},${pt.y + th / 2} ${pt.x},${pt.y + th / 2 + h} ${pt.x - tw / 2},${pt.y + h}" fill="#3d3220"/>`;
-        terrain += `<polygon points="${pt.x + tw / 2},${pt.y} ${pt.x},${pt.y + th / 2} ${pt.x},${pt.y + th / 2 + h} ${pt.x + tw / 2},${pt.y + h}" fill="#2a2418"/>`;
-        terrain += `<polygon points="${pt.x},${pt.y - th / 2 - h} ${pt.x + tw / 2},${pt.y - h} ${pt.x},${pt.y + th / 2 - h} ${pt.x - tw / 2},${pt.y - h}" fill="url(#cliff)"/>`;
+      mountains.forEach(([mx, my]) => {
+        terrain += `<polygon points="${mx},${my} ${mx + 22},${my - 36} ${mx + 44},${my}" fill="#6a5a3a"/>`;
+        terrain += `<polygon points="${mx + 8},${my} ${mx + 22},${my - 24} ${mx + 36},${my}" fill="#4a3c28"/>`;
       });
 
-      // 湖（等距椭圆 + 岸线）
-      const drawLake = (cx, cy, rx, ry) => {
-        terrain += `<ellipse cx="${cx}" cy="${cy + 4}" rx="${rx + 6}" ry="${ry + 4}" fill="#2a4a28" opacity="0.55"/>`;
-        terrain += `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#water)"/>`;
-        terrain += `<ellipse cx="${cx - rx * 0.25}" cy="${cy - ry * 0.25}" rx="${rx * 0.35}" ry="${ry * 0.22}" fill="#b8e4f8" opacity="0.28"/>`;
-      };
+      // 湖：战术湖节点下方空白带，不盖住按钮；装饰湖放边距
       positions.filter((p) => p.c.type === "lake" || p.c.type === "review").forEach((p) => {
-        drawLake(p.cx, p.cy + 6, 42, 22);
+        const lx = p.cx;
+        const ly = p.y + p.nh + 14;
+        if (ly + 18 < boardH - 8) {
+          terrain += `<ellipse cx="${lx}" cy="${ly}" rx="34" ry="12" fill="url(#water)" opacity="0.85"/>`;
+        }
       });
-      drawLake(ox - TILE_W * 1.2, oy + TILE_H * 3, 58, 28);
-      drawLake(ox + TILE_W * 2.2, oy + TILE_H * (maxRow * 0.35), 48, 24);
+      terrain += `<ellipse cx="70" cy="${boardH * 0.25}" rx="40" ry="22" fill="url(#water)" opacity="0.7"/>`;
+      terrain += `<ellipse cx="${boardW - 48}" cy="${boardH * 0.75}" rx="36" ry="20" fill="url(#water)" opacity="0.65"/>`;
 
-      // 树林（等距小树：竖干+菱形冠）
-      for (let t = 0; t < 36; t++) {
-        const tc = (t * 3) % (COLS + 2) - 1;
-        const tr = Math.floor((t * 5) % (maxRow + 3));
-        const pt = isoXY(tc, tr, TILE_W, TILE_H, ox, oy);
-        const near = positions.some((p) => Math.hypot(p.cx - pt.x, p.cy - pt.y) < 55);
-        if (near && t % 4 !== 0) continue;
-        terrain += `<rect x="${pt.x - 2}" y="${pt.y - 4}" width="4" height="10" fill="#3a2818"/>`;
-        terrain += `<polygon points="${pt.x},${pt.y - 22} ${pt.x + 10},${pt.y - 6} ${pt.x},${pt.y - 2} ${pt.x - 10},${pt.y - 6}" fill="#1e4a18"/>`;
-        terrain += `<polygon points="${pt.x},${pt.y - 18} ${pt.x + 7},${pt.y - 7} ${pt.x - 7},${pt.y - 7}" fill="#2d6a24"/>`;
+      // 树林：只种在边距，避开节点
+      for (let t = 0; t < 24; t++) {
+        const tx = t % 2 === 0 ? 18 + (t % 5) * 12 : boardW - 28 - (t % 4) * 10;
+        const ty = 50 + t * ((boardH - 80) / 24);
+        if (hitsNode(tx, ty, 20)) continue;
+        terrain += `<circle cx="${tx}" cy="${ty}" r="6" fill="#1e4a18"/><circle cx="${tx + 4}" cy="${ty - 3}" r="5" fill="#2d6a24"/>`;
       }
 
-      // 土路（沿主线折线，略加阴影）
-      const roadPts = positions.map((p) => `${p.cx},${p.cy + 6}`).join(" ");
-      let roads = `<polyline points="${roadPts}" fill="none" stroke="#2a2210" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"/>`;
-      roads += `<polyline points="${roadPts}" fill="none" stroke="url(#dirt)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>`;
-      roads += `<polyline points="${roadPts}" fill="none" stroke="#c4a86a" stroke-width="1.5" stroke-dasharray="8 12" opacity="0.4"/>`;
+      // 路：节点中心连线（在节点下层）
+      const roadPts = positions.map((p) => `${p.cx},${p.cy}`).join(" ");
+      let roads = `<polyline points="${roadPts}" fill="none" stroke="#3a3020" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>`;
+      roads += `<polyline points="${roadPts}" fill="none" stroke="url(#dirt)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>`;
 
       let banners = "";
       termBlocks.forEach((tb) => {
-        const midCol = Math.floor(COLS / 2);
-        const pt = isoXY(midCol, tb.startRow, TILE_W, TILE_H, ox, oy);
-        banners += `<div class="strat-term-banner" style="left:${Math.max(8, pt.x - 70)}px;top:${Math.max(4, pt.y - 40)}px;">⚔ ${escapeHtml(tb.term)}</div>`;
+        const y = MARGIN_T + tb.startRow * CELL_H + 18;
+        banners += `<div class="strat-term-banner" style="left:8px;top:${y}px;max-width:130px;white-space:normal;line-height:1.25;">⚔ ${escapeHtml(tb.term)}</div>`;
       });
 
       const rankIdx = getRankIndex(progress.correctCount || 0);
       let unitHtml = "";
       let nodes = "";
-      positions.forEach(({ c, x, y, cx, cy }) => {
+      positions.forEach(({ c, x, y, cx, cy, nw }) => {
         const cleared = progress.clearedDays.includes(c.dayNum);
         const isLake = c.type === "lake" || c.type === "review";
         const locked = isPlaceholderCourse(c) || c.type === "lake" || !canStudyDay(c.dayNum);
@@ -3045,16 +3059,21 @@
           <span class="sn-tag">${tag}</span>
         </button>`;
         if (current) {
-          unitHtml = `<div class="strat-unit" style="left:${cx}px;top:${y - 2}px;" title="苏联动员兵（中国大兵）">${conscriptSvgHtml(rankIdx)}</div>`;
+          // 动员兵放在节点右侧空隙，不叠在字上
+          unitHtml = `<div class="strat-unit" style="left:${x + nw + 4}px;top:${y + 6}px;" title="动员兵（中国大兵）">${conscriptSvgHtml(rankIdx)}</div>`;
         }
       });
 
-      root.innerHTML = `<div class="strat-map-board iso-board" style="width:${boardW}px;height:${boardH}px;">
-        <svg class="strat-roads" viewBox="0 0 ${boardW} ${boardH}" preserveAspectRatio="none">${terrain}${roads}</svg>
-        ${banners}
-        ${nodes}
-        ${unitHtml}
+      root.innerHTML = `<div class="strat-map-zoom-inner">
+        <div class="strat-map-board" id="stratMapBoard" data-base-w="${boardW}" data-base-h="${boardH}" style="width:${boardW}px;height:${boardH}px;">
+          <svg class="strat-roads" viewBox="0 0 ${boardW} ${boardH}" preserveAspectRatio="none">${terrain}${roads}</svg>
+          ${banners}
+          ${nodes}
+          ${unitHtml}
+        </div>
       </div>`;
+
+      applyMapZoom();
 
       const goDay = (d) => {
         const c = findCourseByDay(d);
@@ -3076,6 +3095,13 @@
       root.querySelectorAll(".strat-node").forEach((btn) => {
         btn.addEventListener("click", () => goDay(Number(btn.dataset.day)));
       });
+
+      // Ctrl+滚轮缩放
+      root.onwheel = (e) => {
+        if (!e.ctrlKey && !e.metaKey) return;
+        e.preventDefault();
+        setMapZoom(mapZoom + (e.deltaY < 0 ? 0.1 : -0.1));
+      };
 
       document.getElementById("mapOverlay").classList.add("show");
       const curBtn = root.querySelector(`.strat-node[data-day="${active}"]`);
@@ -3236,6 +3262,9 @@
     });
 
     document.getElementById("mapOpenBtn").addEventListener("click", openRoadmap);
+    document.getElementById("mapZoomInBtn").addEventListener("click", () => setMapZoom(mapZoom + 0.15));
+    document.getElementById("mapZoomOutBtn").addEventListener("click", () => setMapZoom(mapZoom - 0.15));
+    document.getElementById("mapZoomResetBtn").addEventListener("click", () => setMapZoom(1));
     document.getElementById("mapCloseBtn").addEventListener("click", () => {
       document.getElementById("mapOverlay").classList.remove("show");
     });
