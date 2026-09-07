@@ -1451,7 +1451,7 @@
         const a = new Audio(relPath);
         voicePlayer = a;
         // 略降速，减轻机械感
-        a.playbackRate = commanderGender === "female" ? 0.98 : 0.95;
+        a.playbackRate = commanderGender === "female" ? 0.94 : 0.95;
         a.onended = () => { if (voicePlayer === a) voicePlayer = null; resolve(true); };
         a.onerror = () => { if (voicePlayer === a) voicePlayer = null; resolve(false); };
         duckBgmForSpeech();
@@ -1463,9 +1463,10 @@
       const n = (v.name + " " + v.lang).toLowerCase();
       if (!/zh|chinese|中文/.test(n)) return -100;
       let s = 10;
-      if (/natural|neural|online|云|microsoft|edge|yunjian|yunxia|xiaoxiao/.test(n)) s += 45;
+      if (/natural|neural|online|云|microsoft|edge|yunjian|yunxia|xiaozhen|xiaoqiu/.test(n)) s += 45;
       if (commanderGender === "female") {
-        if (/xiaoxiao|xiaoyi|xiaoxuan|xiaohan|xiaoyan|xiaomo|xiaorui|女|female|huihui|yaoyao/.test(n)) s += 55;
+        if (/xiaozhen|xiaoqiu|xiaochen|xiaohan|xiaomo|xiaorui|女|female/.test(n)) s += 55;
+        if (/xiaoxiao|xiaoyi|xiaoshuang|xiaomeng|活泼|甜/.test(n)) s -= 20;
         if (/yunyang|yunjian|yunfeng|yunze|kangkang|yunhao|男|male/.test(n)) s -= 50;
       } else {
         if (/yunjian|yunxia|yunfeng|yunze|yunyang|kangkang|yunhao|yunjie|男|male/.test(n)) s += 55;
@@ -1500,8 +1501,8 @@
           if (voice) u.voice = voice;
           // 接近正常人语速，避免过慢过沉的「机器腔」
           if (commanderGender === "female") {
-            u.rate = (opts && opts.rate) != null ? opts.rate : 0.95;
-            u.pitch = (opts && opts.pitch) != null ? opts.pitch : 1.02;
+            u.rate = (opts && opts.rate) != null ? opts.rate : 0.9;
+            u.pitch = (opts && opts.pitch) != null ? opts.pitch : 0.92;
           } else {
             u.rate = (opts && opts.rate) != null ? opts.rate : 0.92;
             u.pitch = (opts && opts.pitch) != null ? opts.pitch : 0.92;

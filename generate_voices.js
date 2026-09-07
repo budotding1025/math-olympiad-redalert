@@ -1,7 +1,8 @@
 /**
  * Edge TTS 预生成长官语音
+ * 女声：zh-CN-XiaoyiNeural（晓伊）+ 降调减速，偏高冷长官感
+ *        （当前 Edge 账号仅开放晓晓/晓伊等少数音色）
  * 男声默认：zh-CN-YunjianNeural（比 Yunyang 更口语）
- * 女声：zh-CN-XiaoxiaoNeural（自然女声）
  * 用法：
  *   node generate_voices.js
  *   node generate_voices.js --female
@@ -18,11 +19,11 @@ const args = process.argv.slice(2);
 const FORCE = args.includes("--force");
 const FEMALE = args.includes("--female");
 const FIXED_ONLY = args.includes("--fixed-only");
-const VOICE = FEMALE ? "zh-CN-XiaoxiaoNeural" : "zh-CN-YunjianNeural";
+const VOICE = FEMALE ? "zh-CN-XiaoyiNeural" : "zh-CN-YunjianNeural";
 const BRIEF_DIR = FEMALE ? "brief-f" : "brief";
-// 更接近口语：略慢、略降调，减少「播音腔」机械感
-const RATE = FEMALE ? "-2%" : "-4%";
-const PITCH = FEMALE ? "+0Hz" : "-2Hz";
+// 女长官：晓伊 + 降调减速，压甜感、偏高冷驾驭；男长官：口语稳重
+const RATE = FEMALE ? "-12%" : "-4%";
+const PITCH = FEMALE ? "-10Hz" : "-2Hz";
 
 function ensureDir(d) {
   if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
