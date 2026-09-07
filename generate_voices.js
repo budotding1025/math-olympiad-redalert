@@ -1,11 +1,12 @@
 /**
  * Edge TTS 预生成长官语音
- * 男声默认：zh-CN-YunyangNeural
- * 女声：zh-CN-XiaoyiNeural（女长官）
+ * 男声默认：zh-CN-YunjianNeural（比 Yunyang 更口语）
+ * 女声：zh-CN-XiaoxiaoNeural（自然女声）
  * 用法：
  *   node generate_voices.js
  *   node generate_voices.js --female
  *   node generate_voices.js --force
+ *   node generate_voices.js --force --fixed-only
  */
 const fs = require("fs");
 const path = require("path");
@@ -16,8 +17,12 @@ const OUT = path.join(ROOT, "voice");
 const args = process.argv.slice(2);
 const FORCE = args.includes("--force");
 const FEMALE = args.includes("--female");
-const VOICE = FEMALE ? "zh-CN-XiaoyiNeural" : "zh-CN-YunyangNeural";
+const FIXED_ONLY = args.includes("--fixed-only");
+const VOICE = FEMALE ? "zh-CN-XiaoxiaoNeural" : "zh-CN-YunjianNeural";
 const BRIEF_DIR = FEMALE ? "brief-f" : "brief";
+// 更接近口语：略慢、略降调，减少「播音腔」机械感
+const RATE = FEMALE ? "-2%" : "-4%";
+const PITCH = FEMALE ? "+0Hz" : "-2Hz";
 
 function ensureDir(d) {
   if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
@@ -30,7 +35,8 @@ function tts(text, outfile) {
       "edge_tts",
       "--voice",
       VOICE,
-      "--rate=-8%",
+      `--rate=${RATE}`,
+      `--pitch=${PITCH}`,
       "--text",
       text,
       "--write-media",
@@ -178,10 +184,29 @@ async function main() {
     [fixedPrefix + "welcome-2.mp3"]: "战场已经准备好，就差你了，指挥官。",
     [fixedPrefix + "welcome-3.mp3"]: "别让敌人觉得你好欺负，让他们见识你的厉害！",
     [fixedPrefix + "brief-end.mp3"]: "讲解完毕。听懂了就去瞄准目标！",
+    [fixedPrefix + "promote-0.mp3"]: "欢迎入伍，新兵！证明给我看。",
+    [fixedPrefix + "promote-1.mp3"]: "不错，你已经开始像个兵了。",
+    [fixedPrefix + "promote-2.mp3"]: "晋升下士！继续冲锋。",
+    [fixedPrefix + "promote-3.mp3"]: "中士！你是队伍的脊梁。",
+    [fixedPrefix + "promote-4.mp3"]: "上士！离军官只有一步之遥。",
+    [fixedPrefix + "promote-5.mp3"]: "准尉！你已经有了军官的气质。",
+    [fixedPrefix + "promote-6.mp3"]: "少尉！这是你的第一颗将星，记住今天。",
+    [fixedPrefix + "promote-7.mp3"]: "中尉！两颗星了，继续闪耀。",
+    [fixedPrefix + "promote-8.mp3"]: "上尉！三颗星，你已经是指挥官了。",
+    [fixedPrefix + "promote-9.mp3"]: "少校！校官行列，欢迎你。",
+    [fixedPrefix + "promote-10.mp3"]: "中校！两颗星，威信日增。",
+    [fixedPrefix + "promote-11.mp3"]: "上校！三颗星，你是战场的主宰。",
+    [fixedPrefix + "promote-12.mp3"]: "大校！四颗星，将军在向你招手。",
+    [fixedPrefix + "promote-13.mp3"]: "少将！！将军！你是真正的领袖！",
   };
 
   for (const [f, t] of Object.entries(fixed)) {
     await gen(t, f);
+  }
+
+  if (FIXED_ONLY) {
+    console.log("fixed-only done.");
+    return;
   }
 
   const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");

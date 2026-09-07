@@ -1370,7 +1370,8 @@
           if (bgmStopTimer) clearTimeout(bgmStopTimer);
           bgmEl.loop = true;
           bgmEl.volume = volume;
-          bgmEl.currentTime = 0;
+          // 若已在播，不要强制从头打断（鼓励连发时更自然）
+          if (bgmEl.paused) bgmEl.currentTime = 0;
           const p = bgmEl.play();
           bgmStopTimer = setTimeout(() => {
             const startVol = bgmEl.volume;
@@ -1387,7 +1388,15 @@
     }
     function duckBgmForSpeech() {
       if (!bgmEl || bgmEl.paused) return;
-      bgmEl.volume = Math.min(bgmEl.volume, 0.12);
+      bgmEl.volume = Math.min(bgmEl.volume, 0.14);
+    }
+    /** 鼓励类语音：必须先起 BGM，再播人声 */
+    function ensureEncourageBgm(durationMs = 14000, volume = 0.3) {
+      playBgmBurst(durationMs, volume);
+    }
+    function isEncourageVoiceFile(relPath) {
+      if (!relPath) return false;
+      return /(welcome|hit|miss|clear|promote|review-done)/i.test(relPath);
     }
     function stopVoicePlayer() {
       if (voicePlayer) {
@@ -1441,6 +1450,8 @@
         stopVoicePlayer();
         const a = new Audio(relPath);
         voicePlayer = a;
+        // 略降速，减轻机械感
+        a.playbackRate = commanderGender === "female" ? 0.98 : 0.95;
         a.onended = () => { if (voicePlayer === a) voicePlayer = null; resolve(true); };
         a.onerror = () => { if (voicePlayer === a) voicePlayer = null; resolve(false); };
         duckBgmForSpeech();
@@ -1452,12 +1463,12 @@
       const n = (v.name + " " + v.lang).toLowerCase();
       if (!/zh|chinese|中文/.test(n)) return -100;
       let s = 10;
-      if (/natural|neural|online|云|microsoft|edge/.test(n)) s += 45;
+      if (/natural|neural|online|云|microsoft|edge|yunjian|yunxia|xiaoxiao/.test(n)) s += 45;
       if (commanderGender === "female") {
-        if (/xiaoyi|xiaoxiao|xiaoxuan|xiaohan|xiaoyan|xiaomo|xiaorui|女|female|huihui|yaoyao/.test(n)) s += 55;
+        if (/xiaoxiao|xiaoyi|xiaoxuan|xiaohan|xiaoyan|xiaomo|xiaorui|女|female|huihui|yaoyao/.test(n)) s += 55;
         if (/yunyang|yunjian|yunfeng|yunze|kangkang|yunhao|男|male/.test(n)) s -= 50;
       } else {
-        if (/yunyang|yunjian|yunfeng|yunze|kangkang|yunhao|yunjie|男|male/.test(n)) s += 55;
+        if (/yunjian|yunxia|yunfeng|yunze|yunyang|kangkang|yunhao|yunjie|男|male/.test(n)) s += 55;
         if (/xiaoyi|xiaoxiao|xiaoxuan|xiaohan|女|female|huihui|yaoyao/.test(n)) s -= 50;
       }
       return s;
@@ -1487,12 +1498,13 @@
           const u = new SpeechSynthesisUtterance(text);
           u.lang = "zh-CN";
           if (voice) u.voice = voice;
+          // 接近正常人语速，避免过慢过沉的「机器腔」
           if (commanderGender === "female") {
-            u.rate = (opts && opts.rate) != null ? opts.rate : 0.88;
-            u.pitch = (opts && opts.pitch) != null ? opts.pitch : 1.05;
+            u.rate = (opts && opts.rate) != null ? opts.rate : 0.95;
+            u.pitch = (opts && opts.pitch) != null ? opts.pitch : 1.02;
           } else {
-            u.rate = (opts && opts.rate) != null ? opts.rate : 0.82;
-            u.pitch = (opts && opts.pitch) != null ? opts.pitch : 0.78;
+            u.rate = (opts && opts.rate) != null ? opts.rate : 0.92;
+            u.pitch = (opts && opts.pitch) != null ? opts.pitch : 0.92;
           }
           u.volume = 1;
           u.onend = () => resolve();
@@ -1517,6 +1529,14 @@
       else if (opts && opts.file) {
         files.push(voiceAsset(opts.file));
         if (commanderGender === "female" && opts.file) files.push(opts.file);
+      }
+      const wantBgm = (opts && opts.encourage === true)
+        || (opts && opts.encourage !== false && files.some(isEncourageVoiceFile));
+      if (wantBgm) {
+        ensureEncourageBgm(
+          (opts && opts.bgmMs) || 14000,
+          (opts && opts.bgmVol) != null ? opts.bgmVol : 0.3
+        );
       }
       const tryNext = (i) => {
         if (i >= files.length) return speakSynth(text, opts);
@@ -2057,7 +2077,7 @@
             progress.promotedAnnounced.push(i);
             saveProgress();
             const line = PROMOTE_SPEECH[i];
-            if (line) enqueueVoice(() => speak(line, { file: `voice/promote-${i}.mp3` }));
+            if (line) enqueueVoice(() => speak(line, { file: `voice/promote-${i}.mp3`, encourage: true, bgmMs: 12000, bgmVol: 0.32 }));
           }
         }
       }
@@ -2123,7 +2143,7 @@
       const idx = Math.floor(Math.random() * MISS_SPEECH.length);
       const line = MISS_SPEECH[idx];
       showToast(line);
-      return speak(line, { file: `voice/miss-${idx}.mp3` });
+      return enqueueVoice(() => speak(line, { file: `voice/miss-${idx}.mp3`, encourage: true, bgmMs: 10000, bgmVol: 0.28 }));
     }
     function stopMissionTimer() {
       if (timerId) { clearInterval(timerId); timerId = null; }
@@ -2677,7 +2697,7 @@
       if (!progress.enlistedSpoken && progress.correctCount === 0) {
         progress.enlistedSpoken = true;
         saveProgress();
-        await enqueueVoice(() => speak(PROMOTE_SPEECH[0], { file: "voice/promote-0.mp3" }));
+        await enqueueVoice(() => speak(PROMOTE_SPEECH[0], { file: "voice/promote-0.mp3", encourage: true, bgmMs: 12000 }));
       }
       progress.lastWelcomeDay = welcomeKey;
       try { sessionStorage.setItem("redAlert_welcome_session", "1"); } catch (e) {}
