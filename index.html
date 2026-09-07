@@ -174,16 +174,27 @@
     .strat-map-scroll {
       flex: 1; min-height: 52vh; max-height: calc(94vh - 140px);
       overflow: auto; border: 2px solid #5a4a2a;
-      background:
-        radial-gradient(ellipse at 20% 30%, rgba(60,90,40,0.35), transparent 50%),
-        radial-gradient(ellipse at 80% 70%, rgba(40,70,90,0.3), transparent 45%),
-        linear-gradient(160deg, #1c2a18 0%, #243520 40%, #1a281c 70%, #152018 100%);
+      background: #1a2818;
       position: relative;
       -webkit-overflow-scrolling: touch;
     }
     .strat-map-board {
       position: relative;
       min-width: 720px;
+      background:
+        repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(0,0,0,0.06) 32px),
+        repeating-linear-gradient(90deg, transparent, transparent 31px, rgba(0,0,0,0.06) 32px),
+        linear-gradient(160deg, #3a5a28 0%, #2f4a22 35%, #355528 70%, #2a421c 100%);
+    }
+    .strat-unit {
+      position: absolute; z-index: 5; pointer-events: none;
+      font-size: 1.6rem; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.7));
+      animation: unitBob 1.2s ease-in-out infinite;
+      transform: translate(-50%, -110%);
+    }
+    @keyframes unitBob {
+      0%, 100% { transform: translate(-50%, -110%); }
+      50% { transform: translate(-50%, -125%); }
     }
     .strat-map-board svg.strat-roads {
       position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;
@@ -349,6 +360,9 @@
       <span class="energy-chip" id="energyChip">⚡ 能源 0</span>
       <div style="margin-top:8px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
         <span class="timer-display" id="timerDisplay">20:00</span>
+        <button type="button" class="btn btn-ghost reset-btn" id="timerPauseBtn" hidden>⏸ 暂停</button>
+        <button type="button" class="btn btn-ghost reset-btn" id="timerResumeBtn" hidden>▶ 继续</button>
+        <button type="button" class="btn btn-ghost reset-btn" id="timerResetGateBtn">⏹ 回到计时前</button>
       </div>
       <div class="timer-alert" id="timerAlert">⏰ 三题全部攻克！任务结束，撤退休整！</div>
       <div class="parent-debug">
@@ -432,6 +446,7 @@
         <span><i class="cleared"></i>已攻克</span>
         <span><i class="locked"></i>迷雾锁定</span>
         <span><i class="lake"></i>战术湖</span>
+        <span>🪖/🚛 指挥官单位</span>
       </div>
       <div class="strat-map-scroll" id="roadmapRoot"></div>
       <p class="map-hint">左右/上下滑动展开整张作战图。点亮节点可进入；灰色迷雾为「即将解锁」占位（需补视频与题目）。</p>
@@ -540,6 +555,10 @@
     let advanceTimer = null;
     let activeCourse = null;
     let activeDayNum = 1;
+    let timerRemain = TIMER_TOTAL_SEC;
+    let timerId = null;
+    let timerRunning = false;
+    let timerPaused = false;
 
     // 后面那张表：真实军官制 14 级
     const RANKS = [
@@ -2096,9 +2115,11 @@
     function stopMissionTimer() {
       if (timerId) { clearInterval(timerId); timerId = null; }
       timerRunning = false;
+      timerPaused = false;
       timerStoppedAt = Date.now();
       const btn = document.getElementById("timerBtn");
       if (btn) { btn.disabled = false; btn.textContent = "⏱️ 任务结束"; }
+      updateTimerControlBtns();
     }
     function getElapsedSec() {
       if (!timerStartedAt) return 0;
@@ -2486,13 +2507,18 @@
       updateCommandBar(dayNum, course);
     }
 
-    function startMissionTimer() {
-      if (timerRunning) return;
+    function startMissionTimer(opts) {
+      const reset = !(opts && opts.reset === false);
+      if (timerRunning && !timerPaused) return;
+      if (reset) {
+        timerRemain = TIMER_TOTAL_SEC;
+        timerStartedAt = Date.now();
+        timerStoppedAt = null;
+      }
       timerRunning = true;
-      timerRemain = TIMER_TOTAL_SEC;
-      timerStartedAt = Date.now();
-      timerStoppedAt = null;
+      timerPaused = false;
       updateTimerUI();
+      updateTimerControlBtns();
       const btn = document.getElementById("timerBtn");
       if (btn) {
         btn.disabled = true;
@@ -2501,6 +2527,7 @@
       document.getElementById("timerAlert").classList.remove("show");
       if (timerId) clearInterval(timerId);
       timerId = setInterval(() => {
+        if (timerPaused) return;
         timerRemain -= 1;
         updateTimerUI();
         if (timerRemain <= 0) {
@@ -2511,6 +2538,56 @@
           speak(line, { file: "voice/timer.mp3" });
         }
       }, 1000);
+    }
+
+    function pauseMissionTimer() {
+      if (!timerRunning || timerPaused) return;
+      timerPaused = true;
+      if (timerId) { clearInterval(timerId); timerId = null; }
+      const btn = document.getElementById("timerBtn");
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "⏸ 已暂停";
+      }
+      updateTimerControlBtns();
+      showToast("已暂停计时（孩子可休息）");
+    }
+
+    function resumeMissionTimer() {
+      if (!missionAccepted) return;
+      if (!timerPaused && timerRunning) return;
+      startMissionTimer({ reset: false });
+      showToast("继续计时");
+    }
+
+    function resetToPreTimerGate() {
+      if (timerId) { clearInterval(timerId); timerId = null; }
+      timerRunning = false;
+      timerPaused = false;
+      timerRemain = TIMER_TOTAL_SEC;
+      timerStartedAt = null;
+      timerStoppedAt = null;
+      missionAccepted = false;
+      welcomeGateDone = false;
+      historyReadonly = false;
+      try { sessionStorage.removeItem("redAlert_welcome_session"); } catch (e) {}
+      updateTimerUI();
+      updateTimerControlBtns();
+      const btn = document.getElementById("timerBtn");
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = "🎯 接受任务";
+      }
+      document.getElementById("timerAlert").classList.remove("show");
+      showToast("已回到计时前 · 需再次「接受任务」才计时");
+      mount(true);
+    }
+
+    function updateTimerControlBtns() {
+      const pauseBtn = document.getElementById("timerPauseBtn");
+      const resumeBtn = document.getElementById("timerResumeBtn");
+      if (pauseBtn) pauseBtn.hidden = !(timerRunning && !timerPaused);
+      if (resumeBtn) resumeBtn.hidden = !(missionAccepted && timerPaused);
     }
 
     function renderBriefingGateHtml(dayNum, course, helloLine) {
@@ -2826,12 +2903,48 @@
       const boardW = PAD_X * 2 + COLS * NODE_W + (COLS - 1) * GAP_X;
       const boardH = PAD_Y + (row + 1) * (NODE_H + GAP_Y) + TERM_H + 40;
 
-      let roads = "";
+      // 红警温带地形层：草地格已在 CSS；此处画山/湖/树林/土路
+      let terrain = `<defs>
+        <linearGradient id="mtn" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#5a4a32"/><stop offset="100%" stop-color="#8a7a55"/></linearGradient>
+        <radialGradient id="water" cx="50%" cy="45%"><stop offset="0%" stop-color="#6eb8e0"/><stop offset="70%" stop-color="#2a6a9a"/><stop offset="100%" stop-color="#1a3a55"/></radialGradient>
+        <pattern id="dirt" width="8" height="8" patternUnits="userSpaceOnUse">
+          <rect width="8" height="8" fill="#6b5a3a"/><circle cx="2" cy="3" r="0.8" fill="#5a4a2e"/><circle cx="6" cy="6" r="0.7" fill="#7a6844"/>
+        </pattern>
+      </defs>`;
+      // 山（角落/边缘高原）
+      [[40,80],[boardW-90,60],[60,boardH*0.45],[boardW-70,boardH*0.55],[boardW*0.45,boardH-50]].forEach(([mx,my],i) => {
+        const s = 38 + (i % 3) * 10;
+        terrain += `<polygon points="${mx},${my} ${mx+s*0.55},${my-s} ${mx+s},${my}" fill="url(#mtn)" opacity="0.85"/>`;
+        terrain += `<polygon points="${mx+s*0.2},${my} ${mx+s*0.55},${my-s*0.7} ${mx+s*0.85},${my}" fill="#3d3220" opacity="0.35"/>`;
+      });
+      // 湖（靠近 lake/review 节点，或固定装饰湖）
+      positions.filter((p) => p.c.type === "lake" || p.c.type === "review").forEach((p) => {
+        terrain += `<ellipse cx="${p.cx}" cy="${p.cy + 8}" rx="48" ry="28" fill="url(#water)" opacity="0.75"/>`;
+        terrain += `<ellipse cx="${p.cx - 10}" cy="${p.cy}" rx="18" ry="8" fill="#9ad0f0" opacity="0.25"/>`;
+      });
+      // 装饰湖
+      terrain += `<ellipse cx="${boardW * 0.22}" cy="${boardH * 0.72}" rx="70" ry="36" fill="url(#water)" opacity="0.55"/>`;
+      terrain += `<ellipse cx="${boardW * 0.78}" cy="${boardH * 0.28}" rx="55" ry="30" fill="url(#water)" opacity="0.5"/>`;
+      // 树林簇
+      for (let t = 0; t < 28; t++) {
+        const tx = 24 + ((t * 97) % (boardW - 48));
+        const ty = 40 + ((t * 53) % (boardH - 80));
+        const nearRoad = positions.some((p) => Math.hypot(p.cx - tx, p.cy - ty) < 70);
+        if (nearRoad && t % 3 !== 0) continue;
+        terrain += `<circle cx="${tx}" cy="${ty}" r="7" fill="#1e4a18"/><circle cx="${tx + 5}" cy="${ty - 4}" r="6" fill="#2d6a24"/><circle cx="${tx - 4}" cy="${ty - 3}" r="5" fill="#245a1e"/>`;
+      }
+
+      // 土路（粗描边折线）
+      let roadPts = positions.map((p) => `${p.cx},${p.cy}`).join(" ");
+      let roads = `<polyline points="${roadPts}" fill="none" stroke="#3a3020" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"/>`;
+      roads += `<polyline points="${roadPts}" fill="none" stroke="url(#dirt)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>`;
+      roads += `<polyline points="${roadPts}" fill="none" stroke="#c4a86a" stroke-width="2" stroke-dasharray="10 14" opacity="0.35"/>`;
       for (let i = 0; i < positions.length - 1; i++) {
         const a = positions[i];
         const b = positions[i + 1];
-        const lockedSeg = isPlaceholderCourse(a.c) || isPlaceholderCourse(b.c);
-        roads += `<line x1="${a.cx}" y1="${a.cy}" x2="${b.cx}" y2="${b.cy}" stroke="${lockedSeg ? "#3a4538" : "#8B7355"}" stroke-width="3" stroke-dasharray="${lockedSeg ? "6 6" : "0"}" opacity="${lockedSeg ? 0.45 : 0.85}"/>`;
+        if (isPlaceholderCourse(a.c) || isPlaceholderCourse(b.c)) {
+          roads += `<line x1="${a.cx}" y1="${a.cy}" x2="${b.cx}" y2="${b.cy}" stroke="#2a3228" stroke-width="14" stroke-dasharray="8 10" opacity="0.5"/>`;
+        }
       }
 
       let banners = "";
@@ -2840,8 +2953,11 @@
         banners += `<div class="strat-term-banner" style="left:${PAD_X}px;top:${y}px;">⚔ ${escapeHtml(tb.term)}</div>`;
       });
 
+      const rankIdx = getRankIndex(progress.correctCount || 0);
+      const unitIcon = rankIdx >= 6 ? "🚛" : rankIdx >= 3 ? "🪖🚗" : "🪖";
+      let unitHtml = "";
       let nodes = "";
-      positions.forEach(({ c, x, y }) => {
+      positions.forEach(({ c, x, y, cx, cy }) => {
         const cleared = progress.clearedDays.includes(c.dayNum);
         const isLake = c.type === "lake" || c.type === "review";
         const locked = isPlaceholderCourse(c) || c.type === "lake" || !canStudyDay(c.dayNum);
@@ -2862,12 +2978,16 @@
           <span class="sn-title">${escapeHtml(shortTitle)}</span>
           <span class="sn-tag">${tag}</span>
         </button>`;
+        if (current) {
+          unitHtml = `<div class="strat-unit" style="left:${cx}px;top:${y}px;" title="指挥官单位">${unitIcon}</div>`;
+        }
       });
 
       root.innerHTML = `<div class="strat-map-board" style="width:${boardW}px;height:${boardH}px;">
-        <svg class="strat-roads" viewBox="0 0 ${boardW} ${boardH}" preserveAspectRatio="none">${roads}</svg>
+        <svg class="strat-roads" viewBox="0 0 ${boardW} ${boardH}" preserveAspectRatio="none">${terrain}${roads}</svg>
         ${banners}
         ${nodes}
+        ${unitHtml}
       </div>`;
 
       const goDay = (d) => {
@@ -2902,25 +3022,33 @@
     }
 
     /* ========== Timer ========== */
-    let timerRemain = TIMER_TOTAL_SEC;
-    let timerId = null;
-    let timerRunning = false;
     function formatTime(sec) {
       const m = Math.floor(sec / 60);
       const s = sec % 60;
       return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
     }
     function updateTimerUI() {
-      document.getElementById("timerDisplay").textContent = formatTime(timerRemain);
+      document.getElementById("timerDisplay").textContent = formatTime(Math.max(0, timerRemain));
     }
 
+    document.getElementById("timerPauseBtn").addEventListener("click", () => pauseMissionTimer());
+    document.getElementById("timerResumeBtn").addEventListener("click", () => resumeMissionTimer());
+    document.getElementById("timerResetGateBtn").addEventListener("click", () => {
+      if (!confirm("回到「接受任务」之前？计时会清零，孩子需要重新点接受任务才会开始计时。")) return;
+      resetToPreTimerGate();
+    });
+
     document.getElementById("timerBtn").addEventListener("click", () => {
-      if (timerRunning) return;
+      if (timerRunning && !timerPaused) return;
+      if (timerPaused) {
+        resumeMissionTimer();
+        return;
+      }
       if (!missionAccepted) {
         acceptMissionAndStart();
         return;
       }
-      startMissionTimer();
+      startMissionTimer({ reset: false });
     });
 
     document.getElementById("cmdPrevBtn").addEventListener("click", () => {
