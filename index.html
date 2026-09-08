@@ -321,6 +321,21 @@
     .tree-dot.ghost { background: transparent; border-style: dashed; opacity: 0.5; }
     .eq-box { text-align: center; font-size: 1.2rem; font-weight: 700; color: var(--accent); padding: 16px; }
     .eq-box .pop { display: inline-block; animation: popIn 0.8s ease; }
+    .trip-line {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      margin: 12px 0; padding: 12px; background: #111; border: 1px solid var(--border);
+      font-weight: 700; color: #ffd08a;
+    }
+    .trip-gap { color: var(--accent); font-size: 0.9rem; }
+    .trip-bridge {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      margin: 12px 0; padding: 16px; background: #111; border: 1px solid var(--border);
+    }
+    .trip-train { font-size: 1.6rem; }
+    .trip-bridge-span {
+      flex: 1; text-align: center; padding: 8px; border-bottom: 4px solid #8B7355;
+      color: #ffd08a; font-weight: 700;
+    }
     @keyframes popIn { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
     /* Guide */
@@ -356,6 +371,87 @@
       .command-bar .btn { flex: 1 1 44%; max-width: none; font-size: 0.92rem; padding: 10px 8px; }
       main { padding-bottom: 160px; }
     }
+
+    /* 今日作战简报 */
+    .ops-board {
+      margin: 18px auto 0; max-width: 420px; text-align: left;
+      padding: 14px 16px; background: rgba(0,0,0,0.28); border: 1px solid var(--border);
+    }
+    .ops-board-title { margin: 0 0 10px; color: #ffd08a; font-weight: 700; font-size: 0.95rem; }
+    .ops-item {
+      display: flex; align-items: center; gap: 10px; margin: 8px 0;
+      color: var(--text); font-size: 0.95rem; cursor: pointer; user-select: none;
+    }
+    .ops-item input { width: 18px; height: 18px; accent-color: var(--accent); }
+    .ops-item.done { color: #7dffa0; text-decoration: line-through; }
+    .ops-weekend { margin-top: 10px; color: #ffd08a; font-size: 0.85rem; }
+
+    /* 战损档案 */
+    .damage-panel { max-width: 640px; }
+    .damage-banner {
+      margin: 0 0 12px; padding: 10px 12px; border: 1px solid var(--accent);
+      background: rgba(255,106,0,0.12); color: #ffd08a; font-size: 0.9rem; line-height: 1.5;
+    }
+    .damage-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+    .damage-card {
+      padding: 12px; background: #1a1a1a; border: 1px solid var(--border);
+    }
+    .damage-card .q-text { margin: 6px 0 10px; line-height: 1.55; }
+    .damage-meta { font-size: 0.8rem; color: var(--muted); margin-bottom: 8px; }
+    .reason-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+    .reason-chip {
+      appearance: none; border: 1px solid var(--border); background: #2a2a2a; color: var(--text);
+      font-size: 0.82rem; padding: 6px 10px; cursor: pointer; font-family: inherit;
+    }
+    .reason-chip.on { border-color: var(--accent); background: rgba(255,106,0,0.2); color: #ffd08a; }
+    .damage-note {
+      width: 100%; min-height: 56px; padding: 8px; margin-top: 6px;
+      background: #111; border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 0.9rem;
+    }
+    .damage-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+    .inline-reason {
+      margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.35); border: 1px dashed var(--border);
+    }
+    .inline-reason p { margin: 0 0 8px; color: #ffd08a; font-size: 0.88rem; }
+
+    /* 战术条令 */
+    .tactics-fab {
+      position: fixed; right: 12px; bottom: calc(88px + env(safe-area-inset-bottom)); z-index: 950;
+      border: 2px solid var(--accent); background: rgba(18,28,18,0.95); color: #ffd08a;
+      font-weight: 700; font-size: 0.85rem; padding: 10px 12px; cursor: pointer; font-family: inherit;
+    }
+    .tactics-dock {
+      position: fixed; top: 0; right: 0; bottom: 0; width: min(320px, 92vw); z-index: 1100;
+      background: rgba(14, 22, 14, 0.98); border-left: 3px solid var(--accent);
+      transform: translateX(105%); transition: transform 0.25s ease; padding: 16px 14px 100px;
+      overflow: auto; box-shadow: -8px 0 24px rgba(0,0,0,0.4);
+    }
+    .tactics-dock.open { transform: none; }
+    .tactics-dock h2 { margin: 0 0 6px; color: var(--accent); font-size: 1.1rem; }
+    .tactics-dock .tactics-sub { margin: 0 0 14px; color: var(--muted); font-size: 0.85rem; line-height: 1.45; }
+    .tactics-item {
+      margin: 0 0 10px; border: 1px solid var(--border); background: #1a1a1a;
+    }
+    .tactics-item summary {
+      cursor: pointer; padding: 10px 12px; color: #ffd08a; font-weight: 700; list-style: none;
+    }
+    .tactics-item summary::-webkit-details-marker { display: none; }
+    .tactics-item[open] summary { border-bottom: 1px solid var(--border); }
+    .tactics-steps { margin: 0; padding: 10px 12px 12px 28px; color: var(--text); font-size: 0.88rem; line-height: 1.55; }
+    .tactics-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1090; display: none;
+    }
+    .tactics-backdrop.show { display: block; }
+    @media (min-width: 1100px) {
+      .tactics-fab { display: none; }
+      .tactics-backdrop { display: none !important; }
+      .tactics-dock {
+        transform: none; top: 72px; bottom: 100px; right: 8px; width: 280px;
+        border: 2px solid var(--border); box-shadow: none; padding-bottom: 16px;
+      }
+      #tacticsCloseBtn { display: none; }
+      main { margin-right: 300px; max-width: 820px; }
+    }
   </style>
 </head>
 <body>
@@ -383,6 +479,8 @@
       <div class="score-line" id="scoreLabel">战果：0/3</div>
       <div class="rank-bar"><div class="rank-bar-fill" id="rankBarFill"></div></div>
       <button type="button" class="btn btn-ghost reset-btn" id="mapOpenBtn">🗺️ 战略地图</button>
+      <button type="button" class="btn btn-ghost reset-btn" id="damageOpenBtn">📁 战损档案</button>
+      <button type="button" class="btn btn-ghost reset-btn" id="tacticsOpenBtn">📖 战术条令</button>
       <button type="button" class="btn btn-ghost reset-btn" id="historyOpenBtn">📅 历史任务</button>
       <button type="button" class="btn btn-ghost reset-btn" id="accountOpenBtn">👤 账号</button>
       <button type="button" class="btn btn-ghost reset-btn" id="transferOpenBtn">📱 换机带走进度</button>
@@ -444,6 +542,28 @@
       <button type="button" class="btn btn-ghost" id="historyCloseBtn" style="width:100%;margin-top:8px;">关闭</button>
     </div>
   </div>
+
+  <div class="history-overlay" id="damageOverlay" role="dialog" aria-modal="true">
+    <div class="history-panel damage-panel">
+      <h2 style="color:var(--accent);margin:0 0 8px;">📁 战损档案</h2>
+      <p style="margin:0 0 12px;color:var(--muted);font-size:0.9rem;line-height:1.5;">答错自动入库。标上错因，周末做「周周清」清剿。</p>
+      <div id="damageWeekendBanner" class="damage-banner" hidden>🗡 周末周周清：建议把本周战损全部回放一遍。</div>
+      <div id="damageListRoot"></div>
+      <div class="damage-actions">
+        <button type="button" class="btn btn-orange" id="damageSweepBtn">🗡 开始清剿复盘</button>
+        <button type="button" class="btn btn-ghost" id="damageCloseBtn">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <button type="button" class="tactics-fab" id="tacticsFab" aria-label="打开战术条令">📖 战术条令</button>
+  <div class="tactics-backdrop" id="tacticsBackdrop"></div>
+  <aside class="tactics-dock" id="tacticsDock" aria-label="战术条令">
+    <h2>📖 战术条令</h2>
+    <p class="tactics-sub">解题先选方法。点开一条，按步骤想。</p>
+    <div id="tacticsList"></div>
+    <button type="button" class="btn btn-ghost" id="tacticsCloseBtn" style="width:100%;margin-top:12px;">收起</button>
+  </aside>
 
   <div class="history-overlay" id="mapOverlay" role="dialog" aria-modal="true">
     <div class="history-panel map-panel">
@@ -638,6 +758,43 @@
       "冷静，士兵。看清题意，我们还能赢。"
     ];
 
+    const DAMAGE_REASONS = [
+      { id: "assume", label: "假设法没想通" },
+      { id: "diagram", label: "线段图画错" },
+      { id: "read", label: "题意读漏" },
+      { id: "calc", label: "计算失误" },
+      { id: "formula", label: "公式用错" },
+      { id: "other", label: "其他" }
+    ];
+
+    const TACTICS_MANUAL = [
+      {
+        id: "draw",
+        title: "画图法",
+        steps: ["先画出线段图或简单示意图", "把已知数字标在图上", "看图找等量关系，再列式"]
+      },
+      {
+        id: "enum",
+        title: "枚举法",
+        steps: ["列出所有可能情况", "用条件逐个排除", "剩下的就是答案，记得验算"]
+      },
+      {
+        id: "backward",
+        title: "倒推法",
+        steps: ["从结果往回想", "每一步做相反运算", "推到起点后正向验算一遍"]
+      },
+      {
+        id: "assume",
+        title: "假设法",
+        steps: ["先假设一种极端情况", "算出与实际的差", "用差÷每份差，求出调整量"]
+      },
+      {
+        id: "equation",
+        title: "方程思想",
+        steps: ["设未知数为 x", "根据题意列等量关系", "解出 x，代入原题检查"]
+      }
+    ];
+
     /* 顶部氛围标语：短、带符号，只显示文字，不播语音 */
     const ENCOURAGE_LINES = [
       "🏆 今天的目标：全歼敌人！",
@@ -785,12 +942,132 @@
         ph(term, topic, "advancement", raBase + "·升级", origBase + "升级");
         ph(term, topic, "consolidate", raBase + "·巩固", origBase + "巩固");
       }
+      function fill(course) {
+        courses.push(Object.assign({ dayNum: d++, term: "四年级下" }, course));
+      }
 
-      // —— 四年级下：行程 → 年龄 → 鸡兔 → 几何面积基础 ——
-      trio("四年级下", "行程·相遇", "🚗 两军会师", "行程相遇");
-      trio("四年级下", "行程·追及", "🏃 追击战", "行程追及");
-      trio("四年级下", "行程·火车过桥", "🚂 装甲列过桥", "火车过桥");
-      lake("四年级下", "行程专题", "🌊 行程战术湖");
+      // —— 四年级下：行程（已填充）→ 年龄 → 鸡兔 → 几何面积基础 ——
+      // 视频统一用超级课堂 BV1ScwnzFEkR 行程相关分P
+      fill({
+        phase: "foundation", topic: "行程·相遇",
+        name: { redAlert: "🚗 两军会师·入门", original: "行程相遇入门" },
+        videoSource: "super", videoLabel: "故事主线 · 超级课堂",
+        videoTitle: "11 行程问题之速度和的秘密", videoDuration: "12:18", videoType: "long",
+        videoUrl: "https://www.bilibili.com/video/BV1ScwnzFEkR?p=11",
+        questions: [
+          { q: "盟军基地与苏军基地相距120千米。采矿车时速40千米，犀牛坦克时速80千米，两队同时相向出发，几小时后相遇？", answer: 1, hint: "相遇路程=速度和×时间。时间=120÷（40+80）=1。", ex: { t: "meet", S: 120, Va: 40, Vb: 80, want: "T", A: "采矿车", B: "犀牛坦克" } },
+          { q: "两支部队相距90千米，同时相向行军，速度分别是30千米/时和60千米/时。相遇时，慢的那支走了多少千米？", answer: 30, hint: "先求时间：90÷（30+60）=1小时，慢队走30×1=30千米。", ex: { t: "meet", S: 90, Va: 30, Vb: 60, want: "Sa", A: "慢队", B: "快队" } },
+          { q: "光棱坦克与幻影坦克相距150千米同时相向出击，速度和为50千米/时。几小时后相遇？", answer: 3, hint: "时间=路程÷速度和=150÷50=3。", ex: { t: "meet", S: 150, Va: 20, Vb: 30, want: "T", A: "光棱", B: "幻影" } }
+        ]
+      });
+      fill({
+        phase: "advancement", topic: "行程·相遇",
+        name: { redAlert: "🚗 两军会师·升级", original: "行程相遇升级" },
+        videoSource: "super", videoLabel: "故事主线 · 超级课堂",
+        videoTitle: "13 三类特殊的相遇问题", videoDuration: "11:47", videoType: "long",
+        videoUrl: "https://www.bilibili.com/video/BV1ScwnzFEkR?p=13",
+        questions: [
+          { q: "甲乙两基地相距100千米。甲队时速40千米，乙队时速60千米。甲队先出发0.5小时后，乙队相向出发。再过多少分钟两队相遇？", answer: 48, hint: "甲先走40×0.5=20千米，剩80千米。再相遇时间=80÷100=0.8小时=48分钟。", ex: { t: "meet", S: 100, Va: 40, Vb: 60, aheadA: 0.5, want: "T2min", A: "甲队", B: "乙队" } },
+          { q: "两车相向行驶，甲速40千米/时，乙速60千米/时。相遇时甲已走80千米。两地相距多少千米？", answer: 200, hint: "甲走了80÷40=2小时；乙同时走60×2=120；全程80+120=200。", ex: { t: "meet", Va: 40, Vb: 60, Sa: 80, want: "S", A: "甲车", B: "乙车" } },
+          { q: "两军相距240千米同时相向，2小时相遇。甲乙速度比是2:3。甲的速度是多少千米/时？", answer: 48, hint: "速度和=240÷2=120。按2:3分，甲=120×2÷5=48。", ex: { t: "meet", S: 240, T: 2, ratio: [2, 3], want: "Va", A: "甲军", B: "乙军" } }
+        ]
+      });
+      fill({
+        phase: "consolidate", topic: "行程·相遇",
+        name: { redAlert: "🚗 两军会师·巩固", original: "行程相遇巩固" },
+        videoSource: "super", videoLabel: "故事主线 · 超级课堂",
+        videoTitle: "15 相遇后继续前进", videoDuration: "10:37", videoType: "long",
+        videoUrl: "https://www.bilibili.com/video/BV1ScwnzFEkR?p=15",
+        questions: [
+          { q: "两地相距300千米，甲乙同时相向，甲速60千米/时，乙速40千米/时。相遇后，甲再到乙的出发点还要几小时？", answer: 2, hint: "相遇时间=300÷100=3小时，乙已走120千米；甲还需走完这120千米：120÷60=2小时。", ex: { t: "meet", S: 300, Va: 60, Vb: 40, want: "Tafter", A: "甲", B: "乙" } },
+          { q: "盟军与苏军同时从两地相向出发，相遇时盟军走了全程的2/5。已知苏军时速60千米，盟军时速多少？", answer: 40, hint: "相遇时盟军走2/5，苏军走3/5，速度比=2:3。盟军=60×2÷3=40。", ex: { t: "meet", Vb: 60, fracA: [2, 5], want: "Va", A: "盟军", B: "苏军" } },
+          { q: "两车同时相向，5小时相遇。若双方速度都加快10千米/时，则4小时相遇。求原来两地距离（千米）。", answer: 200, hint: "原来速度和=S÷5；加快后速度和=S÷4=原和+20。由S/4−S/5=20得S=200。", ex: { t: "meet", T1: 5, T2: 4, boost: 10, want: "S", A: "甲车", B: "乙车" } }
+        ]
+      });
+
+      fill({
+        phase: "foundation", topic: "行程·追及",
+        name: { redAlert: "🏃 追击战·入门", original: "行程追及入门" },
+        videoSource: "super", videoLabel: "故事主线 · 超级课堂",
+        videoTitle: "12 行程问题的基本关系", videoDuration: "14:22", videoType: "long",
+        videoUrl: "https://www.bilibili.com/video/BV1ScwnzFEkR?p=12",
+        questions: [
+          { q: "侦察车时速60千米，运输车时速40千米。运输车先走了30千米，侦察车同向追击，几小时追上？", answer: 1.5, hint: "追及路程30千米，速度差20，时间=30÷20=1.5小时。", ex: { t: "chase", D: 30, Vf: 60, Vs: 40, want: "T", A: "侦察车", B: "运输车" } },
+          { q: "天启坦克时速50千米，犀牛坦克时速30千米，两车同向且相距80千米。天启多久追上犀牛？", answer: 4, hint: "时间=路程差÷速度差=80÷20=4小时。", ex: { t: "chase", D: 80, Vf: 50, Vs: 30, want: "T", A: "天启", B: "犀牛" } },
+          { q: "快慢两支部队速度差为40千米/时，追及路程120千米。需要几小时追上？", answer: 3, hint: "时间=120÷40=3。", ex: { t: "chase", D: 120, Vdiff: 40, want: "T", A: "快队", B: "慢队" } }
+        ]
+      });
+      fill({
+        phase: "advancement", topic: "行程·追及",
+        name: { redAlert: "🏃 追击战·升级", original: "行程追及升级" },
+        videoSource: "super", videoLabel: "故事主线 · 超级课堂",
+        videoTitle: "19 复杂追及问题", videoDuration: "11:50", videoType: "long",
+        videoUrl: "https://www.bilibili.com/video/BV1ScwnzFEkR?p=18",
+        questions: [
+          { q: "慢车时速40千米，先出发2小时。快车时速60千米同向追击，几小时追上？", answer: 4, hint: "慢车先走80千米，速度差20，时间=80÷20=4小时。", ex: { t: "chase", Vf: 60, Vs: 40, aheadS: 2, want: "T", A: "快车", B: "慢车" } },
+          { q: "环形跑道周长400米。甲每秒50米，乙每秒30米，同向跑。甲多久第一次追上乙？（单位：秒）", answer: 20, hint: "环形追及：时间=周长÷速度差=400÷20=20秒。", ex: { t: "chase", D: 400, Vf: 50, Vs: 30, loop: true, want: "T", A: "甲", B: "乙" } },
+          { q: "甲速70千米/时，乙速40千米/时同向。甲追上乙时比乙多走了90千米。追了几小时？", answer: 3, hint: "多走的就是追及路程：90÷（70-40）=3小时。", ex: { t: "chase", D: 90, Vf: 70, Vs: 40, want: "T", A: "甲", B: "乙" } }
+        ]
+      });
+      fill({
+        phase: "consolidate", topic: "行程·追及",
+        name: { redAlert: "🏃 追击战·巩固", original: "行程追及巩固" },
+        videoSource: "super", videoLabel: "故事主线 · 超级课堂",
+        videoTitle: "20 相遇与追及的综合", videoDuration: "11:07", videoType: "long",
+        videoUrl: "https://www.bilibili.com/video/BV1ScwnzFEkR?p=19",
+        questions: [
+          { q: "甲乙同向行驶，甲时速60千米，乙时速40千米，甲在乙后方100千米。甲几小时追上乙？", answer: 5, hint: "追及路程100，速度差20，时间=100÷20=5小时。", ex: { t: "chase", D: 100, Vf: 60, Vs: 40, want: "T", A: "甲", B: "乙" } },
+          { q: "环形公路一周400千米。甲乙同时同地同向出发，甲时速50，乙时速30。甲第一次追上乙要几小时？", answer: 20, hint: "环形追及：时间=周长÷速度差=400÷20=20小时。", ex: { t: "chase", D: 400, Vf: 50, Vs: 30, loop: true, want: "T", A: "甲", B: "乙" } },
+          { q: "运输车时速45千米先走1小时，装甲车时速75千米同向追击。装甲车几小时追上？", answer: 1.5, hint: "运输车先走45千米，速度差30，时间=45÷30=1.5小时。", ex: { t: "chase", Vf: 75, Vs: 45, aheadS: 1, want: "T", A: "装甲车", B: "运输车" } }
+        ]
+      });
+
+      fill({
+        phase: "foundation", topic: "行程·火车过桥",
+        name: { redAlert: "🚂 装甲列过桥·入门", original: "火车过桥入门" },
+        videoSource: "super", videoLabel: "故事主线 · 超级课堂",
+        videoTitle: "21 生化危机大逃亡—过桥问题", videoDuration: "5:16", videoType: "short",
+        videoUrl: "https://www.bilibili.com/video/BV1ScwnzFEkR?p=20",
+        questions: [
+          { q: "一列装甲火车长200米，要通过800米长的大桥，车速20米/秒。从车头上桥到车尾离桥需多少秒？", answer: 50, hint: "过桥路程=车长+桥长=1000米，时间=1000÷20=50秒。", ex: { t: "bridge", L: 200, B: 800, V: 20, want: "T" } },
+          { q: "火车长150米，桥长450米，过桥用了30秒。火车速度是多少米/秒？", answer: 20, hint: "路程=150+450=600，速度=600÷30=20。", ex: { t: "bridge", L: 150, B: 450, T: 30, want: "V" } },
+          { q: "火车时速25米/秒，通过600米长的桥用了32秒。火车车长多少米？", answer: 200, hint: "总路程=25×32=800，车长=800-600=200。", ex: { t: "bridge", B: 600, V: 25, T: 32, want: "L" } }
+        ]
+      });
+      fill({
+        phase: "advancement", topic: "行程·火车过桥",
+        name: { redAlert: "🚂 装甲列过桥·升级", original: "火车过桥升级" },
+        videoSource: "super", videoLabel: "故事主线 · 超级课堂",
+        videoTitle: "25 火车过桥问题", videoDuration: "11:36", videoType: "long",
+        videoUrl: "https://www.bilibili.com/video/BV1ScwnzFEkR?p=24",
+        questions: [
+          { q: "火车通过一座1200米的桥用40秒，通过一座800米的桥用30秒。求火车车长（米）。", answer: 400, hint: "桥差400米对应时间差10秒，速度=40米/秒；车长=40×40-1200=400。", ex: { t: "bridge", B1: 1200, T1: 40, B2: 800, T2: 30, want: "L" } },
+          { q: "火车长200米，过桥用50秒；整列火车完全在桥上的时间是30秒。桥长多少米？", answer: 800, hint: "设桥长为B，速度相同：(B+200)/50=(B-200)/30，解得B=800。", ex: { t: "bridge", L: 200, Tall: 50, Tin: 30, want: "B" } },
+          { q: "一列长180米的火车，以18米/秒通过隧道。从车头进洞到车尾出洞用30秒，隧道长多少米？", answer: 360, hint: "总路程=18×30=540，隧道=540-180=360。", ex: { t: "bridge", L: 180, V: 18, T: 30, want: "B" } }
+        ]
+      });
+      fill({
+        phase: "consolidate", topic: "行程·火车过桥",
+        name: { redAlert: "🚂 装甲列过桥·巩固", original: "火车过桥巩固" },
+        videoSource: "super", videoLabel: "故事主线 · 超级课堂",
+        videoTitle: "24 两列火车的相遇问题", videoDuration: "5:42", videoType: "short",
+        videoUrl: "https://www.bilibili.com/video/BV1ScwnzFEkR?p=23",
+        questions: [
+          { q: "甲车长200米，乙车长300米，相向而行，速度分别是20米/秒和30米/秒。从车头相遇到车尾分开需多少秒？", answer: 10, hint: "错车路程=两车长之和=500，速度和=50，时间=500÷50=10秒。", ex: { t: "bridge", L1: 200, L2: 300, V1: 20, V2: 30, mode: "pass", want: "T" } },
+          { q: "客车长250米时速25米/秒，货车长350米时速15米/秒，同向行驶。客车从追上到完全超过货车，需多少秒？", answer: 60, hint: "超车路程=两车长=600，速度差=10，时间=600÷10=60秒。", ex: { t: "bridge", L1: 250, L2: 350, V1: 25, V2: 15, mode: "overtake", want: "T" } },
+          { q: "火车长240米，一个人以2米/秒与火车相向而行，火车18米/秒。全列火车从他身边开过需多少秒？", answer: 12, hint: "路程=车长240，速度和=20，时间=240÷20=12秒。", ex: { t: "bridge", L: 240, V: 18, Vp: 2, mode: "person", want: "T" } }
+        ]
+      });
+
+      // 行程战术湖：错题复盘（同第9天机制）
+      courses.push({
+        dayNum: d++,
+        type: "review",
+        term: "四年级下",
+        topic: "行程专题复盘",
+        name: { redAlert: "🌊 行程战术湖", original: "行程错题复盘" }
+      });
+
       trio("四年级下", "年龄问题", "⏳ 时间差侦察", "年龄");
       trio("四年级下", "鸡兔同笼", "🐔 鸡兔情报站", "鸡兔同笼");
       trio("四年级下", "几何·面积基础", "📐 领地测绘基础", "几何面积基础");
@@ -864,7 +1141,14 @@
     function qid(dayNum, index) { return `d${dayNum}-q${index}`; }
     function dayKey(dayNum) { return `day-${dayNum}`; }
     function normalizeAnswer(v) { return String(v).trim().replace(/\s+/g, ""); }
-    function answersEqual(user, expected) { return normalizeAnswer(user) === normalizeAnswer(expected); }
+    function answersEqual(user, expected) {
+      const a = normalizeAnswer(user);
+      const b = normalizeAnswer(expected);
+      if (a === b) return true;
+      const na = Number(a);
+      const nb = Number(b);
+      return !Number.isNaN(na) && !Number.isNaN(nb) && Math.abs(na - nb) < 1e-9;
+    }
     function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
     function escapeHtml(s) {
       return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
@@ -887,6 +1171,8 @@
         energy: 0,
         questions: {},
         wrongList: [],
+        damageLog: {},
+        dailyOps: {},
         clearedTopics: [],
         clearedDays: [],
         promotedAnnounced: [],
@@ -914,19 +1200,7 @@
         }
         if (!raw) return defaultProgress();
         const data = JSON.parse(raw);
-        return {
-          correctCount: data.correctCount || 0,
-          energy: data.energy || 0,
-          questions: data.questions || {},
-          wrongList: Array.isArray(data.wrongList) ? data.wrongList : [],
-          clearedTopics: Array.isArray(data.clearedTopics) ? data.clearedTopics : [],
-          clearedDays: Array.isArray(data.clearedDays) ? data.clearedDays.filter((d) => typeof d === "number") : [],
-          promotedAnnounced: Array.isArray(data.promotedAnnounced) ? data.promotedAnnounced : [],
-          lastWelcomeDay: data.lastWelcomeDay || "",
-          scoutedDays: Array.isArray(data.scoutedDays) ? data.scoutedDays : [],
-          enlistedSpoken: !!data.enlistedSpoken,
-          updatedAt: data.updatedAt || 0
-        };
+        return normalizeProgressData(data);
       } catch (e) {
         return defaultProgress();
       }
@@ -997,6 +1271,8 @@
         energy: data.energy || 0,
         questions: data.questions || {},
         wrongList: Array.isArray(data.wrongList) ? data.wrongList : [],
+        damageLog: (data.damageLog && typeof data.damageLog === "object") ? data.damageLog : {},
+        dailyOps: (data.dailyOps && typeof data.dailyOps === "object") ? data.dailyOps : {},
         clearedTopics: Array.isArray(data.clearedTopics) ? data.clearedTopics : [],
         clearedDays: Array.isArray(data.clearedDays) ? data.clearedDays.filter((d) => typeof d === "number") : [],
         promotedAnnounced: Array.isArray(data.promotedAnnounced) ? data.promotedAnnounced : [],
@@ -1272,12 +1548,184 @@
     function addWrong(id) {
       if (!progress.wrongList.includes(id)) {
         progress.wrongList.push(id);
-        saveProgress();
       }
+      ensureDamageEntry(id);
+      saveProgress();
     }
     function removeWrong(id) {
       progress.wrongList = progress.wrongList.filter((x) => x !== id);
+      if (progress.damageLog && progress.damageLog[id]) {
+        progress.damageLog[id].clearedAt = Date.now();
+      }
       saveProgress();
+    }
+
+    function todayKey() {
+      const d = new Date();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return d.getFullYear() + "-" + m + "-" + day;
+    }
+    function isWeekend() {
+      const w = new Date().getDay();
+      return w === 0 || w === 6;
+    }
+    function getTodayOps() {
+      if (!progress.dailyOps) progress.dailyOps = {};
+      const key = todayKey();
+      if (!progress.dailyOps[key]) {
+        progress.dailyOps[key] = { oral: false, practice: false };
+      }
+      return progress.dailyOps[key];
+    }
+    function setTodayOps(field, value) {
+      const ops = getTodayOps();
+      if (field !== "oral" && field !== "practice") return;
+      ops[field] = !!value;
+      saveProgress();
+    }
+    function ensureDamageEntry(id) {
+      if (!progress.damageLog) progress.damageLog = {};
+      if (!progress.damageLog[id]) {
+        progress.damageLog[id] = { reasons: [], note: "", updatedAt: Date.now() };
+      }
+      return progress.damageLog[id];
+    }
+    function toggleDamageReason(id, reasonId) {
+      const entry = ensureDamageEntry(id);
+      const set = new Set(entry.reasons || []);
+      if (set.has(reasonId)) set.delete(reasonId);
+      else set.add(reasonId);
+      entry.reasons = Array.from(set);
+      entry.updatedAt = Date.now();
+      saveProgress();
+    }
+    function setDamageNote(id, note) {
+      const entry = ensureDamageEntry(id);
+      entry.note = String(note || "").slice(0, 200);
+      entry.updatedAt = Date.now();
+      saveProgress();
+    }
+    function reasonChipsHtml(id, selectedIds) {
+      const selected = new Set(selectedIds || []);
+      return DAMAGE_REASONS.map((r) =>
+        `<button type="button" class="reason-chip ${selected.has(r.id) ? "on" : ""}" data-reason="${r.id}" data-qid="${escapeHtml(id)}">${escapeHtml(r.label)}</button>`
+      ).join("");
+    }
+    function inlineReasonPickerHtml(id) {
+      const entry = ensureDamageEntry(id);
+      return `<div class="inline-reason" data-inline-reason="${escapeHtml(id)}">
+        <p>📁 标记战损原因（可多选，方便周末周周清）</p>
+        <div class="reason-chips">${reasonChipsHtml(id, entry.reasons)}</div>
+      </div>`;
+    }
+    function bindInlineReasonPicker(root) {
+      if (!root) return;
+      root.querySelectorAll(".inline-reason .reason-chip").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.dataset.qid;
+          const reason = btn.dataset.reason;
+          toggleDamageReason(id, reason);
+          btn.classList.toggle("on");
+          showToast("已记入战损档案");
+        });
+      });
+    }
+    function openDamageArchive() {
+      const root = document.getElementById("damageListRoot");
+      const banner = document.getElementById("damageWeekendBanner");
+      if (banner) banner.hidden = !isWeekend();
+      const pending = progress.wrongList.filter((id) => getQState(id).status === "wrong");
+      if (!pending.length) {
+        root.innerHTML = `<div class="review-empty">🎉 暂无待修复战损！继续保持。</div>`;
+      } else {
+        let html = `<p style="margin:0 0 10px;color:#ffd08a;">待清剿 ${pending.length} 处</p><ul class="damage-list">`;
+        pending.forEach((id) => {
+          const info = lookupQuestion(id);
+          if (!info) return;
+          const entry = ensureDamageEntry(id);
+          const reasonLabels = (entry.reasons || []).map((rid) => {
+            const hit = DAMAGE_REASONS.find((x) => x.id === rid);
+            return hit ? hit.label : rid;
+          }).join(" · ");
+          html += `<li class="damage-card" data-damage-id="${escapeHtml(id)}">
+            <div class="damage-meta">第${padDay(info.dayNum)}天 · 第${info.index + 1}题 · ${escapeHtml(info.course.topic || "")}${reasonLabels ? " · " + escapeHtml(reasonLabels) : ""}</div>
+            <p class="q-text">${escapeHtml(info.q.q)}</p>
+            <div class="reason-chips">${reasonChipsHtml(id, entry.reasons)}</div>
+            <label style="display:block;color:var(--muted);font-size:0.8rem;">错因备注</label>
+            <textarea class="damage-note" data-note-for="${escapeHtml(id)}" placeholder="例如：线段图把差标反了">${escapeHtml(entry.note || "")}</textarea>
+          </li>`;
+        });
+        html += `</ul>`;
+        root.innerHTML = html;
+        root.querySelectorAll(".reason-chip").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            toggleDamageReason(btn.dataset.qid, btn.dataset.reason);
+            openDamageArchive();
+          });
+        });
+        root.querySelectorAll(".damage-note").forEach((ta) => {
+          ta.addEventListener("change", () => setDamageNote(ta.dataset.noteFor, ta.value));
+          ta.addEventListener("blur", () => setDamageNote(ta.dataset.noteFor, ta.value));
+        });
+      }
+      document.getElementById("damageOverlay").classList.add("show");
+    }
+    function openDamageSweep() {
+      document.getElementById("damageOverlay").classList.remove("show");
+      const review = courses.find((c) => c.type === "review");
+      selectedDayNum = review ? review.dayNum : 9;
+      historyReadonly = false;
+      missionAccepted = true;
+      welcomeGateDone = true;
+      const root = document.getElementById("missionRoot");
+      root.classList.remove("waiting-welcome");
+      document.getElementById("welcomeBanner").hidden = true;
+      root.dataset.mode = "review";
+      root.innerHTML = renderReview();
+      bindMissionEvents({ dayNum: selectedDayNum, course: review || { type: "review", dayNum: selectedDayNum } });
+      showToast(isWeekend() ? "🗡 周周清 · 开始清剿战损" : "🗡 开始清剿战损");
+      try { root.scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) {}
+    }
+    function renderTacticsList() {
+      const box = document.getElementById("tacticsList");
+      if (!box) return;
+      box.innerHTML = TACTICS_MANUAL.map((t, i) => `
+        <details class="tactics-item" ${i === 0 ? "open" : ""}>
+          <summary>⚔ ${escapeHtml(t.title)}</summary>
+          <ol class="tactics-steps">${t.steps.map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ol>
+        </details>`).join("");
+    }
+    function setTacticsOpen(open) {
+      const dock = document.getElementById("tacticsDock");
+      const backdrop = document.getElementById("tacticsBackdrop");
+      if (!dock) return;
+      dock.classList.toggle("open", !!open);
+      if (backdrop) backdrop.classList.toggle("show", !!open && window.matchMedia("(max-width: 1099px)").matches);
+    }
+    function renderOpsBoardHtml() {
+      const ops = getTodayOps();
+      const weekend = isWeekend()
+        ? `<p class="ops-weekend">🗡 周末建议：打开「战损档案」做周周清</p>`
+        : "";
+      return `<div class="ops-board" id="opsBoard">
+        <p class="ops-board-title">📋 今日作战简报</p>
+        <label class="ops-item ${ops.oral ? "done" : ""}"><input type="checkbox" data-ops="oral" ${ops.oral ? "checked" : ""} /> 口算侦察 10 分钟</label>
+        <label class="ops-item ${ops.practice ? "done" : ""}"><input type="checkbox" data-ops="practice" ${ops.practice ? "checked" : ""} /> 浅奥突击 30 分钟</label>
+        ${weekend}
+      </div>`;
+    }
+    function bindOpsBoard() {
+      const board = document.getElementById("opsBoard");
+      if (!board) return;
+      board.querySelectorAll("input[data-ops]").forEach((input) => {
+        input.addEventListener("change", () => {
+          setTodayOps(input.dataset.ops, input.checked);
+          const label = input.closest(".ops-item");
+          if (label) label.classList.toggle("done", input.checked);
+          showToast(input.checked ? "✅ 简报已勾选" : "已取消勾选");
+        });
+      });
     }
 
     function getDefaultDayNum() {
@@ -1951,6 +2399,142 @@
         };
       }
 
+      if (ex.t === "meet") {
+        const va = ex.Va != null ? ex.Va : (ex.ratio && ex.S && ex.T ? (ex.S / ex.T) * ex.ratio[0] / (ex.ratio[0] + ex.ratio[1]) : null);
+        const vb = ex.Vb != null ? ex.Vb : (ex.ratio && ex.S && ex.T ? (ex.S / ex.T) * ex.ratio[1] / (ex.ratio[0] + ex.ratio[1]) : null);
+        const sumV = (va != null && vb != null) ? va + vb : (ex.S && ex.T ? ex.S / ex.T : null);
+        const aheadDist = ex.aheadA && va != null ? va * ex.aheadA : 0;
+        const remain = ex.S != null ? ex.S - aheadDist : null;
+        const tMeet = remain != null && sumV ? remain / sumV : (ex.S && sumV ? ex.S / sumV : null);
+        let ans = q.answer;
+        let sayLast = "目标锁定。记住：相遇看速度和。";
+        let formulaLast = String(ans);
+        if (ex.want === "T" || ex.want === "T2" || ex.want === "T2min") {
+          sayLast = ex.want === "T2min"
+            ? `再相遇要 ${tMeet} 小时，也就是 ${ans} 分钟。`
+            : `相遇时间是 ${ans}。相向而行，用速度和去除路程。`;
+          formulaLast = ex.want === "T2min" ? `${tMeet} 小时 = ${ans} 分钟` : `时间 = ${ans}`;
+        } else if (ex.want === "Sa") {
+          sayLast = `慢队走了 ${ans} 千米。`;
+          formulaLast = `${ex.A}路程 = ${ans}`;
+        } else if (ex.want === "S") {
+          sayLast = `两地相距 ${ans} 千米。`;
+          formulaLast = `全程 = ${ans}`;
+        } else if (ex.want === "Va") {
+          sayLast = `${ex.A}的速度是 ${ans}。`;
+          formulaLast = `${ex.A}速度 = ${ans}`;
+        } else if (ex.want === "Tafter") {
+          sayLast = `相遇后还要 ${ans} 小时。`;
+          formulaLast = `继续时间 = ${ans}`;
+        }
+        return {
+          steps: [
+            {
+              say: `士兵，这是相遇作战。${ex.A || "甲"}与${ex.B || "乙"}相向机动。`,
+              formula: ex.S != null ? `路程 ${ex.S}` : (ex.Sa != null ? `${ex.A}已走 ${ex.Sa}` : "相向 · 速度和"),
+              paint: (stage) => {
+                stage.innerHTML = `<div class="trip-line"><span class="trip-a">◀ ${escapeHtml(ex.A || "甲")}</span><span class="trip-gap">相向</span><span class="trip-b">${escapeHtml(ex.B || "乙")} ▶</span></div><div class="eq-box">路程 ÷ 速度和 = 时间</div>`;
+              }
+            },
+            {
+              say: aheadDist
+                ? `${ex.A}先走了 ${aheadDist}，剩下 ${remain}。速度和是 ${sumV}。`
+                : (sumV != null
+                  ? `速度和是 ${sumV}。关键公式：时间 = 路程 ÷ 速度和。`
+                  : (q.hint || "先求速度和，再去除路程。")),
+              formula: aheadDist
+                ? `剩余 ${remain}，速度和 ${sumV}`
+                : (sumV != null ? `速度和 = ${sumV}` : (q.hint || "")),
+              paint: (stage) => {
+                stage.innerHTML = `<div class="eq-box">${escapeHtml(aheadDist ? `剩余 ${remain} ÷ ${sumV}` : `速度和 ${sumV != null ? sumV : ""}`)}</div>`;
+              }
+            },
+            {
+              say: sayLast,
+              formula: formulaLast,
+              paint: (stage) => {
+                stage.innerHTML = `<div class="eq-box"><span class="pop">${escapeHtml(String(ans))}</span></div>`;
+              }
+            }
+          ]
+        };
+      }
+
+      if (ex.t === "chase") {
+        const vf = ex.Vf;
+        const vs = ex.Vs;
+        const vdiff = ex.Vdiff != null ? ex.Vdiff : (vf != null && vs != null ? vf - vs : null);
+        const dist = ex.D != null ? ex.D : (ex.aheadS && vs != null ? vs * ex.aheadS : null);
+        const t = dist != null && vdiff ? dist / vdiff : null;
+        return {
+          steps: [
+            {
+              say: `追击战：${ex.A || "快方"}去追${ex.B || "慢方"}。${ex.loop ? "在环形跑道上，要多跑整整一圈的差距。" : "同向追及，看速度差。"}`,
+              formula: "路程差 ÷ 速度差 = 时间",
+              paint: (stage) => {
+                stage.innerHTML = `<div class="trip-line"><span class="trip-a">${escapeHtml(ex.A || "快")} ▶▶</span><span class="trip-gap">追击</span><span class="trip-b">${escapeHtml(ex.B || "慢")} ▶</span></div><div class="eq-box">${ex.loop ? "周长 ÷ 速度差" : "差距 ÷ 速度差"}</div>`;
+              }
+            },
+            {
+              say: dist != null && vdiff != null
+                ? `要追上的差距是 ${dist}，速度差是 ${vdiff}。`
+                : (q.hint || "先找出追及路程和速度差。"),
+              formula: dist != null && vdiff != null ? `${dist} ÷ ${vdiff}` : (q.hint || ""),
+              paint: (stage) => {
+                stage.innerHTML = `<div class="eq-box">${dist != null ? `差距 ${dist}` : ""} ${vdiff != null ? `· 差速 ${vdiff}` : ""}</div>`;
+              }
+            },
+            {
+              say: `时间等于 ${q.answer}。记住：追及用速度差。`,
+              formula: `时间 = ${q.answer}`,
+              paint: (stage) => {
+                stage.innerHTML = `<div class="eq-box"><span class="pop">${escapeHtml(String(q.answer))}</span></div>`;
+              }
+            }
+          ]
+        };
+      }
+
+      if (ex.t === "bridge") {
+        let say1 = "火车过桥：从车头上桥计到车尾离桥。路程 = 车长 + 桥长。";
+        let formula1 = "（车长 + 桥长）÷ 速度 = 时间";
+        if (ex.mode === "pass") {
+          say1 = "两车错车：相向而过，路程是两车长之和，用速度和。";
+          formula1 = "（车长1 + 车长2）÷ 速度和 = 时间";
+        } else if (ex.mode === "overtake") {
+          say1 = "两车超车：同向超过，路程是两车长之和，用速度差。";
+          formula1 = "（车长1 + 车长2）÷ 速度差 = 时间";
+        } else if (ex.mode === "person") {
+          say1 = "火车从人身边开过：路程是车长，人和车相向就用速度和。";
+          formula1 = "车长 ÷（车速 + 人速）= 时间";
+        }
+        return {
+          steps: [
+            {
+              say: say1,
+              formula: formula1,
+              paint: (stage) => {
+                stage.innerHTML = `<div class="trip-bridge"><span class="trip-train">🚆</span><span class="trip-bridge-span">桥 / 隧道</span></div><div class="eq-box">${escapeHtml(formula1)}</div>`;
+              }
+            },
+            {
+              say: q.hint || "把已知量代入公式。",
+              formula: q.hint || "",
+              paint: (stage) => {
+                stage.innerHTML = `<div class="eq-box">${escapeHtml(q.hint || "代入公式")}</div>`;
+              }
+            },
+            {
+              say: `答案是 ${q.answer}。过桥别忘了加上车身长度！`,
+              formula: String(q.answer),
+              paint: (stage) => {
+                stage.innerHTML = `<div class="eq-box"><span class="pop">${escapeHtml(String(q.answer))}</span></div>`;
+              }
+            }
+          ]
+        };
+      }
+
       return buildBriefing({ ...q, ex: null });
     }
 
@@ -2298,7 +2882,8 @@
         st.lastReveal = String(entry.answer);
         setQState(id, st);
         addWrong(id);
-        slot.innerHTML = `<p class="feedback bad">💥 未命中！正确答案是 ${escapeHtml(entry.answer)}。需要讲解请点「听讲解」。</p>`;
+        slot.innerHTML = `<p class="feedback bad">💥 未命中！正确答案是 ${escapeHtml(entry.answer)}。需要讲解请点「听讲解」。</p>${inlineReasonPickerHtml(id)}`;
+        bindInlineReasonPicker(slot);
         input.value = "";
         input.focus();
         speakMissEncourage();
@@ -2416,16 +3001,27 @@
     function renderReview() {
       const all = progress.wrongList.filter((id) => getQState(id).status === "wrong");
       if (!all.length) {
-        return `<h1 class="mission-title">📋 错题复盘</h1><div class="review-empty">🎉 暂无待修复漏洞！</div>`;
+        return `<h1 class="mission-title">📋 错题复盘 · 战损清剿</h1><div class="review-empty">🎉 暂无待修复漏洞！</div>`;
       }
-      let html = `<h1 class="mission-title">📋 错题复盘</h1><p class="mission-sub">共 ${all.length} 题</p><div id="reviewList">`;
+      let html = `<h1 class="mission-title">📋 错题复盘 · 战损清剿</h1>
+        <p class="mission-sub">共 ${all.length} 题${isWeekend() ? " · 周末周周清" : ""}</p>
+        <div id="reviewList">`;
       all.forEach((id, i) => {
         const info = lookupQuestion(id);
         if (!info) return;
         const locked = getQState(id).status === "correct";
+        const entry = ensureDamageEntry(id);
+        const reasonLabels = (entry.reasons || []).map((rid) => {
+          const hit = DAMAGE_REASONS.find((x) => x.id === rid);
+          return hit ? hit.label : rid;
+        }).filter(Boolean);
+        const reasonLine = reasonLabels.length
+          ? `<p class="damage-meta">战损原因：${escapeHtml(reasonLabels.join(" · "))}${entry.note ? " · " + escapeHtml(entry.note) : ""}</p>`
+          : (entry.note ? `<p class="damage-meta">备注：${escapeHtml(entry.note)}</p>` : "");
         html += `
           <article class="question" data-qid="${escapeHtml(id)}" data-hit="${Math.min(i, 3)}">
-            <p class="q-badge">错题 · 第${info.index + 1}题</p>
+            <p class="q-badge">错题 · 第${padDay(info.dayNum)}天 · 第${info.index + 1}题</p>
+            ${reasonLine}
             <p class="q-text">${escapeHtml(info.q.q)}</p>
             <div class="answer-row">
               <input class="answer-input" type="text" inputmode="numeric" placeholder="输入答案" ${locked ? "disabled" : ""} />
@@ -2531,7 +3127,8 @@
             st.lastReveal = String(info.q.answer);
             setQState(id, st);
             addWrong(id);
-            slot.innerHTML = `<p class="feedback bad">💥 未命中！正确答案是 ${escapeHtml(info.q.answer)}。可点听讲解。</p>`;
+            slot.innerHTML = `<p class="feedback bad">💥 未命中！正确答案是 ${escapeHtml(info.q.answer)}。可点听讲解。</p>${inlineReasonPickerHtml(id)}`;
+            bindInlineReasonPicker(slot);
             input.value = "";
             await speakMissEncourage();
           }
@@ -2651,11 +3248,11 @@
             <li>📺 先完成侦察：观看今日配套视频</li>
             <li>🎯 再攻克 ${QUESTIONS_PER_DAY} 道题（一道一道来）</li>
             <li>⏱️ 接受任务后开始 <strong>20 分钟</strong>作战计时</li>
-          </ol>`
+          </ol>${renderOpsBoardHtml()}`
           : `<ol class="briefing-tips">
             <li>📢 听长官鼓励，明确今日目标</li>
             <li>⏱️ 点「接受任务」后再开始计时</li>
-          </ol>`;
+          </ol>${renderOpsBoardHtml()}`;
       const action = locked
         ? `<button type="button" class="btn btn-orange" id="briefOpenMapBtn">🗺️ 打开战略地图</button>
            <button type="button" class="btn btn-ghost" id="acceptMissionBtn" style="margin-top:10px;">返回当前可学任务</button>`
@@ -2758,6 +3355,7 @@
           acceptMissionAndStart();
         });
       }
+      bindOpsBoard();
     }
 
     function mount(runWelcome) {
@@ -3299,6 +3897,22 @@
     document.getElementById("historyOverlay").addEventListener("click", (e) => {
       if (e.target.id === "historyOverlay") document.getElementById("historyOverlay").classList.remove("show");
     });
+
+    document.getElementById("damageOpenBtn").addEventListener("click", openDamageArchive);
+    document.getElementById("damageCloseBtn").addEventListener("click", () => {
+      document.getElementById("damageOverlay").classList.remove("show");
+    });
+    document.getElementById("damageSweepBtn").addEventListener("click", openDamageSweep);
+    document.getElementById("damageOverlay").addEventListener("click", (e) => {
+      if (e.target.id === "damageOverlay") document.getElementById("damageOverlay").classList.remove("show");
+    });
+
+    renderTacticsList();
+    document.getElementById("tacticsOpenBtn").addEventListener("click", () => setTacticsOpen(true));
+    document.getElementById("tacticsFab").addEventListener("click", () => setTacticsOpen(true));
+    document.getElementById("tacticsCloseBtn").addEventListener("click", () => setTacticsOpen(false));
+    document.getElementById("tacticsBackdrop").addEventListener("click", () => setTacticsOpen(false));
+    if (window.matchMedia("(min-width: 1100px)").matches) setTacticsOpen(true);
 
     document.getElementById("transferOpenBtn").addEventListener("click", openTransferPanel);
     document.getElementById("transferCloseBtn").addEventListener("click", () => {
