@@ -368,6 +368,42 @@
       max-width: 900px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
     }
     .command-bar .btn { flex: 1 1 120px; max-width: 180px; }
+    /* 孩子模式：底栏只显示当前阶段需要的按钮 */
+    .command-bar[data-phase="gate"] .cmd-phase:not(.cmd-gate),
+    .command-bar[data-phase="video"] .cmd-phase:not(.cmd-video),
+    .command-bar[data-phase="quiz"] .cmd-phase:not(.cmd-quiz),
+    .command-bar[data-phase="done"] .cmd-phase:not(.cmd-done),
+    .command-bar[data-phase="review"] .cmd-phase:not(.cmd-review),
+    .command-bar[data-phase="idle"] .cmd-phase { display: none !important; }
+    .command-bar[data-phase="gate"] .cmd-gate {
+      flex: 1 1 100%; max-width: 420px; min-height: 56px; font-size: 1.2rem;
+    }
+    .command-bar[data-phase="video"] .cmd-video {
+      flex: 1 1 40%; max-width: 280px; min-height: 52px; font-size: 1.05rem;
+    }
+    .status-kid-row {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 6px;
+    }
+    .parent-tools {
+      display: none;
+      width: 100%;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(74,122,74,0.45);
+    }
+    .parent-tools.open { display: block; }
+    .parent-tools .btn { margin: 4px 4px 0 0; }
+    .parent-menu-btn {
+      font-size: 0.75rem !important; padding: 6px 10px !important; min-height: 32px;
+      opacity: 0.75;
+    }
+    .briefing-gate .briefing-tips { max-width: 360px; }
+    .briefing-gate .kid-start-hint {
+      margin: 0 0 12px; color: var(--muted); font-size: 0.95rem;
+    }
+    .video-hero .kid-step {
+      margin: 0 0 12px; color: #ffd08a; font-size: 1.15rem; font-weight: 700;
+    }
 
     .overlay, .brief-overlay, .guide-overlay, .history-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 1000;
@@ -518,7 +554,7 @@
     }
     .inline-reason p { margin: 0 0 8px; color: #ffd08a; font-size: 0.88rem; }
 
-    /* 战术条令 */
+    /* 战术条令：默认收起，需要时再打开（孩子模式少分心） */
     .tactics-fab {
       position: fixed; right: 12px; bottom: calc(88px + env(safe-area-inset-bottom)); z-index: 950;
       border: 2px solid var(--accent); background: rgba(18,28,18,0.95); color: #ffd08a;
@@ -549,14 +585,18 @@
     @media (min-width: 1100px) {
       .tactics-fab { display: none; }
       .tactics-backdrop { display: none !important; }
+      /* 桌面也不常驻展开，避免抢注意力；点「战术条令」再打开 */
       .tactics-dock {
-        transform: none; top: 72px; bottom: 100px; right: 8px; width: 280px;
-        border: 2px solid var(--border); box-shadow: none; padding-bottom: 16px;
+        top: 72px; bottom: 100px; right: 8px; width: 280px;
+        border: 2px solid var(--border); box-shadow: -8px 0 24px rgba(0,0,0,0.4); padding-bottom: 16px;
       }
-      #tacticsCloseBtn { display: none; }
-      /* 给右侧条令留空，主栏在剩余区域内水平居中 */
-      body { padding-right: 296px; }
+      .tactics-dock.open { transform: none; }
+      body.tactics-open { padding-right: 296px; }
       main { max-width: 820px; margin-left: auto; margin-right: auto; }
+      #missionRoot:has(.briefing-gate) {
+        left: 50%;
+        width: min(560px, calc(100vw - 32px));
+      }
     }
   </style>
 </head>
@@ -565,34 +605,37 @@
     <div>
       <div class="status-title">📡 数学指挥部</div>
       <div class="encourage" id="encourageText"></div>
-      <span class="energy-chip" id="userChip" hidden>👤 </span>
-      <span class="energy-chip" id="energyChip">⚡ 能源 0</span>
-      <div style="margin-top:8px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
+      <div class="status-kid-row">
+        <span class="energy-chip" id="userChip" hidden>👤 </span>
+        <span class="energy-chip" id="energyChip">⚡ 能源 0</span>
         <span class="timer-display" id="timerDisplay">20:00</span>
         <button type="button" class="btn btn-ghost reset-btn" id="timerPauseBtn" hidden>⏸ 暂停</button>
         <button type="button" class="btn btn-ghost reset-btn" id="timerResumeBtn" hidden>▶ 继续</button>
-        <button type="button" class="btn btn-ghost reset-btn" id="timerResetGateBtn">⏹ 回到计时前</button>
       </div>
       <div class="timer-alert" id="timerAlert">⏰ 三题全部攻克！任务结束，撤退休整！</div>
-      <div class="parent-debug">
-        <span>家长调试</span>
-        <select id="debugDaySelect"></select>
-        <button type="button" id="debugDayApply">切换</button>
-      </div>
     </div>
     <div>
       <div class="rank-line"><span class="rank-badge" id="rankBadge"></span><span id="rankName">🪖 列兵</span></div>
       <div class="score-line" id="scoreLabel">战果：0/3</div>
       <div class="rank-bar"><div class="rank-bar-fill" id="rankBarFill"></div></div>
-      <button type="button" class="btn btn-ghost reset-btn" id="mapOpenBtn">🗺️ 战略地图</button>
-      <button type="button" class="btn btn-ghost reset-btn" id="damageOpenBtn">📁 战损档案</button>
-      <button type="button" class="btn btn-ghost reset-btn" id="tacticsOpenBtn">📖 战术条令</button>
-      <button type="button" class="btn btn-ghost reset-btn" id="historyOpenBtn">📅 历史任务</button>
-      <button type="button" class="btn btn-ghost reset-btn" id="accountOpenBtn">👤 账号</button>
-      <button type="button" class="btn btn-ghost reset-btn" id="transferOpenBtn">📱 换机带走进度</button>
-      <button type="button" class="btn btn-ghost reset-btn" id="muteBtn">🔊 音效开</button>
-      <button type="button" class="btn btn-ghost reset-btn" id="voiceGenderBtn">👨 男长官</button>
-      <button type="button" class="btn btn-ghost reset-btn" id="resetProgressBtn">🔄 重置进度</button>
+      <button type="button" class="btn btn-ghost parent-menu-btn" id="parentMenuBtn" aria-expanded="false">家长设置</button>
+      <div class="parent-tools" id="parentTools" hidden>
+        <button type="button" class="btn btn-ghost reset-btn" id="mapOpenBtn">🗺️ 战略地图</button>
+        <button type="button" class="btn btn-ghost reset-btn" id="damageOpenBtn">📁 战损档案</button>
+        <button type="button" class="btn btn-ghost reset-btn" id="tacticsOpenBtn">📖 战术条令</button>
+        <button type="button" class="btn btn-ghost reset-btn" id="historyOpenBtn">📅 历史任务</button>
+        <button type="button" class="btn btn-ghost reset-btn" id="accountOpenBtn">👤 账号</button>
+        <button type="button" class="btn btn-ghost reset-btn" id="transferOpenBtn">📱 换机带走进度</button>
+        <button type="button" class="btn btn-ghost reset-btn" id="muteBtn">🔊 音效开</button>
+        <button type="button" class="btn btn-ghost reset-btn" id="voiceGenderBtn">👨 男长官</button>
+        <button type="button" class="btn btn-ghost reset-btn" id="timerResetGateBtn">⏹ 回到计时前</button>
+        <button type="button" class="btn btn-ghost reset-btn" id="resetProgressBtn">🔄 重置进度</button>
+        <div class="parent-debug">
+          <span>家长调试</span>
+          <select id="debugDaySelect"></select>
+          <button type="button" id="debugDayApply">切换</button>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -605,14 +648,16 @@
     <section class="mission-card waiting-welcome" id="missionRoot"></section>
   </main>
 
-  <nav class="command-bar" id="commandBar" aria-label="作战命令栏">
+  <nav class="command-bar" id="commandBar" aria-label="作战命令栏" data-phase="gate">
     <div class="command-bar-inner">
-      <button type="button" class="btn btn-orange" id="timerBtn">🎯 接受任务</button>
-      <a class="btn btn-ghost" id="cmdVideoBtn" href="#" target="_blank" rel="noopener noreferrer">🎬 前往B站观看</a>
-      <button type="button" class="btn btn-ghost" id="cmdPrevBtn">⏪ 上一题</button>
-      <button type="button" class="btn btn-ghost" id="cmdNextBtn">⏩ 下一题</button>
-      <button type="button" class="btn btn-orange" id="cmdCheckBtn">✅ 确认战果</button>
-      <button type="button" class="btn btn-ghost" id="cmdHintBtn">📢 听讲解</button>
+      <button type="button" class="btn btn-orange cmd-phase cmd-gate" id="timerBtn">🚀 开始今天的任务</button>
+      <a class="btn btn-orange cmd-phase cmd-video" id="cmdVideoBtn" href="#" target="_blank" rel="noopener noreferrer">🎬 去看视频</a>
+      <button type="button" class="btn btn-orange cmd-phase cmd-video" id="cmdDoneVideoBtn">✅ 我看完了，开始做题</button>
+      <button type="button" class="btn btn-ghost cmd-phase cmd-quiz" id="cmdPrevBtn">⏪ 上一题</button>
+      <button type="button" class="btn btn-ghost cmd-phase cmd-quiz" id="cmdNextBtn">⏩ 下一题</button>
+      <button type="button" class="btn btn-orange cmd-phase cmd-quiz" id="cmdCheckBtn">✅ 确认答案</button>
+      <button type="button" class="btn btn-ghost cmd-phase cmd-quiz cmd-review cmd-done" id="cmdHintBtn">📢 听讲解</button>
+      <button type="button" class="btn btn-ghost cmd-phase cmd-done" id="cmdNextDayBtn">🗺️ 看地图选下一天</button>
     </div>
   </nav>
 
@@ -2108,7 +2153,17 @@
       const backdrop = document.getElementById("tacticsBackdrop");
       if (!dock) return;
       dock.classList.toggle("open", !!open);
+      document.body.classList.toggle("tactics-open", !!open && window.matchMedia("(min-width: 1100px)").matches);
       if (backdrop) backdrop.classList.toggle("show", !!open && window.matchMedia("(max-width: 1099px)").matches);
+    }
+    function setParentToolsOpen(open) {
+      const box = document.getElementById("parentTools");
+      const btn = document.getElementById("parentMenuBtn");
+      if (!box || !btn) return;
+      box.hidden = !open;
+      box.classList.toggle("open", !!open);
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      btn.textContent = open ? "收起家长设置" : "家长设置";
     }
     function renderOpsBoardHtml() {
       const ops = getTodayOps();
@@ -3447,22 +3502,69 @@
       refreshEnergyUI();
     }
 
+    function syncCommandBarPhase(dayNum, course) {
+      const bar = document.getElementById("commandBar");
+      const timerBtn = document.getElementById("timerBtn");
+      if (!bar) return;
+      let phase = "idle";
+      if (!missionAccepted || !welcomeGateDone) {
+        phase = "gate";
+      } else if (course && course.type === "review") {
+        phase = "review";
+      } else if (missionPhase === "video") {
+        phase = "video";
+      } else if (missionPhase === "quiz") {
+        phase = "quiz";
+      } else if (missionPhase === "done") {
+        phase = "done";
+      } else {
+        phase = "idle";
+      }
+      bar.dataset.phase = phase;
+      if (timerBtn) {
+        if (phase === "gate") {
+          timerBtn.textContent = "🚀 开始今天的任务";
+          timerBtn.disabled = false;
+        } else {
+          timerBtn.disabled = true;
+        }
+      }
+      updateCommandBar(dayNum, course);
+    }
+
     function updateCommandBar(dayNum, course) {
       const video = document.getElementById("cmdVideoBtn");
-      if (course && course.videoUrl) {
-        video.href = course.videoUrl;
-        video.style.display = "";
-      } else {
-        video.removeAttribute("href");
-        video.style.display = "none";
+      if (video) {
+        if (course && course.videoUrl) {
+          video.href = course.videoUrl;
+        } else {
+          video.removeAttribute("href");
+        }
       }
       const inQuiz = missionPhase === "quiz" && course && !course.type;
-      document.getElementById("cmdPrevBtn").disabled = !inQuiz || currentQIndex <= 0;
-      document.getElementById("cmdNextBtn").disabled = !inQuiz || currentQIndex >= QUESTIONS_PER_DAY - 1;
+      const prev = document.getElementById("cmdPrevBtn");
+      const next = document.getElementById("cmdNextBtn");
+      const check = document.getElementById("cmdCheckBtn");
+      const hint = document.getElementById("cmdHintBtn");
+      if (prev) prev.disabled = !inQuiz || currentQIndex <= 0;
+      if (next) next.disabled = !inQuiz || currentQIndex >= QUESTIONS_PER_DAY - 1;
       const id = course && !course.type ? qid(dayNum, currentQIndex) : null;
       const locked = id ? getQState(id).status === "correct" : true;
-      document.getElementById("cmdCheckBtn").disabled = !inQuiz || locked || historyReadonly;
-      document.getElementById("cmdHintBtn").disabled = !inQuiz;
+      if (check) check.disabled = !(inQuiz || (course && course.type === "review")) || locked || historyReadonly;
+      if (hint) hint.disabled = !(inQuiz || missionPhase === "done" || (course && course.type === "review"));
+    }
+
+    function finishVideoAndStartQuiz() {
+      if (activeDayNum == null || !activeCourse) return;
+      const key = dayKey(activeDayNum);
+      if (!progress.scoutedDays.includes(key)) {
+        progress.scoutedDays.push(key);
+        saveProgress();
+      }
+      missionPhase = "quiz";
+      currentQIndex = firstUnfinishedQIndex(activeDayNum);
+      if (currentQIndex >= QUESTIONS_PER_DAY) currentQIndex = 0;
+      mount(false);
     }
 
     function goToQuestion(dayNum, course, qIndex) {
@@ -3630,11 +3732,9 @@
       if (missionPhase === "video") {
         body += `
           <div class="video-hero">
-            <p style="margin:0 0 8px;color:#ffd08a;">第①步：先看教学视频（新标签页打开，本页不离开）</p>
+            <p class="kid-step">第 1 步：去看今天的小视频</p>
             <p class="video-meta">${escapeHtml(metaBits.join(" · "))}</p>
-            <a class="btn btn-orange" id="videoBtn" href="${escapeHtml(course.videoUrl)}" target="_blank" rel="noopener noreferrer">🎬 前往B站观看</a>
-            <p style="margin:14px 0 0;color:var(--muted);font-size:0.9rem;">看完后关掉B站标签，回到这里点下面按钮开始做题</p>
-            <button type="button" class="btn btn-ghost" id="startQuizBtn" style="margin-top:12px;min-width:200px;">我看完了，开始做题</button>
+            <p style="margin:12px 0 0;color:var(--muted);font-size:0.95rem;">看完后回到这里，点下面「我看完了，开始做题」</p>
           </div>`;
       } else if (missionPhase === "quiz") {
         body += `<div id="quizSlot">${renderQuizCard(dayNum, course, currentQIndex)}</div>`;
@@ -3702,31 +3802,6 @@
       activeDayNum = dayNum;
       activeCourse = course;
 
-      const markScoutedAndQuiz = () => {
-        const key = dayKey(dayNum);
-        if (!progress.scoutedDays.includes(key)) {
-          progress.scoutedDays.push(key);
-          saveProgress();
-        }
-        missionPhase = "quiz";
-        currentQIndex = firstUnfinishedQIndex(dayNum);
-        if (currentQIndex >= QUESTIONS_PER_DAY) currentQIndex = 0;
-        mount(false);
-      };
-
-      const videoBtn = document.getElementById("videoBtn");
-      if (videoBtn) {
-        // <a target=_blank> keeps this page; also mark scouted lightly without remount
-        videoBtn.addEventListener("click", () => {
-          const key = dayKey(dayNum);
-          if (!progress.scoutedDays.includes(key)) {
-            progress.scoutedDays.push(key);
-            saveProgress();
-          }
-        });
-      }
-      const startQuizBtn = document.getElementById("startQuizBtn");
-      if (startQuizBtn) startQuizBtn.addEventListener("click", markScoutedAndQuiz);
       const exitHistoryBtn = document.getElementById("exitHistoryBtn");
       if (exitHistoryBtn) {
         exitHistoryBtn.addEventListener("click", () => {
@@ -3738,9 +3813,6 @@
 
       if (missionPhase === "quiz") {
         bindActiveQuestion(dayNum, course, currentQIndex);
-        if (!historyReadonly && !timerRunning && !timerStoppedAt) {
-          // do not auto-start timer; kid clicks 开始行动
-        }
       }
 
       document.querySelectorAll(".day-chip").forEach((btn) => {
@@ -3758,7 +3830,6 @@
       const openMapFromLock = document.getElementById("openMapFromLockBtn");
       if (openMapFromLock) openMapFromLock.addEventListener("click", () => openRoadmap());
 
-      // review bind
       const root = document.getElementById("missionRoot");
       root.querySelectorAll(".question").forEach((el) => {
         const id = el.dataset.qid;
@@ -3789,7 +3860,7 @@
         });
       });
 
-      updateCommandBar(dayNum, course);
+      syncCommandBarPhase(dayNum, course);
     }
 
     function startMissionTimer(opts) {
@@ -3861,10 +3932,10 @@
       const btn = document.getElementById("timerBtn");
       if (btn) {
         btn.disabled = false;
-        btn.textContent = "🎯 接受任务";
+        btn.textContent = "🚀 开始今天的任务";
       }
       document.getElementById("timerAlert").classList.remove("show");
-      showToast("已回到计时前 · 需再次「接受任务」才计时");
+      showToast("已回到开始前 · 再点底部橙色按钮即可");
       mount(true);
     }
 
@@ -3885,39 +3956,22 @@
             ? "战术复盘室"
             : "今日作战命令";
       const sub = locked
-        ? `第${padDay(dayNum)}天 · ${escapeHtml(courseTerm(course))} · ${escapeHtml((course && (course.topic || (course.name && course.name.original))) || "")}（占位）`
+        ? `第${padDay(dayNum)}天还没开放，先打当前关卡`
         : course && !course.type
-          ? `第${padDay(dayNum)}天 · ${escapeHtml(course.name.original)} · ${phaseLabel(course.phase)}`
+          ? `第${padDay(dayNum)}天 · ${escapeHtml(course.name.original)}`
           : course && course.type === "review"
-            ? "复习本周错题，巩固阵地"
+            ? "复习错题"
             : "";
       const tips = locked
-        ? `<ol class="briefing-tips">
-            <li>🗺️ 完整汇文主线已在战略地图标出</li>
-            <li>🔒 当前节点待补充 B 站视频与题目</li>
-            <li>✅ 请先完成「基础武器」已开放关卡</li>
-          </ol>`
-        : course && !course.type
-          ? `<ol class="briefing-tips">
-            <li>📺 先侦察：看今日视频（约几分钟）</li>
-            <li>🎯 再攻克 ${QUESTIONS_PER_DAY} 道题；做错先看思路，第二次才公布答案</li>
-            <li>⏱️ 接受任务后计时 <strong>20 分钟</strong>（一次陪练约 20–30 分钟即可）</li>
-            <li>📅 本周目标：陪练约 <strong>4 次</strong>，不必天天硬扛</li>
-          </ol>${renderOpsBoardHtml()}`
-          : `<ol class="briefing-tips">
-            <li>📢 听长官鼓励，明确今日目标</li>
-            <li>⏱️ 点「接受任务」后再开始计时</li>
-          </ol>${renderOpsBoardHtml()}`;
-      const action = locked
-        ? `<button type="button" class="btn btn-orange" id="briefOpenMapBtn">🗺️ 打开战略地图</button>
-           <button type="button" class="btn btn-ghost" id="acceptMissionBtn" style="margin-top:10px;">返回当前可学任务</button>`
-        : `<button type="button" class="btn btn-orange" id="acceptMissionBtn">🎯 接受任务 · 开始计时</button>`;
+        ? `<p class="kid-start-hint">请家长打开「家长设置 → 战略地图」查看路线。</p>
+           <button type="button" class="btn btn-orange" id="briefOpenMapBtn">🗺️ 打开战略地图</button>`
+        : `<p class="kid-start-hint">今天只要做一件事：点下面的橙色按钮开始。</p>
+           <p class="kid-start-hint" style="color:#ffd08a;">看一小段视频 → 做 ${QUESTIONS_PER_DAY} 道题 → 通关！</p>`;
       return `<div class="briefing-gate">
         <p class="briefing-hello">🎙️ ${escapeHtml(helloLine)}</p>
         <h2 class="briefing-title">${title}</h2>
         <p class="briefing-sub">${sub}</p>
         ${tips}
-        ${action}
       </div>`;
     }
 
@@ -3971,7 +4025,7 @@
       const timerBtn = document.getElementById("timerBtn");
       if (timerBtn && !timerRunning) {
         timerBtn.disabled = false;
-        timerBtn.textContent = "🎯 接受任务";
+        timerBtn.textContent = "🚀 开始今天的任务";
       }
 
       // 同一会话已接受过：直接进入任务（计时若已停过则不自动再开）
@@ -3999,18 +4053,17 @@
       root.innerHTML = renderBriefingGateHtml(dayNum, course, line);
       const mapBtn = document.getElementById("briefOpenMapBtn");
       if (mapBtn) mapBtn.addEventListener("click", () => openRoadmap());
-      const acceptBtn = document.getElementById("acceptMissionBtn");
-      if (acceptBtn) {
-        acceptBtn.addEventListener("click", () => {
-          if (course && (isPlaceholderCourse(course) || course.type === "lake" || !canStudyDay(dayNum))) {
-            selectedDayNum = null;
-            mount(false);
-            return;
-          }
-          acceptMissionAndStart();
-        });
+      activeDayNum = dayNum;
+      activeCourse = course;
+      missionPhase = "video";
+      syncCommandBarPhase(dayNum, course);
+      // gate 阶段强制
+      const bar = document.getElementById("commandBar");
+      if (bar) bar.dataset.phase = "gate";
+      if (timerBtn) {
+        timerBtn.disabled = false;
+        timerBtn.textContent = "🚀 开始今天的任务";
       }
-      bindOpsBoard();
     }
 
     function mount(runWelcome) {
@@ -4053,9 +4106,9 @@
 
     /* ========== Guide ========== */
     const guideSteps = [
-      { el: "#cmdVideoBtn", text: "先去看今日视频侦察！" },
-      { el: "#activeAnswer", text: "在这里输入你的答案" },
-      { el: "#cmdCheckBtn", text: "点击这里检查对不对！" }
+      { el: "#cmdVideoBtn", text: "先点这里去看今天的视频！" },
+      { el: "#cmdDoneVideoBtn", text: "看完回来，点这里开始做题" },
+      { el: "#cmdCheckBtn", text: "算完后点这里确认答案" }
     ];
     let guideStep = 0;
     function clearGuideHighlight() {
@@ -4063,7 +4116,6 @@
     }
     function maybeStartGuide() {
       if (localStorage.getItem(GUIDE_KEY) === "1") return;
-      // Ensure quiz UI exists for later steps — if still on video, still guide timer+video
       guideStep = 0;
       const overlay = document.getElementById("guideOverlay");
       overlay.hidden = false;
@@ -4099,16 +4151,6 @@
         return;
       }
       guideStep += 1;
-      // If entering answer step but still on video, auto enter quiz for demo highlight
-      if (guideStep === 2 && missionPhase === "video" && activeCourse) {
-        const key = dayKey(activeDayNum);
-        if (!progress.scoutedDays.includes(key)) {
-          progress.scoutedDays.push(key);
-          saveProgress();
-        }
-        missionPhase = "quiz";
-        mount(false);
-      }
       showGuideStep();
     });
 
@@ -4396,7 +4438,7 @@
     document.getElementById("timerPauseBtn").addEventListener("click", () => pauseMissionTimer());
     document.getElementById("timerResumeBtn").addEventListener("click", () => resumeMissionTimer());
     document.getElementById("timerResetGateBtn").addEventListener("click", () => {
-      if (!confirm("回到「接受任务」之前？计时会清零，孩子需要重新点接受任务才会开始计时。")) return;
+      if (!confirm("回到开始任务之前？计时会清零，需要重新点「开始今天的任务」。")) return;
       resetToPreTimerGate();
     });
 
@@ -4411,6 +4453,14 @@
         return;
       }
       startMissionTimer({ reset: false });
+    });
+
+    document.getElementById("cmdDoneVideoBtn").addEventListener("click", () => finishVideoAndStartQuiz());
+    document.getElementById("cmdNextDayBtn").addEventListener("click", () => openRoadmap());
+
+    document.getElementById("parentMenuBtn").addEventListener("click", () => {
+      const box = document.getElementById("parentTools");
+      setParentToolsOpen(!!(box && box.hidden));
     });
 
     document.getElementById("cmdPrevBtn").addEventListener("click", () => {
@@ -4566,7 +4616,7 @@
     document.getElementById("tacticsFab").addEventListener("click", () => setTacticsOpen(true));
     document.getElementById("tacticsCloseBtn").addEventListener("click", () => setTacticsOpen(false));
     document.getElementById("tacticsBackdrop").addEventListener("click", () => setTacticsOpen(false));
-    if (window.matchMedia("(min-width: 1100px)").matches) setTacticsOpen(true);
+    setTacticsOpen(false);
 
     document.getElementById("transferOpenBtn").addEventListener("click", openTransferPanel);
     document.getElementById("transferCloseBtn").addEventListener("click", () => {
