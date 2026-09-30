@@ -780,7 +780,11 @@
       <label style="display:block;color:#ffd08a;font-size:0.85rem;margin-bottom:6px;">密码</label>
       <input id="accountPassInput" type="password" autocomplete="current-password" placeholder="自己设一个，至少6位" maxlength="32" style="width:100%;padding:14px;margin-bottom:12px;background:#1a1a1a;border:2px solid var(--border);color:var(--text);font-family:inherit;font-size:1.1rem;" />
 
-      <button type="button" class="btn btn-orange" id="accountLoginBtn" style="width:100%;margin-bottom:12px;min-height:48px;">▶ 进入指挥部</button>
+      <button type="button" class="btn btn-orange" id="accountLoginBtn" style="width:100%;margin-bottom:10px;min-height:48px;">▶ 进入指挥部</button>
+      <button type="button" class="btn btn-ghost" id="accountSkipBtn" style="width:100%;margin-bottom:12px;min-height:44px;">⏭ 跳过登录 · 本机试用</button>
+      <p style="margin:0 0 12px;color:var(--muted);font-size:0.82rem;line-height:1.45;">
+        试用进度只保存在这台电脑，不会上云。孩子那台已配好云同步的可继续用账号登录。
+      </p>
 
       <details id="accountSetupDetails" style="margin-bottom:12px;color:var(--muted);font-size:0.88rem;line-height:1.6;">
         <summary style="cursor:pointer;color:#ffd08a;font-weight:700;">家长首次开通云同步（阿里云 · 支付宝实名，不绑微信）</summary>
@@ -1570,10 +1574,19 @@
     const FAMILY_OSS_AK_KEY = "redAlert_oss_ak";
     const FAMILY_OSS_SK_KEY = "redAlert_oss_sk";
     const FAMILY_SALT = "redAlert_family_salt_2026";
+    const GUEST_TRIAL_KEY = "redAlert_guest_trial";
     let cloudPushTimer = null;
     let accountReady = false;
     let _ossClient = null;
     let _ossSig = "";
+
+    function isGuestTrial() {
+      return localStorage.getItem(GUEST_TRIAL_KEY) === "1";
+    }
+    function setGuestTrial(on) {
+      if (on) localStorage.setItem(GUEST_TRIAL_KEY, "1");
+      else localStorage.removeItem(GUEST_TRIAL_KEY);
+    }
 
     function getOssCfg() {
       const cfg = (window.RED_ALERT_CLOUD && window.RED_ALERT_CLOUD.oss) || {};
@@ -1645,9 +1658,13 @@
       const logoutBtn = document.getElementById("accountLogoutBtn");
       const closeBtn = document.getElementById("accountCloseBtn");
       const details = document.getElementById("accountSetupDetails");
+      const skipBtn = document.getElementById("accountSkipBtn");
       const user = getAccountUser();
       if (chip) {
-        if (user) {
+        if (isGuestTrial() && !isLoggedIn()) {
+          chip.hidden = false;
+          chip.textContent = "🧪 本机试用";
+        } else if (user) {
           chip.hidden = false;
           chip.textContent = "👤 " + user;
         } else {
@@ -1655,9 +1672,13 @@
         }
       }
       if (logoutBtn) logoutBtn.hidden = !isLoggedIn();
-      if (closeBtn) closeBtn.hidden = !isLoggedIn();
-      if (!cloudReady()) {
-        if (status) status.textContent = "请先展开下方「家长首次开通云同步」";
+      if (closeBtn) closeBtn.hidden = !(isLoggedIn() || isGuestTrial());
+      if (skipBtn) skipBtn.hidden = !!(isLoggedIn() && cloudReady());
+      if (isGuestTrial() && !isLoggedIn()) {
+        if (status) status.textContent = "本机试用中：进度只存在这台电脑，可随时登录开启云同步";
+        if (details) details.open = false;
+      } else if (!cloudReady()) {
+        if (status) status.textContent = "请先展开下方「家长首次开通云同步」——或点「跳过登录」先试用";
         if (details) details.open = true;
       } else if (!isLoggedIn()) {
         if (status) status.textContent = "输入账号密码进入（第一次会自动建档）";
@@ -1828,11 +1849,25 @@
       document.getElementById("accountUserInput").value = getAccountUser();
       document.getElementById("accountPassInput").value = getAccountPass();
       refreshAccountUI();
-      if (force || !isLoggedIn() || !cloudReady()) overlay.classList.add("show");
+      const canEnter = (isLoggedIn() && cloudReady()) || isGuestTrial();
+      if (force || !canEnter) overlay.classList.add("show");
       else overlay.classList.remove("show");
     }
     function hideAccountGate() {
       document.getElementById("accountOverlay").classList.remove("show");
+    }
+    function enterGuestTrial() {
+      unlockAudioFromUserGesture();
+      setGuestTrial(true);
+      accountReady = true;
+      refreshAccountUI();
+      hideAccountGate();
+      try {
+        sessionStorage.removeItem("redAlert_welcome_session");
+        missionAccepted = false;
+      } catch (e) {}
+      mount(true);
+      showToast("🧪 本机试用 · 进度不同步云端");
     }
 
     /* ========== 换机备份 / 恢复（家长操作，无账号） ========== */
@@ -4484,10 +4519,10 @@
 
     document.getElementById("accountOpenBtn").addEventListener("click", () => showAccountGate(true));
     document.getElementById("accountCloseBtn").addEventListener("click", () => {
-      if (isLoggedIn()) hideAccountGate();
+      if (isLoggedIn() || isGuestTrial()) hideAccountGate();
     });
     document.getElementById("accountOverlay").addEventListener("click", (e) => {
-      if (e.target.id === "accountOverlay" && isLoggedIn() && accountReady) hideAccountGate();
+      if (e.target.id === "accountOverlay" && accountReady && (isLoggedIn() || isGuestTrial())) hideAccountGate();
     });
     document.getElementById("familyConfigLinkBtn").addEventListener("click", async () => {
       const draft = {
@@ -4553,6 +4588,7 @@
           showToast("✅ 账号已创建，进度将自动保存到云端");
         }
         accountReady = true;
+        setGuestTrial(false);
         try {
           sessionStorage.removeItem("redAlert_welcome_session");
           missionAccepted = false;
@@ -4572,6 +4608,7 @@
       }
     }
     document.getElementById("accountLoginBtn").addEventListener("click", doAccountLogin);
+    document.getElementById("accountSkipBtn").addEventListener("click", enterGuestTrial);
     document.getElementById("accountPassInput").addEventListener("keydown", (e) => {
       if (e.key === "Enter") doAccountLogin();
     });
@@ -4579,6 +4616,7 @@
       if (!confirm("退出后本机不再自动同步。云端进度还在，下次用同一账号密码可找回。")) return;
       localStorage.removeItem(ACCOUNT_USER_KEY);
       localStorage.removeItem(ACCOUNT_PASS_KEY);
+      setGuestTrial(false);
       accountReady = false;
       refreshAccountUI();
       showAccountGate(true);
@@ -4732,24 +4770,25 @@
       });
     })();
 
-    // boot：配置链接 → 登录门 → 云同步 → 今日任务
+    // boot：配置链接 → 登录门（可跳过试用）→ 云同步 → 今日任务
     (async function boot() {
       const cfgApplied = tryApplyConfigFromUrl();
       const restored = tryRestoreFromUrl();
-      if (cfgApplied || (isLoggedIn() && cloudReady())) {
+      if (cfgApplied || (isLoggedIn() && cloudReady()) || isGuestTrial()) {
         accountReady = true;
       }
       showAccountGate(!accountReady);
       if (!accountReady) {
         refreshAccountUI();
-        return; // 等登录后再 mount
+        return; // 等登录或跳过后再 mount
       }
       let cloudPulled = false;
       try {
-        cloudPulled = await bootCloudSync();
+        if (!isGuestTrial()) cloudPulled = await bootCloudSync();
       } catch (e) { /* ignore */ }
       hideAccountGate();
       mount(true);
+      if (isGuestTrial() && !isLoggedIn()) setTimeout(() => showToast("🧪 本机试用中"), 400);
       if (cfgApplied) setTimeout(() => showToast("🔑 云同步已自动配置"), 500);
       if (restored) setTimeout(() => showToast("✅ 进度已从链接恢复"), 700);
       else if (cloudPulled) setTimeout(() => showToast("☁️ 已同步云端进度"), 700);
